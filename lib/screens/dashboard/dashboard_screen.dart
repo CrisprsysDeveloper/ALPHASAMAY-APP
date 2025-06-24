@@ -126,12 +126,36 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.person, color: ColorConstants.appColor),
-            title: Text("Face Registration"),
+            title: Text("My Account"),
             onTap: () {
-              Get.back();
-              Get.toNamed(Routes.faceRegistrationListScreen);
+              // Get.back();
+              Get.toNamed(Routes.myAccount);
             },
           ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Workforce Management"),
+            onTap: () {
+              Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Check-in/Out"),
+            onTap: () {
+              Get.toNamed(Routes.checkInOutScreen);
+              // Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Check-in/Out Approvals"),
+            onTap: () {
+              Get.toNamed(Routes.checkInOutApproveScreen);
+              // Get.back();
+            },
+          ),
+
           ListTile(
             leading: Icon(Icons.person, color: ColorConstants.appColor),
             title: Text("Time Events"),
@@ -142,7 +166,50 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.person, color: ColorConstants.appColor),
-            title: Text("My Account"),
+            title: Text("Time Justification"),
+            onTap: () {
+              Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Face Registration"),
+            onTap: () {
+              Get.back();
+              Get.toNamed(Routes.faceRegistrationListScreen);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Leave Quota"),
+            onTap: () {
+              Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Leave Request"),
+            onTap: () {
+              Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Notification Dashboard"),
+            onTap: () {
+              Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Measurements"),
+            onTap: () {
+              Get.back();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: ColorConstants.appColor),
+            title: Text("Measurement Summary"),
             onTap: () {
               Get.back();
             },

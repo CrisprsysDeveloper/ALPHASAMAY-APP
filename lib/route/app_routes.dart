@@ -9,6 +9,9 @@ abstract class Routes {
   static const faceRegistrationScreen = '/faceRegistrationScreen';
   static const timeEventOverScreen = '/timeEventOverScreen';
   static const createTimeEventsScreen = '/createTimeEventsScreen';
+  static const myAccount = '/myAccount';
+  static const checkInOutScreen = '/checkInOutScreen';
+  static const checkInOutApproveScreen = '/checkInOutApproveScreen';
 
 
 }

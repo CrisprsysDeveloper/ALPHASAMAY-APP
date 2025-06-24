@@ -4,6 +4,7 @@ import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class FaceRegistrationListScreen extends StatelessWidget {
@@ -51,15 +52,35 @@ class FaceRegistrationListScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(color: Colors.grey.shade300, height: 96, width: 90),
-                Expanded(child: Column()),
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                  Text(
+                  "Employee/User",
+                  style: interTextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                    size: 12.sp
+                  )),
+                  Text(
+                  "1234567890-Venkot",
+                  style: interTextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                      size: 15.sp
+                  )),
+                  ],
+                )),
                 Padding(
                   padding: EdgeInsets.only(bottom: 10, right: 10),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       widgetContainer(
                         icon: Icons.delete,
