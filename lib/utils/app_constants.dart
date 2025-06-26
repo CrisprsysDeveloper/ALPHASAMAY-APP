@@ -6,14 +6,34 @@ class AppConstants {
   static const String fontFamily = 'Inter';
 
   //API related
-  static const String baseUrl = 'http://18.220.85.13/api/';
+  static const String baseUrl = 'http://apis.crisprsys.net/';
 
-  static const String loginApi = 'login';
+  static const String loginApi = 'api/ClientAuthorization/Login';
+
+  static const String updateUserTokenForNotificationApi =
+      'api/NotificationToken/UpdateUserTokenForNotification';
+
+  static const String userTrackerApi =
+      'api/ClientAuthorization/MobileUserTracker';
+
+  static const String clientAuthenticationApi =
+      'api/ClientAuthorization/GetCrisprsysMobAppOTP';
+
+  static const String otpVerificationApi =
+      'api/ClientAuthorization/CrisprsysMobAppOTPVerification';
 
   //
   static const String isLoggedIn = 'is_logged_in';
   static String authType = 'authType';
   static String accessToken = 'token';
+
+  static String prefClientID = 'prefClientID';
+  static String prefPIN = 'prefPin';
+
+  static String prefUsername = 'prefUsername';
+  static String prefPassword = 'prefPassword';
+  static String prefIsRemember = 'prefIsRemember';
+
 
   //login screen
   static const String clientAuthentication = 'Client Authentication';
@@ -33,10 +53,6 @@ class AppConstants {
   static const String checkIn = 'Password';
   static const String faceRegistrationList = 'Face Registration List';
   static const String timeEvents = 'Time Events';
-
-
-
-
 
   static const String emailIsRequired = 'Email is required';
   static const String passwordIsRequired = 'Password is required';

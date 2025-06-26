@@ -1,12 +1,12 @@
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/route/app_pages.dart';
+import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 
 class SetPinScreen extends StatefulWidget {
   const SetPinScreen({Key? key}) : super(key: key);
@@ -17,30 +17,119 @@ class SetPinScreen extends StatefulWidget {
 
 class _SetPinScreenState extends State<SetPinScreen> {
   List<String> pin = [];
+  List<String> confirmPin = [];
+  bool isConfirming = false;
 
-  void onKeyboardTap(String value) {
-    if (pin.length < 4) {
-      setState(() {
-        pin.add(value);
+  final box = GetStorage();
+  var setPin = '';
+
+  @override
+  void initState() {
+    super.initState();
+    printf('<----init----SetPinScreen---->');
+    loadSavedCredentials();
+  }
+
+  void loadSavedCredentials() {
+    final pin = box.read(AppConstants.prefPIN);
+
+    if (pin != null) {
+      setPin = pin;
+    }
+    printf('<---set-pin--->$pin');
+  }
+
+  void onKeyboardTap(String value) async {
+    // Login mode (PIN already set)
+    if (setPin.isNotEmpty) {
+      if (pin.length < 4) {
+        setState(() {
+          pin.add(value);
+        });
+
         if (pin.length == 4) {
-          String finalPin = pin.join(); // "4568"
-          printf('<-----pin-set-----> $finalPin');
-          Fluttertoast.showToast(
-            msg: "PIN set successfully",
-            toastLength: Toast.LENGTH_SHORT,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-          );
-          Get.toNamed(Routes.dashboardScreen);
+          await Future.delayed(const Duration(milliseconds: 200));
+          if (setPin == pin.join()) {
+            printf('<---navigate-to-dashboard--->');
+            Get.toNamed(Routes.dashboardScreen);
+          } else {
+            Fluttertoast.showToast(
+              msg: "Incorrect PIN",
+              toastLength: Toast.LENGTH_SHORT,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+            );
+            setState(() {
+              pin.clear();
+            });
+          }
         }
-      });
+      }
+    }
+    // Set new PIN mode
+    else {
+      if (!isConfirming) {
+        if (pin.length < 4) {
+          setState(() {
+            pin.add(value);
+          });
+
+          if (pin.length == 4) {
+            await Future.delayed(const Duration(milliseconds: 200));
+            setState(() {
+              isConfirming = true;
+            });
+          }
+        }
+      } else {
+        if (confirmPin.length < 4) {
+          setState(() {
+            confirmPin.add(value);
+          });
+
+          if (confirmPin.length == 4) {
+            if (pin.join() == confirmPin.join()) {
+              String finalPin = pin.join();
+              printf('<-----pin-set-----> $finalPin');
+
+              Fluttertoast.showToast(
+                msg: "PIN set successfully",
+                toastLength: Toast.LENGTH_SHORT,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+              );
+
+              await GetStorage().write(AppConstants.prefPIN, finalPin);
+              Get.toNamed(Routes.dashboardScreen);
+            } else {
+              Fluttertoast.showToast(
+                msg: "PINs do not match. Try again.",
+                toastLength: Toast.LENGTH_SHORT,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+              );
+
+              setState(() {
+                pin.clear();
+                confirmPin.clear();
+                isConfirming = false;
+              });
+            }
+          }
+        }
+      }
     }
   }
 
+
   void onBackspace() {
-    if (pin.isNotEmpty) {
-      setState(() => pin.removeLast());
-    }
+    setState(() {
+      if (!isConfirming && pin.isNotEmpty) {
+        pin.removeLast();
+      } else if (isConfirming && confirmPin.isNotEmpty) {
+        confirmPin.removeLast();
+      }
+    });
   }
 
   Widget pinIndicator(bool filled) {
@@ -93,6 +182,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentPin = isConfirming ? confirmPin : pin;
+
     return Scaffold(
       backgroundColor: ColorConstants.appColor,
       appBar: AppBar(
@@ -104,16 +195,21 @@ class _SetPinScreenState extends State<SetPinScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Please Set Your PIN',
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
+          setPin.isNotEmpty
+              ? Text(
+                'Please Enter PIN',
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              )
+              : Text(
+                isConfirming ? 'Re-enter Your PIN' : 'Please Set Your PIN',
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
               4,
-              (index) => pinIndicator(index < pin.length),
+              (index) => pinIndicator(index < currentPin.length),
             ),
           ),
           const SizedBox(height: 40),

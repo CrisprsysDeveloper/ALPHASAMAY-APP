@@ -20,52 +20,62 @@ class AuthenticationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: CommonAppBar(text: AppConstants.clientAuthentication),
-        body: SizedBox(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                20.sbh,
-                AppTextField(
-                  controller: controller.textCompany,
-                  isPassword: false,
-                  textHint: AppConstants.companyId,
-                ),
-                20.sbh,
-                AppTextField(
-                  controller: controller.textEmail,
-                  isPassword: false,
-                  textHint: AppConstants.email,
-                ),
-                20.sbh,
-                CustomButton(
-                  horizontalMargin: 0,
-                  icon: "",
-                  text: AppConstants.submit.toUpperCase(),
-                  onPressed: () {
-                    Get.toNamed(Routes.dashboardScreen);
-                  },
-                ),
-                30.sbh,
-                InkWell(
-                  onTap: () {
-                    Get.toNamed(Routes.loginScreen);
-                  },
-                  child: Text(
-                    AppConstants.backToLogin.toUpperCase(),
-                    style: interTextStyle(
-                      color: ColorConstants.appColor,
-                      size: 16.sp,
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        onPanDown: (_) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: CommonAppBar(text: AppConstants.clientAuthentication),
+          body: SizedBox(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  20.sbh,
+                  AppTextField(
+                    textType: TextInputType.number,
+                    controller: controller.textCompany,
+                    isPassword: false,
+                    textHint: AppConstants.companyId,
+                  ),
+                  20.sbh,
+                  AppTextField(
+                    textType: TextInputType.emailAddress,
+                    controller: controller.textEmail,
+                    isPassword: false,
+                    textHint: AppConstants.email,
+                  ),
+                  20.sbh,
+                  CustomButton(
+                    horizontalMargin: 0,
+                    icon: "",
+                    text: AppConstants.submit.toUpperCase(),
+                    onPressed: () {
+                      controller.buttonSubmit();
+                    },
+                  ),
+                  30.sbh,
+                  InkWell(
+                    onTap: () {
+                      Get.toNamed(Routes.loginScreen);
+                    },
+                    child: Text(
+                      AppConstants.backToLogin.toUpperCase(),
+                      style: interTextStyle(
+                        color: ColorConstants.appColor,
+                        size: 16.sp,
+                      ),
                     ),
                   ),
-                ),
-                20.sbh,
-              ],
+                  20.sbh,
+                ],
+              ),
             ),
           ),
         ),

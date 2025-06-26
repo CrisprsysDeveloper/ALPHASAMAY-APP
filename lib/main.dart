@@ -57,6 +57,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/*
+
+ClientAuth
+ClientId : 1
+Email : amcssoft@gmail.com
+
+Login
+username : Call
+password : Crisprsys@123
+
+*/
 
 // TODO ios
 // iOS: Add in Info.plist:

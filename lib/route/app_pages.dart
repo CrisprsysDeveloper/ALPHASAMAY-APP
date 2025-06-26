@@ -8,6 +8,7 @@ import 'package:crysprsys/bindings/login_binding.dart';
 import 'package:crysprsys/bindings/time_event_over_binding.dart';
 import 'package:crysprsys/screens/authentication/authentication_screen.dart';
 import 'package:crysprsys/screens/authentication/login_screen.dart';
+import 'package:crysprsys/screens/authentication/otp_screen.dart';
 import 'package:crysprsys/screens/dashboard/check_in_out_approve_list.dart';
 import 'package:crysprsys/screens/dashboard/check_in_out_screen.dart';
 import 'package:crysprsys/screens/dashboard/dashboard_screen.dart';
@@ -91,5 +92,10 @@ class AppPages {
       binding: CheckInOutApproveBinding(),
       transition: Transition.rightToLeftWithFade,
     ),
+    // GetPage(
+    //   name: Routes.otpScreen,
+    //   page: () => OtpScreen(),
+    //   transition: Transition.rightToLeftWithFade,
+    // ),
   ];
 }

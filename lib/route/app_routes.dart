@@ -12,6 +12,7 @@ abstract class Routes {
   static const myAccount = '/myAccount';
   static const checkInOutScreen = '/checkInOutScreen';
   static const checkInOutApproveScreen = '/checkInOutApproveScreen';
+  static const otpScreen = '/otpScreen';
 
 
 }
