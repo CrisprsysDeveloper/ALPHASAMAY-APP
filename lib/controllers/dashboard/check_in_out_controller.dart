@@ -13,7 +13,7 @@ class CheckInOutController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--CreateTimeEventsController----->');
+    printf('<------init--CheckInOutController----->');
   }
 
 }

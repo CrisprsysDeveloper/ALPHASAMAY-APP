@@ -11,8 +11,7 @@ import '../../controllers/dashboard/check_in_out_controller.dart';
 class CheckInOutScreen extends StatelessWidget {
   CheckInOutScreen({super.key});
 
-  final CheckInOutController controller =
-      Get.find<CheckInOutController>();
+  final CheckInOutController controller = Get.find<CheckInOutController>();
 
   @override
   Widget build(BuildContext context) {
@@ -107,13 +106,14 @@ class CheckInOutScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                    "Partner Type",
-                    style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp
-                    )),
-                 2.sbh,
+                  "Partner Type",
+                  style: interTextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                    size: 12.sp,
+                  ),
+                ),
+                2.sbh,
                 Container(
                   color: Colors.grey.shade300,
                   child: Padding(
@@ -128,7 +128,8 @@ class CheckInOutScreen extends StatelessWidget {
                       items:
                           ['Partner Type', 'Employee Type']
                               .map(
-                                (e) => DropdownMenuItem(value: e, child: Text(e)),
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
                               )
                               .toList(),
                       onChanged: (_) {},
@@ -139,18 +140,19 @@ class CheckInOutScreen extends StatelessWidget {
             ),
             30.sbh,
             Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                    "Employee Type",
-                    style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp
-                    )),
+                  "Employee Type",
+                  style: interTextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                    size: 12.sp,
+                  ),
+                ),
                 2.sbh,
-          Container(
+                Container(
                   color: Colors.grey.shade300,
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.w),
@@ -164,7 +166,8 @@ class CheckInOutScreen extends StatelessWidget {
                       items:
                           ['Partner Type', 'Employee Type']
                               .map(
-                                (e) => DropdownMenuItem(value: e, child: Text(e)),
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
                               )
                               .toList(),
                       onChanged: (_) {},
@@ -175,77 +178,83 @@ class CheckInOutScreen extends StatelessWidget {
             ),
             30.sbh,
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         "Date",
                         style: interTextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w700,
-                            size: 12.sp
-                        )),
-                    2.sbh,
-                    Container(
-                      width: 150,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 10.h),
-                        child:  Text("24/06/2025",
-                          style: interTextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            size: 14,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
+                      ),
+                      2.sbh,
+                      Container(
+                        width: Get.width,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 10.h,
+                          ),
+                          child: Text(
+                            "24/06/2025",
+                            style: interTextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              size: 14,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
+                20.sbw,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
                         "Time",
                         style: interTextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w700,
-                            size: 12.sp
-                        )),
-                    2.sbh,
-                    Container(
-                      width: 150,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 10.h),
-                        child:  Text("12:15:00",
-                          style: interTextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            size: 14,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
+                      ),
+                      2.sbh,
+                      Container(
+                        width: Get.width,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 10.h,
+                          ),
+                          child: Text(
+                            "12:15:00",
+                            style: interTextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              size: 14,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-
-
             30.sbh,
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 180,
+                Expanded(
                   child: CustomButton(
                     horizontalMargin: 0,
                     icon: "",
@@ -253,8 +262,8 @@ class CheckInOutScreen extends StatelessWidget {
                     onPressed: () {},
                   ),
                 ),
-                Container(
-                  width: 180,
+                10.sbw,
+                Expanded(
                   child: CustomButton(
                     horizontalMargin: 0,
                     icon: "",

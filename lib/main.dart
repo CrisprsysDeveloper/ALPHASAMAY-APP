@@ -74,3 +74,6 @@ password : Crisprsys@123
 
 // <key>NSPhotoLibraryUsageDescription</key>
 // <string>We need access to your photo library to update your profile image.</string>
+
+
+//& "C:\Users\DELL\Downloads\development_tool\flutter_sdk\flutter_windows_3.29.2-stable\flutter\bin\flutter.bat" pub run flutter_launcher_icons:main

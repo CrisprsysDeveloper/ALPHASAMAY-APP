@@ -251,7 +251,7 @@ class DashboardScreen extends StatelessWidget {
             title: Text("Logout"),
             onTap: () {
               Get.back();
-              Get.toNamed(Routes.loginScreen);
+              controller.buttonLogout();
             },
           ),
         ],
