@@ -13,6 +13,11 @@ abstract class Routes {
   static const checkInOutScreen = '/checkInOutScreen';
   static const checkInOutApproveScreen = '/checkInOutApproveScreen';
   static const otpScreen = '/otpScreen';
+  static const timeJustificationScreen = '/timeJustificationScreen';
+  static const justificationAddScreen = '/justificationAddScreen';
+  static const leaveRequestScreen = '/leaveRequestScreen';
+  static const leaveQuotaScreen = '/leaveQuotaScreen';
+
 
 
 }

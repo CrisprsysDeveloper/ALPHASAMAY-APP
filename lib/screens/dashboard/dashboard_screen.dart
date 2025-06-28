@@ -185,7 +185,7 @@ class DashboardScreen extends StatelessWidget {
                   leading: Icon(Icons.schedule, color: ColorConstants.appColor),
                   title: Text("Time Justification"),
                   onTap: () {
-                    Get.back();
+                    Get.toNamed(Routes.timeJustificationScreen);
                   },
                 ),
                 ListTile(
@@ -202,14 +202,15 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   title: Text("Leave Quota"),
                   onTap: () {
-                    Get.back();
-                  },
+                    Get.toNamed(Routes.leaveQuotaScreen);
+                    },
                 ),
                 ListTile(
                   leading: Icon(Icons.send, color: ColorConstants.appColor),
                   title: Text("Leave Request"),
                   onTap: () {
-                    Get.back();
+                    Get.toNamed(Routes.leaveRequestScreen);
+                    // Get.back();
                   },
                 ),
                 ListTile(
