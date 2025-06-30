@@ -1,4 +1,4 @@
-package com.crisprsys.main
+package com.alphasamay.main
 
 import io.flutter.embedding.android.FlutterActivity
 
