@@ -85,6 +85,7 @@ class LoginScreen extends StatelessWidget {
                       controller: controller.textPassword,
                       isPassword: true,
                       textHint: AppConstants.password,
+
                     ),
                     10.sbh,
                     Row(

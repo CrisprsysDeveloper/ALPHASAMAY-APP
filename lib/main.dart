@@ -37,12 +37,10 @@ class MyApp extends StatelessWidget {
             duration: Durations.medium4,
             reverseDuration: Durations.medium4,
             overlayColor: Colors.black.withOpacity(0.5),
-            overlayWidgetBuilder: (_) => Center(
-              child: SpinKitCircle(
-                color: ColorConstants.white,
-                size: 50.h,
-              ),
-            ),
+            overlayWidgetBuilder:
+                (_) => Center(
+                  child: SpinKitCircle(color: ColorConstants.white, size: 50.h),
+                ),
             child: GetMaterialApp(
               debugShowCheckedModeBanner: false,
               initialRoute: Routes.splash,
@@ -75,5 +73,18 @@ password : Crisprsys@123
 // <key>NSPhotoLibraryUsageDescription</key>
 // <string>We need access to your photo library to update your profile image.</string>
 
+// for location
+
+// <key>NSLocationWhenInUseUsageDescription</key>
+// <string>This app needs access to your location.</string>
+// <key>NSLocationAlwaysUsageDescription</key>
+// <string>This app needs access to your location.</string>
 
 //& "C:\Users\DELL\Downloads\development_tool\flutter_sdk\flutter_windows_3.29.2-stable\flutter\bin\flutter.bat" pub run flutter_launcher_icons:main
+
+//& "C:\Users\DELL\Downloads\development_tool\flutter_sdk\flutter_windows_3.29.2-stable\flutter\bin\flutter.bat" build apk --debug
+
+/*
+
+
+*/

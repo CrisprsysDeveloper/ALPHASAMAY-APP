@@ -37,10 +37,14 @@ class TimeJustificationController extends GetxController {
   String selectedYear = '2025';
   String selectedMonth = 'February';
 
+
+
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--TimeEventOverController----->');
+    printf('<------init--TimeJustificationController----->');
+
   }
+
 
 }

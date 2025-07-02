@@ -26,6 +26,14 @@ class AppTextField extends StatefulWidget {
 }
 
 class TextFieldState extends State<AppTextField> {
+  bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.isPassword;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,7 +45,7 @@ class TextFieldState extends State<AppTextField> {
         child: TextField(
           keyboardType: widget.textType ?? TextInputType.text,
           controller: widget.controller,
-          obscureText: widget.isPassword,
+          obscureText: _obscureText,
           maxLength: widget.maxLimit,
           style: interTextStyle(size: 14, color: Colors.black),
           decoration: InputDecoration(
@@ -50,6 +58,20 @@ class TextFieldState extends State<AppTextField> {
               borderRadius: BorderRadius.circular(5),
               borderSide: BorderSide.none,
             ),
+            suffixIcon:
+                widget.isPassword
+                    ? IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                    : null,
           ),
         ),
       ),

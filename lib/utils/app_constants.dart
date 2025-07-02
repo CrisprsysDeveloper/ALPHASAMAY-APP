@@ -22,6 +22,14 @@ class AppConstants {
   static const String otpVerificationApi =
       'api/ClientAuthorization/CrisprsysMobAppOTPVerification';
 
+  // Time Events
+  static const String timeEventListApi = 'api/TimeEvents/GetTimeEventsData';
+  static const String deleteEventApi = 'api/TimeEvents/DELETEAttendEvents';
+
+  static const String approvalListApi = 'api/TimeEventApprovals/GetTimeEventApprovalsData';
+
+
+
   //
   static const String isLoggedIn = 'is_logged_in';
   static String authType = 'authType';
@@ -33,7 +41,6 @@ class AppConstants {
   static String prefUsername = 'prefUsername';
   static String prefPassword = 'prefPassword';
   static String prefIsRemember = 'prefIsRemember';
-
 
   //login screen
   static const String clientAuthentication = 'Client Authentication';

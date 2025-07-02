@@ -1,5 +1,6 @@
 import 'package:crysprsys/controllers/dashboard/time_event_over_controller.dart';
 import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
@@ -124,26 +125,27 @@ class TimeEventOverScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Expanded(
-                child: ListView.builder(
-                  itemCount: controller.records.length,
-                  itemBuilder: (context, index) {
-                    var record = controller.records[index];
-                    bool isCheckIn = record['checkType'] == 'Check In';
-                    Color borderColor =
-                        isCheckIn ? Colors.green : Colors.orange;
-
-                    return widgetTimeEvents(
-                      record: record,
-                      borderColor: borderColor,
-                    );
-                  },
-                ),
+                child: Obx(()
+                {
+                  return ListView.builder(
+                    itemCount: controller.employeeList.length,
+                    itemBuilder: (context, index) {
+                      final emp = controller.employeeList[index];
+                      return widgetTimeEvents(
+                        employee: emp,
+                        borderColor: Colors.green,
+                      );
+                    },
+                  );
+                }),
               ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {}, // Change icon if needed
+          onPressed: () {
+            Get.toNamed(Routes.checkInOutScreen);
+          }, // Change icon if needed
           backgroundColor: ColorConstants.appColor,
           shape: const CircleBorder(),
           child: Icon(Icons.add, color: Colors.white), // Optional
@@ -152,7 +154,7 @@ class TimeEventOverScreen extends StatelessWidget {
     );
   }
 
-  Widget widgetTimeEvents({borderColor, record}) {
+  Widget widgetTimeEvents({borderColor, employee}) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -182,7 +184,8 @@ class TimeEventOverScreen extends StatelessWidget {
                     ),
                     3.sbh,
                     Text(
-                      record['name'],
+                      employee.value,
+                      //record['name'],
                       style: interTextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -218,7 +221,7 @@ class TimeEventOverScreen extends StatelessWidget {
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
                 onTap: () {
-                  printf('<---on-tap-delete--->');
+                  controller.showDeleteEventDialog();
                 },
               ),
             ],
@@ -240,7 +243,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     ),
                     3.sbh,
                     Text(
-                      record['userId'],
+                      employee.id, //record['userId'],
                       style: interTextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -260,11 +263,15 @@ class TimeEventOverScreen extends StatelessWidget {
                         SizedBox(
                           height: 15,
                           width: 15,
-                          child: Icon(Icons.access_time, size: 15),
+                          child: Icon(
+                            Icons.access_time,
+                            size: 15,
+                            color: Colors.transparent,
+                          ),
                         ),
                         2.sbw,
                         Text(
-                          record['datetime'],
+                          '', //record['datetime'],
                           style: interTextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -275,7 +282,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     ),
                     4.sbw,
                     Text(
-                      "Check Type: ${record['checkType']}",
+                      '', //"Check Type: ${record['checkType']}",
                       style: interTextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
