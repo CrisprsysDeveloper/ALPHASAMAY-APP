@@ -28,6 +28,8 @@ class AppConstants {
 
   static const String approvalListApi = 'api/TimeEventApprovals/GetTimeEventApprovalsData';
 
+  static const String faceRecognitionListApi = 'api/FaceRekognition/GetAttendanceUserProfiles';
+
 
 
   //

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crysprsys/controllers/dashboard/face_registration_list_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/route/app_pages.dart';
@@ -39,123 +40,101 @@ class FaceRegistrationListScreen extends StatelessWidget {
         //   SizedBox(width: 10),
         // ],
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(10),
-        itemCount: controller.users.length,
-        itemBuilder: (context, index) {
-          final user = controller.users[index];
-          return Card(
-            elevation: 1,
-            color: Colors.white,
-            margin: EdgeInsets.only(bottom: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(color: Colors.grey.shade300, height: 96, width: 90),
-                Expanded(child: Column(
+      body:
+      Expanded(
+        child: Obx(()
+        {
+          return ListView.builder(
+            padding: EdgeInsets.only(bottom: 100),
+            itemCount: controller.faceUserList.length,
+            itemBuilder: (context, index) {
+              final emp = controller.faceUserList[index];
+              return  Card(
+                elevation: 1,
+                color: Colors.white,
+                margin: EdgeInsets.only(bottom: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                  Text(
-                  "Employee/User",
-                  style: interTextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w700,
-                    size: 12.sp
-                  )),
-                  Text(
-                  "1234567890-Venkot",
-                  style: interTextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w900,
-                      size: 15.sp
-                  )),
-                  ],
-                )),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10, right: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      widgetContainer(
-                        icon: Icons.delete,
-                        bgColors: ColorConstants.appColor,
-                        borderColor: ColorConstants.appColor,
-                        iconColor: Colors.white,
-                        onTap: () {
-                          printf('<---on-tap-delete--->');
-                        },
-                      ),
-                      10.sbw,
-                      widgetContainer(
-                        icon: Icons.edit,
-                        bgColors: ColorConstants.appColor,
-                        borderColor: ColorConstants.appColor,
-                        iconColor: Colors.white,
-                        onTap: () {
-                          printf('<---on-tap-edit--->');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
 
-          return Card(
-            elevation: 1,
-            margin: EdgeInsets.only(bottom: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListTile(
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  user['image']!,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
+                    Container(
+                      height: 96,
+                      width: 90,
+                      child: CachedNetworkImage(
+                        imageUrl: emp.attendanceUserUImage,
+                        placeholder: (context, url) => Center(
+                          child: SizedBox(
+                            height: 24, // Adjust size as needed
+                            width: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2), // Thinner circle
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        fit: BoxFit.cover, // Optional: scale image to fill container
+                      ),
+                    ),
+                    5.sbw,
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                            "Employee/User",
+                            style: interTextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w700,
+                                size: 12.sp
+                            )),
+                        Text(
+                            emp.objectNo,
+                            style: interTextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w900,
+                                size: 15.sp
+                            )),
+                      ],
+                    )),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 10, right: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          widgetContainer(
+                            icon: Icons.delete,
+                            bgColors: ColorConstants.appColor,
+                            borderColor: ColorConstants.appColor,
+                            iconColor: Colors.white,
+                            onTap: () {
+                              printf('<---on-tap-delete--->');
+                              controller.showDeleteEventDialog();
+                            },
+                          ),
+                          10.sbw,
+                          widgetContainer(
+                            icon: Icons.edit,
+                            bgColors: ColorConstants.appColor,
+                            borderColor: ColorConstants.appColor,
+                            iconColor: Colors.white,
+                            onTap: () {
+                              printf('<---on-tap-edit--->');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              title: Text(
-                'Employee/User',
-                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-              ),
-              subtitle: Text('${user['id']}-${user['name']}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.delete, color: Colors.white),
-                    onPressed: () {},
-                    color: Colors.deepPurple,
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      shape: CircleBorder(),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.edit, color: Colors.white),
-                    onPressed: () {},
-                    color: Colors.deepPurple,
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      shape: CircleBorder(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+              );
+            },
           );
-        },
+        }),
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Get.toNamed(Routes.faceRegistrationScreen);
