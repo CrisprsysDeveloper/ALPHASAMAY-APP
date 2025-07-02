@@ -42,39 +42,45 @@ class CheckInOutScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  height: 120,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.deepPurple, // border color
-                      width: 1, // border width
+                Obx(
+                  () => Container(
+                    height: 120,
+                    width: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.deepPurple, width: 1),
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipOval(
+                          child:
+                              controller.image!.value != null
+                                  ? Image.file(
+                                    controller.image!.value!,
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                  )
+                                  : Image.asset(
+                                    'assets/icons/ic_user_profile.png',
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                  ),
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: IconButton(
+                            icon: Icon(Icons.camera_alt_outlined),
+                            onPressed: () {
+                              controller.showImageSourceDialog();
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: const CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage(
-                            'assets/icons/ic_user_profile.png',
-                          ), // Replace with your image
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: IconButton(
-                          icon: Icon(Icons.camera_alt_outlined),
-                          onPressed: () {
-                            printf('<----click-to-upload-profile---->');
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-
                 Container(
                   height: 120,
                   width: 120,
@@ -114,25 +120,56 @@ class CheckInOutScreen extends StatelessWidget {
                   ),
                 ),
                 2.sbh,
-                Container(
-                  color: Colors.grey.shade300,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                    child: DropdownButtonFormField<String>(
-                      value: controller.selectedYear,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
+                // Container(
+                //   color: Colors.grey.shade300,
+                //   child: Padding(
+                //     padding: EdgeInsets.symmetric(horizontal: 10.w),
+                //     child: DropdownButtonFormField<String>(
+                //       value: controller.selectedYear,
+                //       decoration: InputDecoration(
+                //         border: InputBorder.none,
+                //         enabledBorder: InputBorder.none,
+                //         focusedBorder: InputBorder.none,
+                //       ),
+                //       items:
+                //           ['Partner Type', 'Employee Type']
+                //               .map(
+                //                 (e) =>
+                //                     DropdownMenuItem(value: e, child: Text(e)),
+                //               )
+                //               .toList(),
+                //       onChanged: (_) {},
+                //     ),
+                //   ),
+                // ),
+                Obx(
+                  () => Container(
+                    color: Colors.grey.shade300,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: DropdownButtonFormField<String>(
+                        value:
+                            controller.selectedAuthId.value.isEmpty
+                                ? null
+                                : controller.selectedAuthId.value,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        items:
+                            controller.dropdownItems
+                                .map(
+                                  (item) => DropdownMenuItem<String>(
+                                    value: item['id'],
+                                    child: Text(item['label'] ?? ''),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (value) {
+                          controller.selectedAuthId.value = value ?? '';
+                        },
                       ),
-                      items:
-                          ['Partner Type', 'Employee Type']
-                              .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
-                              )
-                              .toList(),
-                      onChanged: (_) {},
                     ),
                   ),
                 ),
@@ -152,25 +189,36 @@ class CheckInOutScreen extends StatelessWidget {
                   ),
                 ),
                 2.sbh,
-                Container(
-                  color: Colors.grey.shade300,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                    child: DropdownButtonFormField<String>(
-                      value: controller.selectedYear,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
+                Obx(
+                  () => Container(
+                    color: Colors.grey.shade300,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: DropdownButtonFormField<String>(
+                        value:
+                            controller.selectedPartnerType.value.isEmpty
+                                ? null
+                                : controller.selectedPartnerType.value,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        items:
+                            controller.partnerDropdownItems
+                                .map<DropdownMenuItem<String>>((item) {
+                                  return DropdownMenuItem(
+                                    value: item['id'],
+                                    child: Text(item['label'] ?? ''),
+                                  );
+                                })
+                                .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.selectedPartnerType.value = value;
+                          }
+                        },
                       ),
-                      items:
-                          ['Partner Type', 'Employee Type']
-                              .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
-                              )
-                              .toList(),
-                      onChanged: (_) {},
                     ),
                   ),
                 ),
@@ -192,20 +240,25 @@ class CheckInOutScreen extends StatelessWidget {
                         ),
                       ),
                       2.sbh,
-                      Container(
-                        width: Get.width,
-                        color: Colors.grey.shade300,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 10.h,
-                          ),
-                          child: Text(
-                            "24/06/2025",
-                            style: interTextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              size: 14,
+                      GestureDetector(
+                        onTap: () {
+                          controller.selectDate(context);
+                        },
+                        child: Obx(
+                          () => Container(
+                            width: Get.width,
+                            color: Colors.grey.shade300,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 10.h,
+                            ),
+                            child: Text(
+                              controller.defaultDate.value,
+                              style: interTextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                size: 14,
+                              ),
                             ),
                           ),
                         ),
@@ -228,20 +281,25 @@ class CheckInOutScreen extends StatelessWidget {
                         ),
                       ),
                       2.sbh,
-                      Container(
-                        width: Get.width,
-                        color: Colors.grey.shade300,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 10.h,
-                          ),
-                          child: Text(
-                            "12:15:00",
-                            style: interTextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              size: 14,
+                      GestureDetector(
+                        onTap: () {
+                          controller.selectTime(context);
+                        },
+                        child: Obx(
+                          () => Container(
+                            width: Get.width,
+                            color: Colors.grey.shade300,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 10.h,
+                            ),
+                            child: Text(
+                              controller.defaultTime.value,
+                              style: interTextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                size: 14,
+                              ),
                             ),
                           ),
                         ),
@@ -259,7 +317,9 @@ class CheckInOutScreen extends StatelessWidget {
                     horizontalMargin: 0,
                     icon: "",
                     text: 'Check in'.toUpperCase(),
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.buttonCheckIn();
+                    },
                   ),
                 ),
                 10.sbw,

@@ -1,6 +1,23 @@
+import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/model/dashboard/checkin_checkout_type_model.dart';
 import 'package:crysprsys/repositories/token_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+
+import 'package:crysprsys/helper/snackbar_toast.dart';
+import 'package:crysprsys/utils/app_constants.dart';
+import 'package:crysprsys/utils/utility.dart';
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:intl/intl.dart';
 
 class CheckInOutController extends GetxController {
   final TokenRepository authRepository;
@@ -10,10 +27,303 @@ class CheckInOutController extends GetxController {
   String selectedYear = 'Partner Type';
   String selectedMonth = 'Employee Type';
 
+  // File? image;
+  var image = Rxn<File>();
+  final RxString pickedImagePath = ''.obs;
+  final RxString pickedImageName = ''.obs;
+
+  final box = GetStorage();
+
+  var clientId = '1';
+  var userName = 'Call';
+
+  var selectedAuthId = ''.obs;
+  RxList<Map<String, String>> dropdownItems = <Map<String, String>>[].obs;
+
+  var selectedPartnerType = ''.obs;
+  RxList<Map<String, String>> partnerDropdownItems =
+      <Map<String, String>>[].obs;
+
+  Rx<DateTime> selectedDate = DateTime.now().obs;
+  Rx<TimeOfDay> selectedTime = TimeOfDay.now().obs;
+
+  final dateFormat = DateFormat('dd/MM/yyyy');
+  final timeFormat = DateFormat('HH:mm:ss');
+
+  // Reactive formatted strings
+  RxString defaultDate = ''.obs;
+  RxString defaultTime = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
     printf('<------init--CheckInOutController----->');
+    defaultDate.value = dateFormat.format(selectedDate.value);
+
+    getCurrentLocation();
+    final now = DateTime.now();
+    final fullDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      selectedTime.value.hour,
+      selectedTime.value.minute,
+    );
+    defaultTime.value = timeFormat.format(fullDateTime);
+
+    loadSavedCredentials();
+    getDropDownListApi(clientId: clientId, userName: userName);
   }
 
+  void loadSavedCredentials() {
+    final savedUsername = box.read(AppConstants.prefUsername);
+    final companyId = box.read(AppConstants.prefClientID);
+
+    if (savedUsername != null) {
+      userName = savedUsername;
+    }
+
+    if (companyId != null) {
+      clientId = companyId;
+    }
+
+    printf('<---userName-->$userName---clientId--->$clientId');
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate.value,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate.value) {
+      selectedDate.value = picked;
+      defaultDate.value = dateFormat.format(picked);
+    }
+  }
+
+  Future<void> selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime.value,
+    );
+    if (picked != null && picked != selectedTime.value) {
+      selectedTime.value = picked;
+
+      // Convert TimeOfDay to DateTime to format as HH:mm:ss
+      final now = DateTime.now();
+      final dt = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        picked.hour,
+        picked.minute,
+      );
+      defaultTime.value = timeFormat.format(dt);
+    }
+  }
+
+  Future<void> getDropDownListApi({
+    required String clientId,
+    required String userName,
+  }) async {
+    printf('<--clientId-$clientId--userName-->$userName');
+
+    final dio = Dio();
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.getCheckInCheckOutDropDownListApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'BusObjCode': 'ATTEND_BUS_Attendance_Events',
+            'ScreenMode': 'Display',
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+          },
+        );
+
+        printf('<----response---->$response');
+
+        final Map<String, dynamic> outerJson = jsonDecode(response.data);
+
+        final Map<String, dynamic> serviceStatus = jsonDecode(
+          outerJson['ServiceStatus'],
+        );
+
+        final String messageCode = serviceStatus['MessageCode'];
+        final String messageDescription = serviceStatus['MessageDescription'];
+
+        printf('MessageCode: $messageCode');
+        printf('MessageDescription: $messageDescription');
+
+        if (messageCode == "200") {
+          final Map<String, dynamic> json = jsonDecode(response.data);
+          final model = AuthResponseModel.fromJson(json);
+          dropdownItems.value =
+              model.authBasedObjectsList.map((e) {
+                return {'id': e.id ?? '', 'label': e.description ?? ''};
+              }).toList();
+
+          partnerDropdownItems.value =
+              model.partnerTypeList.map((e) {
+                return {'id': e.id ?? '', 'label': e.value ?? ''};
+              }).toList();
+
+          if (partnerDropdownItems.isNotEmpty) {
+            selectedPartnerType.value = partnerDropdownItems.first['id'] ?? '';
+          }
+
+          if (dropdownItems.isNotEmpty) {
+            selectedAuthId.value = dropdownItems.first['id'] ?? '';
+          }
+        } else {
+          dropDownBannerError(messageDescription);
+        }
+        hideProgress();
+      } catch (e) {
+        printf("Exception: $e");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  Future<void> pickImage(ImageSource source) async {
+    final XFile? pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      final originalPath = pickedFile.path;
+      final dir = await getTemporaryDirectory();
+
+      final targetPath = path.join(dir.path, 'compressed_${pickedFile.name}');
+
+      final compressedFile = await FlutterImageCompress.compressAndGetFile(
+        originalPath,
+        targetPath,
+        quality: 85, // Adjust this if needed
+        minWidth: 1080,
+      );
+
+      if (compressedFile != null) {
+        final compressed = File(compressedFile.path);
+        if (compressed.lengthSync() <= 2 * 1024 * 1024) {
+          image.value = compressed;
+          pickedImagePath.value = compressed.path;
+          pickedImageName.value = pickedFile.name;
+        } else {
+          Get.snackbar("Image too large", "Compressed image still exceeds 2MB");
+        }
+      } else {
+        Get.snackbar("Error", "Image compression failed");
+      }
+    }
+  }
+
+  Future<void> showImageSourceDialog() async {
+    await showModalBottomSheet(
+      context: Get.context!,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder:
+          (context) => SafeArea(
+            bottom: true,
+            child: Wrap(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.camera_alt),
+                  title: Text('Camera'),
+                  onTap: () {
+                    Navigator.pop(context); // Close the bottom sheet
+                    pickImage(ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_library),
+                  title: Text('Gallery'),
+                  onTap: () {
+                    Navigator.pop(context); // Close the bottom sheet
+                    pickImage(ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
+          ),
+    );
+  }
+
+  void buttonCheckIn() {
+    if (pickedImagePath.value.isEmpty) {
+      dropDownBannerError('Upload image');
+    } else if (selectedAuthId.value.isEmpty) {
+      dropDownBannerError('select patner type');
+    } else if (selectedPartnerType.value.isEmpty) {
+      dropDownBannerError('select employe type');
+    } else {
+      // Map<String, dynamic> body = {
+      //   "EmployeeID": selectedAuthId.value,
+      //   "CheckType": 'I',
+      //   "InDate": DateTime.parse(defaultDate.value),
+      //   // or use DateFormat if it's a string
+      //   "TimeZone": timeSettings.userTimeZone,
+      //   "DeviceSno": "",
+      //   "Checktime": timeNow(defaultTime.value),
+      //   // your method that returns time
+      //   "IsmanuallyDone": false,
+      //   "DuplicateDate": DateTime.parse(defaultDate.value),
+      //   "Latitude": latitude,
+      //   "Longitude": longitude,
+      //   "BusObjCode": "ATTEND_BUS_Attendance_Events",
+      //   "filePath": pickedImagePath.value,
+      //   "PartnerType": selectedPartnerType.value,
+      // };
+
+      printf('<---call-check-in/out--->');
+    }
+  }
+
+  void buttonCheckOut() {}
+
+  Future<void> getCurrentLocation() async {
+    String location = "Fetching...";
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      location = "Location services are disabled.";
+      update();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        location = "Location permission denied.";
+        update();
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      location = "Location permissions are permanently denied.";
+      update();
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    location =
+        "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+    update();
+
+    printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+  }
 }

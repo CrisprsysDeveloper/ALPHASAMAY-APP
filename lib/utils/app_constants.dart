@@ -26,11 +26,16 @@ class AppConstants {
   static const String timeEventListApi = 'api/TimeEvents/GetTimeEventsData';
   static const String deleteEventApi = 'api/TimeEvents/DELETEAttendEvents';
 
-  static const String approvalListApi = 'api/TimeEventApprovals/GetTimeEventApprovalsData';
+  static const String approvalListApi =
+      'api/TimeEventApprovals/GetTimeEventApprovalsData';
 
-  static const String faceRecognitionListApi = 'api/FaceRekognition/GetAttendanceUserProfiles';
+  static const String faceRecognitionListApi =
+      'api/FaceRekognition/GetAttendanceUserProfiles';
 
+  static const String getCheckInCheckOutDropDownListApi =
+      'api/TimeEvents/GettingAttenEventsDropdown';
 
+  //
 
   //
   static const String isLoggedIn = 'is_logged_in';

@@ -50,16 +50,13 @@ class SplashController extends GetxController {
   void _route() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    //redirect();
-    // final isLoggedIn = GetStorage().read(AppConstants.isLoggedIn) ?? false;
+    Get.offAndToNamed(Routes.dashboardScreen);
 
-    printf("<--check-login---->$setPin");
-    //
-    if (setPin.isNotEmpty) {
-      Get.to(() => SetPinScreen());
-    } else {
-      redirect();
-    }
+    // if (setPin.isNotEmpty) {
+    //   Get.to(() => SetPinScreen());
+    // } else {
+    //   redirect();
+    // }
   }
 
   Future<void> redirect() async {

@@ -49,14 +49,14 @@ class CheckInOutApproveList extends StatelessWidget {
           },
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.toNamed(Routes.checkInOutScreen);
-        }, // Change icon if needed
-        backgroundColor: ColorConstants.appColor,
-        shape: const CircleBorder(),
-        child: Icon(Icons.add, color: Colors.white), // Optional
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Get.toNamed(Routes.checkInOutScreen);
+      //   }, // Change icon if needed
+      //   backgroundColor: ColorConstants.appColor,
+      //   shape: const CircleBorder(),
+      //   child: Icon(Icons.add, color: Colors.white), // Optional
+      // ),
     );
   }
 
@@ -94,19 +94,23 @@ class CheckInOutApproveList extends StatelessWidget {
                       width: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.deepPurple, // border color
-                          width: 1, // border width
-                        ),
+                        border: Border.all(color: Colors.deepPurple, width: 1),
                       ),
                       child: Stack(
                         children: [
                           Center(
-                            child: const CircleAvatar(
+                            child: CircleAvatar(
                               radius: 50,
-                              backgroundImage: AssetImage(
-                                'assets/icons/ic_user_profile.png',
-                              ), // Replace with your image
+                              backgroundImage:
+                                  data.regUserProfilePath != null &&
+                                          data.regUserProfilePath!.isNotEmpty
+                                      ? NetworkImage(
+                                        data.regUserProfilePath.toString(),
+                                      )
+                                      : AssetImage(
+                                            'assets/icons/ic_user_profile.png',
+                                          )
+                                          as ImageProvider,
                             ),
                           ),
                         ],
@@ -156,149 +160,162 @@ class CheckInOutApproveList extends StatelessWidget {
             8.sbh,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Partner Object",
-                      style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Partner Object",
+                        style: interTextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                    2.sbh,
-                    Text(
-                      data.employeeID,
-                      style: interTextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 12.sp,
+                      2.sbh,
+                      Text(
+                        data.employeeID,
+                        style: interTextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Partner Type",
-                      style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Partner Type",
+                        style: interTextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                    2.sbh,
-                    Text(
-                      "Employee",
-                      style: interTextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 12.sp,
+                      2.sbh,
+                      Text(
+                        "Employee",
+                        style: interTextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Partner Name",
-                      style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp,
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Partner Name",
+                        style: interTextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                    2.sbh,
-                    Text(
-                      data.employeeName,
-                      style: interTextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 12.sp,
+                      2.sbh,
+                      Text(
+                        data.employeeName,
+                        style: interTextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
             8.sbh,
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Check Type",
-                      style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Check Type",
+                        style: interTextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                    2.sbh,
-                    Text(
-                      data.checkType,
-                      style: interTextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 12.sp,
+                      2.sbh,
+                      Text(
+                        data.checkType,
+                        style: interTextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Check Date",
-                      style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Check Date",
+                        style: interTextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                    2.sbh,
-                    Text(
-                      data.checkInDate,
-                      style: interTextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 12.sp,
+                      2.sbh,
+                      Text(
+                        data.checkInDate,
+                        style: interTextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Check Time",
-                      style: interTextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w700,
-                        size: 12.sp,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Check Time",
+                        style: interTextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w700,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                    2.sbh,
-                    Text(
-                      data.checktime,
-                      style: interTextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
-                        size: 12.sp,
+                      2.sbh,
+                      Text(
+                        data.checktime,
+                        style: interTextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          size: 12.sp,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
