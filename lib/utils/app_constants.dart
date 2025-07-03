@@ -6,7 +6,7 @@ class AppConstants {
   static const String fontFamily = 'Inter';
 
   //API related
-  static const String baseUrl = 'http://apis.crisprsys.net/';
+  static const String baseUrl = 'https://apis.crisprsys.net/';
 
   static const String loginApi = 'api/ClientAuthorization/Login';
 
@@ -34,6 +34,11 @@ class AppConstants {
 
   static const String getCheckInCheckOutDropDownListApi =
       'api/TimeEvents/GettingAttenEventsDropdown';
+
+  static const String getGetFaceRekognitionScreenDataApi =
+      'api/FaceRekognition/GetFaceRekognitionScreenData';
+  static const String saveMobileAttendanceUserProfileApi =
+      'api/FaceRekognition/SaveMobileAttendanceUserProfile';
 
   //
 

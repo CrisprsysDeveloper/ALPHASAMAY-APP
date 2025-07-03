@@ -38,88 +38,148 @@ class FaceRegistrationScreen extends StatelessWidget {
         child: Column(
           children: [
             20.sbh,
+            Obx(
+            () =>
             Container(
-              height: 120,
-              width: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.deepPurple, // border color
-                  width: 1, // border width
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: const CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage(
-                        'assets/icons/ic_user_profile.png',
-                      ), // Replace with your image
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.deepPurple, // border color
+                          width: 1, // border width
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          ClipOval(
+                            child:
+                            controller.image!.value != null
+                                ? Image.file(
+                              controller.image!.value!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            )
+                                : Image.asset(
+                              'assets/icons/ic_user_profile.png',
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: IconButton(
+                              icon: Icon(Icons.camera_alt_outlined),
+                              onPressed: () {
+                                controller.showImageSourceDialog();
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: IconButton(
-                      icon: Icon(Icons.camera_alt_outlined),
-                      onPressed: () {
-                        printf('<----click-to-upload-profile---->');
-                      },
-                    ),
-                  ),
-                ],
-              ),
             ),
             20.sbh,
-            Container(
-              color: Colors.grey.shade300,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                child: DropdownButtonFormField<String>(
-                  value: controller.selectedYear,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Business Object",
+                  style: interTextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                    size: 12.sp,
                   ),
-                  items:
-                      ['Business Object', 'Business object']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                  onChanged: (_) {},
                 ),
-              ),
+                2.sbh,
+                Obx(
+                      () => Container(
+                    color: Colors.grey.shade300,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: DropdownButtonFormField<String>(
+                        value: controller.selectedAuthId.value.isEmpty
+                            ? null
+                            : controller.selectedAuthId.value,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        items: controller.dropdownItems
+                            .map(
+                              (item) => DropdownMenuItem<String>(
+                            value: item['id'],
+                            child: Text(item['label'] ?? ''),
+                          ),
+                        )
+                            .toList(),
+                        onChanged: (value) {
+                          controller.selectedPartnerType.value = value ?? '';
+                          controller.selectedObjectNumber.value='1009-Ashok Kumar Gudi';
+                          // controller.filterObjectNumbersByPType(); // ⬅️ Add this function
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             30.sbh,
-            Container(
-              color: Colors.grey.shade300,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                child: DropdownButtonFormField<String>(
-                  value: controller.selectedYear,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Object Number",
+                  style: interTextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                    size: 12.sp,
                   ),
-                  items:
-                      ['Business Object', 'Business object']
-                          .map(
-                            (e) => DropdownMenuItem(value: e, child: Text(e)),
-                          )
-                          .toList(),
-                  onChanged: (_) {},
                 ),
-              ),
+                2.sbh,
+                Obx(
+                      () => Container(
+                    color: Colors.grey.shade300,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.w),
+                      child: DropdownButtonFormField<String>(
+                        value: controller.selectedObjectNumber.value.isEmpty
+                            ? null
+                            : controller.selectedObjectNumber.value,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        items: controller.filteredObjectNumbers
+                            .map((item) => DropdownMenuItem<String>(
+                          value: item['id'],
+                          child: Text(item['label'] ?? ''),
+                        ))
+                            .toList(),
+                        onChanged: (value) {
+                          controller.selectedObjectNumber.value = value ?? '';
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             30.sbh,
             CustomButton(
               horizontalMargin: 0,
               icon: "",
               text: 'Register'.toUpperCase(),
-              onPressed: () {},
+              onPressed: () {
+                controller.registerFace();
+              },
             ),
           ],
         ),
