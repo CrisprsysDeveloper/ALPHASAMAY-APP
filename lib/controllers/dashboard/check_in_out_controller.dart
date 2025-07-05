@@ -410,7 +410,9 @@ class CheckInOutController extends GetxController {
       printf(
         'emp->${selectedAuthId.value} date->${defaultDate.value} time->${defaultTime.value}',
       );
-      printf('checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',);
+      printf(
+        'checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',
+      );
       printf(
         'file->$pickedImagePath partnertype->${selectedPartnerType.value}',
       );
@@ -526,7 +528,7 @@ class CheckInOutController extends GetxController {
         clientId: clientId,
         userName: userName,
         type: 'O',
-        editId: '31447',
+        editId: checkInId,
       );
 
       printf('<---call-check-in/out--->');
@@ -546,6 +548,7 @@ class CheckInOutController extends GetxController {
     const String endpoint = AppConstants.checkOutApi;
 
     if (await InternetConnection().hasInternetAccess) {
+      showProgress();
       final url =
           '$baseUrl$endpoint?AttendEventID=$editId&CPMClientID=1&CPMUserName=Call'; //; //&FilePath=$encodedPath';
 
@@ -562,8 +565,19 @@ class CheckInOutController extends GetxController {
 
       final dio = dio_.Dio();
       final response = await dio.post(url);
-
       printf('<---response--->$response');
+      final Map<String, dynamic> json =
+          response.data is String ? jsonDecode(response.data) : response.data;
+
+      final serviceStatus = jsonDecode(json['ServiceStatus']);
+      if (serviceStatus['MessageDescription'] == "Success") {
+        hideProgress();
+        Get.back(result: true);
+        dropDownBannerSuccess('Success');
+      } else {
+        dropDownBannerSuccess(serviceStatus['MessageDescription']);
+      }
+      hideProgress();
     } else {
       Utility.showToastMessage(AppConstants.internetConnectionError);
     }
