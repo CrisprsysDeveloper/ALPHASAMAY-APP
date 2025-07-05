@@ -25,6 +25,8 @@ class AppConstants {
   // Time Events
   static const String timeEventListApi = 'api/TimeEvents/GetTimeEventsData';
   static const String deleteEventApi = 'api/TimeEvents/DELETEAttendEvents';
+  static const String leaveRequestOverviewApi = 'api/LeaveRequest/LeaveRequestOverview';
+  static const String deleteLeaveRequestApi = 'api/LeaveRequest/DeleteLeaveRequest';
 
   static const String approvalListApi =
       'api/TimeEventApprovals/GetTimeEventApprovalsData';

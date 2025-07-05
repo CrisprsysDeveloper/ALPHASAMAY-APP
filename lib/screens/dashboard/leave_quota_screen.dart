@@ -181,9 +181,24 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
               ),
 
               20.sbh,
+              Expanded(
+                child: Obx(()
+                {
+                  return ListView.builder(
+                    itemCount: controller.employeeList.length,
+                    itemBuilder: (context, index) {
+                      final emp = controller.employeeList[index];
+                      return widgetTimeEvents(
+                        record: emp,
+                        borderColor: Colors.green,
+                      );
+                    },
+                  );
+                }),
+              ),
 
               // List of Records (Filtered by selected tab)
-              Expanded(
+            /*  Expanded(
                 child: ListView.builder(
                   itemCount: controller.records.length,
                   itemBuilder: (context, index) {
@@ -202,7 +217,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                     );
                   },
                 ),
-              ),
+              ),*/
             ],
           ),
         ),
@@ -218,7 +233,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
     );
   }
 
-  Widget widgetTimeEvents({required borderColor, required record}) {
+  Widget widgetTimeEvents({ borderColor, record}) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -234,10 +249,10 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Employee/UserName", record['name']),
+                child: buildTextColumn("Employee/UserName", record.empName),
               ),
               Expanded(
-                child: buildTextColumn("Employee No", "100008798911"),
+                child: buildTextColumn("LeaveID No", record.leaveID),
               ),
             ],
           ),
@@ -245,7 +260,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Leave Type", "Annual Leave"),
+                child: buildTextColumn("Leave Type", record.leaveType),
               ),
               Expanded(
                 child: buildTextColumn("Cost Center", "ST Branch"),
@@ -255,14 +270,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Start Date", "27/06/2025")),
-              Expanded(child: buildTextColumn("End Date", "27/06/2025")),
+              Expanded(child: buildTextColumn("Start Date", record.leaveStartDate)),
+              Expanded(child: buildTextColumn("End Date", record.leaveEndDate)),
             ],
           ),
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Leave Status", "Submitted")),
+              Expanded(child: buildTextColumn("Leave Status", record.leaveStatus)),
               widgetContainer(
                 icon: Icons.remove_red_eye,
                 bgColors: Colors.white,
