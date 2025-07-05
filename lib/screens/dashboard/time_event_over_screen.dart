@@ -1,6 +1,8 @@
 import 'package:crysprsys/controllers/dashboard/time_event_over_controller.dart';
 import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/model/dashboard/time_event_model.dart';
 import 'package:crysprsys/route/app_pages.dart';
+import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
@@ -60,63 +62,72 @@ class TimeEventOverScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      height: 40,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: DropdownButtonFormField<String>(
-                          value: controller.selectedYear,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
+                    child: Obx(
+                      () => Container(
+                        height: 40,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: DropdownButtonFormField<String>(
+                            value:
+                                controller.selectedYear.value.isEmpty
+                                    ? null
+                                    : controller.selectedYear.value,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            items:
+                                controller.yearList.map((year) {
+                                  return DropdownMenuItem<String>(
+                                    value: year.value,
+                                    child: Text(year.value),
+                                  );
+                                }).toList(),
+                            onChanged: (value) {
+                              controller.selectedYear.value = value!;
+                              printf(
+                                '<--selected-year-->${controller.selectedYear.value}',
+                              );
+                            },
                           ),
-                          items:
-                              ['2024', '2025', '2026']
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e,
-                                      child: Text(e),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (_) {},
                         ),
                       ),
                     ),
                   ),
                   16.sbw,
                   Expanded(
-                    child: Container(
-                      height: 40,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: DropdownButtonFormField<String>(
-                          value: controller.selectedMonth,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
+                    child: Obx(
+                      () => Container(
+                        height: 40,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: DropdownButtonFormField<String>(
+                            value:
+                                controller.selectedMonth.value.isEmpty
+                                    ? null
+                                    : controller.selectedMonth.value,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            items:
+                                controller.monthList.map((month) {
+                                  return DropdownMenuItem<String>(
+                                    value: month.value,
+                                    child: Text(month.value),
+                                  );
+                                }).toList(),
+                            onChanged: (value) {
+                              controller.selectedMonth.value = value!;
+                              printf(
+                                '<--selected-month-->${controller.selectedMonth.value}',
+                              );
+                            },
                           ),
-                          items:
-                              [
-                                    'January',
-                                    'February',
-                                    'March',
-                                    'April',
-                                    'May',
-                                    'June',
-                                  ]
-                                  .map(
-                                    (e) => DropdownMenuItem(
-                                      value: e,
-                                      child: Text(e),
-                                    ),
-                                  )
-                                  .toList(),
-                          onChanged: (_) {},
                         ),
                       ),
                     ),
@@ -125,26 +136,34 @@ class TimeEventOverScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Expanded(
-                child: Obx(()
-                {
-                  return ListView.builder(
-                    itemCount: controller.employeeList.length,
-                    itemBuilder: (context, index) {
-                      final emp = controller.employeeList[index];
-                      return widgetTimeEvents(
-                        employee: emp,
-                        borderColor: Colors.green,
-                      );
-                    },
-                  );
+                child: Obx(() {
+                  return controller.attendanceList.isNotEmpty
+                      ? ListView.builder(
+                        itemCount: controller.attendanceList.length,
+                        itemBuilder: (context, index) {
+                          final emp = controller.attendanceList[index];
+                          return widgetTimeEvents(
+                            emp,
+                            borderColor: Colors.green,
+                          );
+                        },
+                      )
+                      : Center(child: Text(AppConstants.noDataFound));
                 }),
               ),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Get.toNamed(Routes.checkInOutScreen);
+          onPressed: () async {
+            final result = await Get.toNamed(
+              Routes.checkInOutScreen,
+              arguments: {'from': AppConstants.add, 'checkInId': ''},
+            );
+            printf('<--result--->$result');
+            if (result) {
+              controller.getList();
+            }
           }, // Change icon if needed
           backgroundColor: ColorConstants.appColor,
           shape: const CircleBorder(),
@@ -154,7 +173,7 @@ class TimeEventOverScreen extends StatelessWidget {
     );
   }
 
-  Widget widgetTimeEvents({borderColor, employee}) {
+  Widget widgetTimeEvents(AttendanceModel employee, {borderColor}) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -184,8 +203,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     ),
                     3.sbh,
                     Text(
-                      employee.value,
-                      //record['name'],
+                      employee.employeeName.toString(),
                       style: interTextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -200,9 +218,7 @@ class TimeEventOverScreen extends StatelessWidget {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-                  printf('<---on-tap-delete--->');
-                },
+                onTap: () {},
               ),
               10.sbw,
               widgetContainer(
@@ -210,8 +226,17 @@ class TimeEventOverScreen extends StatelessWidget {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-                  printf('<---on-tap-delete--->');
+                onTap: () async {
+                  final result = await Get.toNamed(
+                    Routes.checkInOutScreen,
+                    arguments: {
+                      'from': AppConstants.edit,
+                      'checkInId': employee.checkInId.toString(),
+                    },
+                  );
+                  if (result) {
+                    controller.getList();
+                  }
                 },
               ),
               10.sbw,
@@ -221,7 +246,9 @@ class TimeEventOverScreen extends StatelessWidget {
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
                 onTap: () {
-                  controller.showDeleteEventDialog();
+                  controller.showDeleteEventDialog(
+                    employee.checkInId.toString(),
+                  );
                 },
               ),
             ],
@@ -243,7 +270,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     ),
                     3.sbh,
                     Text(
-                      employee.id, //record['userId'],
+                      employee.employeeID.toString(),
                       style: interTextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -266,12 +293,12 @@ class TimeEventOverScreen extends StatelessWidget {
                           child: Icon(
                             Icons.access_time,
                             size: 15,
-                            color: Colors.transparent,
+                            color: Colors.grey,
                           ),
                         ),
                         2.sbw,
                         Text(
-                          '', //record['datetime'],
+                          '${employee.checkInDate} ${employee.checktime}',
                           style: interTextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -281,13 +308,27 @@ class TimeEventOverScreen extends StatelessWidget {
                       ],
                     ),
                     4.sbw,
-                    Text(
-                      '', //"Check Type: ${record['checkType']}",
-                      style: interTextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                        size: 14,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'CheckType:',
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                            size: 14,
+                          ),
+                        ),
+                        5.sbw,
+                        Text(
+                          '${employee.checkType}',
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            size: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

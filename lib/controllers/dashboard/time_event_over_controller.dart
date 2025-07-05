@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:dio/dio.dart' as dio_;
 
 class TimeEventOverController extends GetxController {
   final TokenRepository authRepository;
@@ -21,9 +22,13 @@ class TimeEventOverController extends GetxController {
   final box = GetStorage();
 
   RxList<Employee> employeeList = <Employee>[].obs;
+  RxList<AttendanceModel> attendanceList = <AttendanceModel>[].obs;
 
-  String selectedYear = '2025';
-  String selectedMonth = 'February';
+  RxList<YearMonth> yearList = <YearMonth>[].obs;
+  RxList<Month> monthList = <Month>[].obs;
+
+  final RxString selectedYear = ''.obs;
+  final RxString selectedMonth = ''.obs;
 
   String firstDay = '';
   String lastDay = '';
@@ -79,6 +84,18 @@ class TimeEventOverController extends GetxController {
     );
   }
 
+  void getList()
+  {
+    getEventListApi(
+      clientId: clientId,
+      userName: userName,
+      empNo: '',
+      startDay: firstDay,
+      endDay: lastDay,
+    );
+  }
+
+
   Future<void> getEventListApi({
     required String clientId,
     required String userName,
@@ -107,7 +124,7 @@ class TimeEventOverController extends GetxController {
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
-            'flag':'get',
+            'flag': 'get',
             'ClientId': clientId,
             'UserName': userName,
             'EmployeeNumber': empNo,
@@ -139,14 +156,18 @@ class TimeEventOverController extends GetxController {
           final Map<String, dynamic> outerJson = jsonDecode(response.data);
           final model = TimeEventModel.fromJson(outerJson);
 
-          if (model.employeeList.isNotEmpty) {
-            employeeList.value = model.employeeList;
+          if (model.attendanceList.isNotEmpty) {
+            attendanceList.value = model.attendanceList;
           }
 
-          printf(
-            '<---employeeList--->${model.employeeList.length}--->${employeeList.value.length}',
-          );
-
+          if (model.objYearsList.isNotEmpty) {
+            yearList.value = model.objYearsList;
+            selectedYear.value = model.objYearsList.last.value; // Optional
+          }
+          if (model.objMonthsList.isNotEmpty) {
+            monthList.value = model.objMonthsList;
+            selectedMonth.value = model.objMonthsList.first.value;
+          }
           for (final emp in model.employeeList) {
             printf('Employee: ${emp.id} - ${emp.value}');
           }
@@ -163,12 +184,12 @@ class TimeEventOverController extends GetxController {
     }
   }
 
-  Future<void> deleteEventApi({
+  Future<void> deleteEventApiOld({
     required String clientId,
     required String userName,
     required String eventId,
   }) async {
-    printf('<--clientId-$clientId--userName-->$userName--eventId-->$eventId');
+    printf('<--clientId-$clientId--userName-->$userName--deleteId-->$eventId');
 
     final dio = Dio();
 
@@ -177,6 +198,7 @@ class TimeEventOverController extends GetxController {
     const String endpoint = AppConstants.deleteEventApi;
 
     if (await InternetConnection().hasInternetAccess) {
+      showProgress();
       try {
         showProgress();
         final response = await dio.get(
@@ -184,38 +206,26 @@ class TimeEventOverController extends GetxController {
           queryParameters: {
             'CPMClientID': clientId,
             'CPMUserName': userName,
-            'AttendEventID': eventId,
+            'AttendEventID': '',
           },
         );
 
         printf('<----response---->$response');
 
-        final Map<String, dynamic> outerJson = jsonDecode(response.data);
-
-        // Step 2: Decode the nested JSON string in "ServiceStatus"
-        final Map<String, dynamic> serviceStatus = jsonDecode(
-          outerJson['ServiceStatus'],
-        );
-
-        final String messageCode = serviceStatus['MessageCode'];
-        final String messageDescription = serviceStatus['MessageDescription'];
-
-        printf('MessageCode: $messageCode');
-        printf('MessageDescription: $messageDescription');
-
-        if (messageCode == "200") {
-          printf('<----success-delete-event---refresh-event-list-here->');
-
-          // getEventListApi(
-          //   clientId: clientId,
-          //   userName: userName,
-          //   empNo: '',
-          //   startDay: firstDay,
-          //   endDay: lastDay,
-          // );
+        if (response.data['Message'] == "Success") {
+          final messageText = response.data['MessageText'];
+          dropDownBannerSuccess(messageText);
+          getEventListApi(
+            clientId: clientId,
+            userName: userName,
+            empNo: '',
+            startDay: firstDay,
+            endDay: lastDay,
+          );
         } else {
-          dropDownBannerError(messageDescription);
+          dropDownBannerError(AppConstants.somethingWentWrong);
         }
+
         hideProgress();
       } catch (e) {
         printf("Exception: $e");
@@ -226,7 +236,47 @@ class TimeEventOverController extends GetxController {
     }
   }
 
-  void showDeleteEventDialog() {
+  Future<void> deleteEventApi({
+    required String clientId,
+    required String userName,
+    required String editId,
+  }) async {
+    printf('<--deleteEventApi-clientId-$clientId--userName-->$userName');
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.timeEventDeleteApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      final url =
+          '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&AttendEventID=$editId'; //; //&FilePath=$encodedPath';
+
+      printf('<---url-->$url');
+
+      final dio = dio_.Dio();
+      final response = await dio.post(url);
+
+      printf('<---response--->$response');
+
+      if (response.data['Message'] == "Success") {
+        final messageText = response.data['MessageText'];
+        dropDownBannerSuccess(messageText);
+        getEventListApi(
+          clientId: clientId,
+          userName: userName,
+          empNo: '',
+          startDay: firstDay,
+          endDay: lastDay,
+        );
+      } else {
+        dropDownBannerError(AppConstants.somethingWentWrong);
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  void showDeleteEventDialog(String checkInId) {
     showDialog(
       context: Get.context!,
       barrierDismissible: false, // Prevents closing by tapping outside
@@ -269,6 +319,11 @@ class TimeEventOverController extends GetxController {
                       child: Text("YES", style: TextStyle(color: Colors.blue)),
                       onPressed: () async {
                         Get.back(); // Close the current route
+                        deleteEventApi(
+                          clientId: clientId,
+                          userName: userName,
+                          editId: checkInId,
+                        );
                       },
                     ),
                   ],
@@ -317,3 +372,4 @@ class TimeEventOverController extends GetxController {
     printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
   }
 }
+

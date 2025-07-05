@@ -161,7 +161,10 @@ class DashboardScreen extends StatelessWidget {
                   leading: Icon(Icons.login, color: ColorConstants.appColor),
                   title: Text("Check-in/Out"),
                   onTap: () {
-                    Get.toNamed(Routes.checkInOutScreen);
+                    Get.toNamed(
+                      Routes.checkInOutScreen,
+                      arguments: {'from': AppConstants.add, 'checkInId': ''},
+                    );
                   },
                 ),
                 ListTile(
@@ -203,7 +206,7 @@ class DashboardScreen extends StatelessWidget {
                   title: Text("Leave Quota"),
                   onTap: () {
                     Get.toNamed(Routes.leaveQuotaScreen);
-                    },
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.send, color: ColorConstants.appColor),

@@ -35,7 +35,7 @@ class FaceRegistrationListController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--TimeEventOverController----->');
+    printf('<------init--FaceRegistrationListController----->');
     loadSavedCredentials();
     getCurrentLocation();
     DateTime now = DateTime.now();

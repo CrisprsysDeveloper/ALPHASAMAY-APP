@@ -61,23 +61,58 @@ class CheckInOutController extends GetxController {
   var latitude = '';
   var longitude = '';
 
+  var from = AppConstants.add;
+  var checkInId = '';
+
+  RxString selectedInDate = ''.obs;
+  RxString convertedCheckInDate = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
     printf('<------init--CheckInOutController----->');
+
+    try {
+      from = Get.arguments['from'] ?? AppConstants.add;
+      checkInId = Get.arguments['checkInId'];
+      printf('<---from---->$from--check-in-id-->$checkInId');
+    } catch (e) {
+      printf('exe-from-->$e');
+    }
+
+    // Format and store the default date
     defaultDate.value = dateFormat.format(selectedDate.value);
 
+    // Store UTC ISO string for selected date
+    selectedInDate.value = selectedDate.value.toUtc().toIso8601String();
+
+    // Get location
     getCurrentLocation();
-    final now = DateTime.now();
-    final fullDateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
+
+    // Combine selectedDate and selectedTime to build fullDateTime
+    final DateTime fullDateTime = DateTime(
+      selectedDate.value.year,
+      selectedDate.value.month,
+      selectedDate.value.day,
       selectedTime.value.hour,
       selectedTime.value.minute,
     );
+
+    // Format display time (e.g., 10:30 AM)
     defaultTime.value = timeFormat.format(fullDateTime);
 
+    // Format "yyyy-MM-dd%20HH:mm:00" for ConvertedCheckinDate
+    final String convertedDate =
+        "${fullDateTime.year.toString().padLeft(4, '0')}-"
+        "${fullDateTime.month.toString().padLeft(2, '0')}-"
+        "${fullDateTime.day.toString().padLeft(2, '0')}%20"
+        "${fullDateTime.hour.toString().padLeft(2, '0')}:"
+        "${fullDateTime.minute.toString().padLeft(2, '0')}:00";
+
+    // Store for submission
+    convertedCheckInDate.value = convertedDate;
+
+    // Load saved data and dropdowns
     loadSavedCredentials();
     getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(() {
       getDropDownListApi(clientId: clientId, userName: userName);
@@ -108,6 +143,10 @@ class CheckInOutController extends GetxController {
       lastDate: today, //DateTime(2101),
     );
     if (picked != null && picked != selectedDate.value) {
+      selectedInDate.value =
+          picked.toUtc().toIso8601String(); // "2025-02-06T05:00:00.000Z"
+      printf('Selected UTC Date: $selectedInDate');
+
       selectedDate.value = picked;
       defaultDate.value = dateFormat.format(picked);
     }
@@ -122,23 +161,23 @@ class CheckInOutController extends GetxController {
     if (picked != null && picked != selectedTime.value) {
       final now = DateTime.now();
 
-      // Convert picked TimeOfDay to DateTime
       final pickedDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
+        // now.year,
+        // now.month,
+        // now.day,
+        selectedDate.value.year,
+        selectedDate.value.month,
+        selectedDate.value.day,
         picked.hour,
         picked.minute,
       );
 
-      // Check if selected date is today
       final isToday =
           selectedDate.value.year == now.year &&
           selectedDate.value.month == now.month &&
           selectedDate.value.day == now.day;
 
       if (isToday && pickedDateTime.isAfter(now)) {
-        // Show warning - user selected future time today
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Cannot select future time for today's date."),
@@ -149,6 +188,19 @@ class CheckInOutController extends GetxController {
 
       selectedTime.value = picked;
       defaultTime.value = timeFormat.format(pickedDateTime);
+
+      // Format as "yyyy-MM-dd%20HH:mm:00"
+      final String convertedDate =
+          "${pickedDateTime.year.toString().padLeft(4, '0')}-"
+          "${pickedDateTime.month.toString().padLeft(2, '0')}-"
+          "${pickedDateTime.day.toString().padLeft(2, '0')}%20"
+          "${pickedDateTime.hour.toString().padLeft(2, '0')}:"
+          "${pickedDateTime.minute.toString().padLeft(2, '0')}:00";
+
+      // Store for submission
+      convertedCheckInDate.value = convertedDate;
+
+      print("ConvertedCheckinDate: $convertedDate");
     }
   }
 
@@ -347,7 +399,7 @@ class CheckInOutController extends GetxController {
     );
   }
 
-  void buttonCheckIn() {
+  Future<void> buttonCheckIn() async {
     if (pickedImagePath.value.isEmpty) {
       dropDownBannerError('Upload image');
     } else if (selectedAuthId.value.isEmpty) {
@@ -358,16 +410,29 @@ class CheckInOutController extends GetxController {
       printf(
         'emp->${selectedAuthId.value} date->${defaultDate.value} time->${defaultTime.value}',
       );
-      printf(
-        'checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',
-      );
+      printf('checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',);
       printf(
         'file->$pickedImagePath partnertype->${selectedPartnerType.value}',
       );
 
-      checkInApi(clientId: clientId, userName: userName, type: 'I');
+      if (from == AppConstants.add) {
+        checkInApi(clientId: clientId, userName: userName, type: 'I');
+      } else {
+        final result = await timeEventUpdateApi(
+          clientId: clientId,
+          userName: userName,
+          type: 'I',
+          checkInId: checkInId,
+        );
 
-      // timeEventUpdateApi(clientId: clientId, userName: userName, type: 'I');
+        if (result) {
+          hideProgress();
+          Get.back(result: true);
+          dropDownBannerSuccess("Attendance Event Updated Successfully...!!");
+        } else {
+          hideProgress();
+        }
+      }
 
       //deleteEventApi(clientId: clientId, userName: userName, editId: '31447');
 
@@ -382,14 +447,17 @@ class CheckInOutController extends GetxController {
   }) async {
     printf('<--checkInApi-clientId-$clientId--userName-->$userName');
 
+    final DateTime nowUtc = DateTime.now().toUtc();
+    final String createdDate = nowUtc.toIso8601String();
+
     Map<String, dynamic> body = {
       "EmployeeID": selectedAuthId.value,
       "CheckType": type,
-      "InDate": '2025-07-05T05:00:00.000Z',
-      "ConvertedCheckinDate": "2025-02-04%2010:30:00",
-      "Checktime": timeNow(defaultTime.value).toString(),
+      "InDate": selectedInDate.value,
+      "ConvertedCheckinDate": convertedCheckInDate.value,
+      //"Checktime": timeNow(defaultTime.value).toString(),
       "IsmanuallyDone": false,
-      "CreatedDate": "2025-02-07T07:41:41.972Z",
+      "CreatedDate": createdDate,
       "Latitude": latitude,
       "Longitude": longitude,
       "BusObjCode": "ATTEND_BUS_Attendance_Events",
@@ -398,13 +466,12 @@ class CheckInOutController extends GetxController {
 
     printf('<---json-body--->${jsonEncode(body)}');
 
-    final dio = Dio();
-
     // Construct the full URL
     const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
     const String endpoint = AppConstants.checkInApi;
 
     if (await InternetConnection().hasInternetAccess) {
+      showProgress();
       final url =
           '$baseUrl$endpoint?flag=INSERT&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
 
@@ -423,44 +490,15 @@ class CheckInOutController extends GetxController {
       final response = await dio.post(url, data: formData);
 
       printf('<---response--->$response');
-
-      // try {
-      //   showProgress();
-      //   final response = await dio.get(
-      //     '$baseUrl$endpoint',
-      //     queryParameters: {
-      //       'flag': 'INSERT',
-      //       'CPMClientID': clientId,
-      //       'CPMUserName': userName,
-      //       'AttendanceEventList': json,
-      //      // 'FilePath': pickedImagePath.value,
-      //     },
-      //   );
-      //
-      //   printf('<----response---->$response');
-      //
-      //   final Map<String, dynamic> outerJson = jsonDecode(response.data);
-      //
-      //   final Map<String, dynamic> serviceStatus = jsonDecode(
-      //     outerJson['ServiceStatus'],
-      //   );
-      //
-      //   final String messageCode = serviceStatus['MessageCode'];
-      //   final String messageDescription = serviceStatus['MessageDescription'];
-      //
-      //   printf('MessageCode: $messageCode');
-      //   printf('MessageDescription: $messageDescription');
-      //
-      //   if (messageCode == "200") {
-      //     printf('<----success---check-in----->');
-      //   } else {
-      //     dropDownBannerError(messageDescription);
-      //   }
-      //   hideProgress();
-      // } catch (e) {
-      //   printf("Exception: $e");
-      //   hideProgress();
-      // }
+      final messageText = response.data['MessageText'];
+      if (response.data['Message'] == "Success") {
+        hideProgress();
+        Get.back(result: true);
+        dropDownBannerSuccess(messageText);
+      } else {
+        hideProgress();
+        dropDownBannerError(messageText);
+      }
     } else {
       Utility.showToastMessage(AppConstants.internetConnectionError);
     }
@@ -531,24 +569,26 @@ class CheckInOutController extends GetxController {
     }
   }
 
-  Future<void> timeEventUpdateApi({
+  Future<bool> timeEventUpdateApi({
     required String clientId,
     required String userName,
     required String type,
+    required String checkInId,
   }) async {
     printf('<--timeEventUpdateApi-clientId-$clientId--userName-->$userName');
-
+    final DateTime nowUtc = DateTime.now().toUtc();
+    final String createdDate = nowUtc.toIso8601String();
     Map<String, dynamic> body = {
-      "CheckInId": '2231447',
+      "CheckInId": checkInId,
       "EmployeeID": selectedAuthId.value,
       "CheckType": type,
-      "InDate": '2025-07-05T05:00:00.000Z',
-      "ConvertedCheckinDate": "2025-02-04%2010:30:00",
-      "Checktime": timeNow(defaultTime.value).toString(),
+      "InDate": selectedInDate.value,
+      "ConvertedCheckinDate": convertedCheckInDate.value,
       "IsmanuallyDone": false,
-      "CreatedDate": "2025-02-07T07:41:41.972Z",
+      "CreatedDate": createdDate,
       "Latitude": latitude,
       "Longitude": longitude,
+      "BusObjCode": "ATTEND_BUS_Attendance_Events",
       "PartnerType": selectedPartnerType.value,
     };
 
@@ -559,6 +599,7 @@ class CheckInOutController extends GetxController {
     const String endpoint = AppConstants.timeEventUpdateApi;
 
     if (await InternetConnection().hasInternetAccess) {
+      showProgress();
       final url =
           '$baseUrl$endpoint?flag=UPDATE&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
 
@@ -577,34 +618,19 @@ class CheckInOutController extends GetxController {
       final response = await dio.post(url);
 
       printf('<---response--->$response');
+
+      if (response.data['Message'] == "Success") {
+        // final messageText = response.data['MessageText'];
+        // dropDownBannerSuccess(messageText);
+        return true;
+      } else {
+        // final messageText = response.data['MessageText'];
+        // dropDownBannerError(messageText);
+        return false;
+      }
     } else {
       Utility.showToastMessage(AppConstants.internetConnectionError);
-    }
-  }
-
-  Future<void> deleteEventApi({
-    required String clientId,
-    required String userName,
-    required String editId,
-  }) async {
-    printf('<--deleteEventApi-clientId-$clientId--userName-->$userName');
-
-    // Construct the full URL
-    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
-    const String endpoint = AppConstants.timeEventDeleteApi;
-
-    if (await InternetConnection().hasInternetAccess) {
-      final url =
-          '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&AttendEventID=$editId'; //; //&FilePath=$encodedPath';
-
-      printf('<---url-->$url');
-
-      final dio = dio_.Dio();
-      final response = await dio.post(url);
-
-      printf('<---response--->$response');
-    } else {
-      Utility.showToastMessage(AppConstants.internetConnectionError);
+      return false;
     }
   }
 

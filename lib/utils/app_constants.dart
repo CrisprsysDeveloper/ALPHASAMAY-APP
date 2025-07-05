@@ -42,20 +42,32 @@ class AppConstants {
 
   static const String getUserTimeZoneApi = '/api/UserProfile/GetUserTimezone';
 
-  static const String checkInApi =  'api//TimeEvents/INSERT_TimeEvent'; //'/api/TimeEvents/SaveMobileAttendanceUserTimeEvents';
+  static const String checkInApi =
+      'api//TimeEvents/INSERT_TimeEvent'; //'/api/TimeEvents/SaveMobileAttendanceUserTimeEvents';
 
-  static const String checkOutApi =  'api//TimeEvents/EditAttendanceEvents';
+  static const String checkOutApi = 'api//TimeEvents/EditAttendanceEvents';
 
-  static const String timeEventUpdateApi =  'api//TimeEvents/UPDATE_TimeEvent';
+  static const String timeEventUpdateApi = 'api//TimeEvents/UPDATE_TimeEvent';
 
-  static const String timeEventDeleteApi =  'api//TimeEvents/DELETEAttendEvents';
+  static const String timeEventDeleteApi = 'api//TimeEvents/DELETEAttendEvents';
+
   //
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
 
   //
 
+  static const busObject = 'ATTEND_BUS_Attendance_Events_Overview';
+
   //
+
+  static const add = 'Add';
+  static const edit = 'Edit';
+
+  static const somethingWentWrong =
+      'Something went wrong...please try again later';
+  static const noDataFound = 'No data found';
+
   static const String isLoggedIn = 'is_logged_in';
   static String authType = 'authType';
   static String accessToken = 'token';
@@ -109,7 +121,7 @@ class AppConstants {
   static const String reminder = 'Reminder';
   static const String from = 'From';
 
-  static const String edit = 'Edit';
+
   static const String viewAdd = 'View/Add Description';
   static const String assignTask = 'Assign Task';
   static const String addReviewer = 'Add Reviewer';
@@ -136,7 +148,7 @@ class AppConstants {
   static const String wellness = 'Wellness';
   static const String spirituality = 'Spirituality';
 
-  static const String add = 'Add';
+
   static const String addTask = 'Add Task';
   static const String addNewTask = 'Add New Task';
 
