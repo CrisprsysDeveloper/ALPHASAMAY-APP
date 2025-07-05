@@ -40,6 +40,19 @@ class AppConstants {
   static const String saveMobileAttendanceUserProfileApi =
       'api/FaceRekognition/SaveMobileAttendanceUserProfile';
 
+  static const String getUserTimeZoneApi = '/api/UserProfile/GetUserTimezone';
+
+  static const String checkInApi =  'api//TimeEvents/INSERT_TimeEvent'; //'/api/TimeEvents/SaveMobileAttendanceUserTimeEvents';
+
+  static const String checkOutApi =  'api//TimeEvents/EditAttendanceEvents';
+
+  static const String timeEventUpdateApi =  'api//TimeEvents/UPDATE_TimeEvent';
+
+  static const String timeEventDeleteApi =  'api//TimeEvents/DELETEAttendEvents';
+  //
+
+  //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
+
   //
 
   //

@@ -99,16 +99,22 @@ class TimeEventOverController extends GetxController {
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
+        final url = '$baseUrl$endpoint';
+
+        printf('<---url-->$url');
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
+            'flag':'get',
             'ClientId': clientId,
-            'userName': userName,
+            'UserName': userName,
             'EmployeeNumber': empNo,
             'StartDate': startDay,
             'EndDate': endDay,
             'BusObject': 'ATTEND_BUS_Attendance_Events_Overview',
-            'RequestComingFrom': 'Web',
+            'RequestComingFrom': 'Mobile',
           },
         );
 

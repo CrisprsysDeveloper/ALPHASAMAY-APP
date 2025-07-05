@@ -54,9 +54,9 @@ class FaceRegistrationScreen extends StatelessWidget {
                         children: [
                           ClipOval(
                             child:
-                            controller.image!.value != null
+                            controller.image.value != null
                                 ? Image.file(
-                              controller.image!.value!,
+                              controller.image.value!,
                               width: 120,
                               height: 120,
                               fit: BoxFit.cover,

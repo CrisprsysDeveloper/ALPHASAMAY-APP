@@ -120,28 +120,6 @@ class CheckInOutScreen extends StatelessWidget {
                   ),
                 ),
                 2.sbh,
-                // Container(
-                //   color: Colors.grey.shade300,
-                //   child: Padding(
-                //     padding: EdgeInsets.symmetric(horizontal: 10.w),
-                //     child: DropdownButtonFormField<String>(
-                //       value: controller.selectedYear,
-                //       decoration: InputDecoration(
-                //         border: InputBorder.none,
-                //         enabledBorder: InputBorder.none,
-                //         focusedBorder: InputBorder.none,
-                //       ),
-                //       items:
-                //           ['Partner Type', 'Employee Type']
-                //               .map(
-                //                 (e) =>
-                //                     DropdownMenuItem(value: e, child: Text(e)),
-                //               )
-                //               .toList(),
-                //       onChanged: (_) {},
-                //     ),
-                //   ),
-                // ),
                 Obx(
                   () => Container(
                     color: Colors.grey.shade300,
@@ -328,7 +306,9 @@ class CheckInOutScreen extends StatelessWidget {
                     horizontalMargin: 0,
                     icon: "",
                     text: 'Check out'.toUpperCase(),
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.buttonCheckOut();
+                    },
                   ),
                 ),
               ],

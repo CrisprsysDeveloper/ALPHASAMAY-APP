@@ -40,7 +40,7 @@ class LeaveQuotaController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--TimeEventOverController----->');
+    printf('<------init--LeaveQuotaController----->');
   }
 
 }

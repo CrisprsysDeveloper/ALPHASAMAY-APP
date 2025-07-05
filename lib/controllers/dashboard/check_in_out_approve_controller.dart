@@ -16,29 +16,6 @@ class CheckInOutApproveController extends GetxController {
 
   CheckInOutApproveController({required this.authRepository});
 
-  final List<Map<String, String>> users = [
-    {
-      'id': '1009',
-      'name': 'Ashok Kumar Gudi',
-      'image': 'https://via.placeholder.com/150',
-    },
-    {
-      'id': '1007',
-      'name': 'Harish Narakuduru',
-      'image': 'https://via.placeholder.com/150',
-    },
-    {
-      'id': '1006',
-      'name': 'Narendar chaluvadi',
-      'image': 'https://via.placeholder.com/150',
-    },
-    {
-      'id': '1012',
-      'name': 'Venkat',
-      'image': 'https://via.placeholder.com/150',
-    },
-  ];
-
   final box = GetStorage();
   String firstDay = '';
   String lastDay = '';
@@ -116,14 +93,18 @@ class CheckInOutApproveController extends GetxController {
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
+        final url = '$baseUrl$endpoint';
+        printf('<---url-->$url');
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
             'ClientId': clientId,
             'userName': userName,
             'EmployeeNumber': empNo,
-            'StartDate': '2025-02-01',
-            'EndDate': '2025-02-28',
+            'StartDate': firstDay,
+            'EndDate': endDay,
           },
         );
 

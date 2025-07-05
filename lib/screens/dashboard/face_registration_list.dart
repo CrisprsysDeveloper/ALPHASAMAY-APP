@@ -40,97 +40,107 @@ class FaceRegistrationListScreen extends StatelessWidget {
         //   SizedBox(width: 10),
         // ],
       ),
-      body:
-      Expanded(
-        child: Obx(()
-        {
-          return ListView.builder(
-            padding: EdgeInsets.only(bottom: 100),
-            itemCount: controller.faceUserList.length,
-            itemBuilder: (context, index) {
-              final emp = controller.faceUserList[index];
-              return  Card(
-                elevation: 1,
-                color: Colors.white,
-                margin: EdgeInsets.only(bottom: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-
-                    Container(
-                      height: 96,
-                      width: 90,
-                      child: CachedNetworkImage(
-                        imageUrl: emp.attendanceUserUImage,
-                        placeholder: (context, url) => Center(
-                          child: SizedBox(
-                            height: 24, // Adjust size as needed
-                            width: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2), // Thinner circle
-                          ),
+      body: Expanded(
+        child: Obx(() {
+          return Padding(
+            padding: EdgeInsets.all(10),
+            child: ListView.builder(
+              padding: EdgeInsets.only(bottom: 100),
+              itemCount: controller.faceUserList.length,
+              itemBuilder: (context, index) {
+                final emp = controller.faceUserList[index];
+                return Card(
+                  elevation: 1,
+                  color: Colors.white,
+                  margin: EdgeInsets.only(bottom: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        height: 96,
+                        width: 90,
+                        child: CachedNetworkImage(
+                          imageUrl: emp.attendanceUserUImage,
+                          placeholder:
+                              (context, url) => Center(
+                                child: SizedBox(
+                                  height: 24, // Adjust size as needed
+                                  width: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ), // Thinner circle
+                                ),
+                              ),
+                          errorWidget:
+                              (context, url, error) => Icon(Icons.error),
+                          fit:
+                              BoxFit
+                                  .cover, // Optional: scale image to fill container
                         ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                        fit: BoxFit.cover, // Optional: scale image to fill container
                       ),
-                    ),
-                    5.sbw,
-                    Expanded(child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                            "Employee/User",
-                            style: interTextStyle(
+                      5.sbw,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Employee/User",
+                              style: interTextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w700,
-                                size: 12.sp
-                            )),
-                        Text(
-                            emp.objectNo,
-                            style: interTextStyle(
+                                size: 12.sp,
+                              ),
+                            ),
+                            Text(
+                              emp.objectNo,
+                              style: interTextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w900,
-                                size: 15.sp
-                            )),
-                      ],
-                    )),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 10, right: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          widgetContainer(
-                            icon: Icons.delete,
-                            bgColors: ColorConstants.appColor,
-                            borderColor: ColorConstants.appColor,
-                            iconColor: Colors.white,
-                            onTap: () {
-                              printf('<---on-tap-delete--->');
-                              controller.showDeleteEventDialog();
-                            },
-                          ),
-                          10.sbw,
-                          widgetContainer(
-                            icon: Icons.edit,
-                            bgColors: ColorConstants.appColor,
-                            borderColor: ColorConstants.appColor,
-                            iconColor: Colors.white,
-                            onTap: () {
-                              printf('<---on-tap-edit--->');
-                            },
-                          ),
-                        ],
+                                size: 15.sp,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 10, right: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            widgetContainer(
+                              icon: Icons.delete,
+                              bgColors: ColorConstants.appColor,
+                              borderColor: ColorConstants.appColor,
+                              iconColor: Colors.white,
+                              onTap: () {
+                                printf('<---on-tap-delete--->');
+                                controller.showDeleteEventDialog();
+                              },
+                            ),
+                            10.sbw,
+                            widgetContainer(
+                              icon: Icons.edit,
+                              bgColors: ColorConstants.appColor,
+                              borderColor: ColorConstants.appColor,
+                              iconColor: Colors.white,
+                              onTap: () {
+                                printf('<---on-tap-edit--->');
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           );
         }),
       ),

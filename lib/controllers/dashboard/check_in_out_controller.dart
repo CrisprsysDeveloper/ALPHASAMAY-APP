@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:crysprsys/model/dashboard/user_time_zone_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/dashboard/checkin_checkout_type_model.dart';
@@ -10,6 +11,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:dio/dio.dart' as dio_;
 
 import 'package:crysprsys/helper/snackbar_toast.dart';
 import 'package:crysprsys/utils/app_constants.dart';
@@ -54,6 +56,11 @@ class CheckInOutController extends GetxController {
   RxString defaultDate = ''.obs;
   RxString defaultTime = ''.obs;
 
+  late final UserSettingsModel userSettingsTimeZone;
+
+  var latitude = '';
+  var longitude = '';
+
   @override
   void onInit() {
     super.onInit();
@@ -72,7 +79,9 @@ class CheckInOutController extends GetxController {
     defaultTime.value = timeFormat.format(fullDateTime);
 
     loadSavedCredentials();
-    getDropDownListApi(clientId: clientId, userName: userName);
+    getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(() {
+      getDropDownListApi(clientId: clientId, userName: userName);
+    });
   }
 
   void loadSavedCredentials() {
@@ -91,11 +100,12 @@ class CheckInOutController extends GetxController {
   }
 
   Future<void> selectDate(BuildContext context) async {
+    final DateTime today = DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate.value,
       firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
+      lastDate: today, //DateTime(2101),
     );
     if (picked != null && picked != selectedDate.value) {
       selectedDate.value = picked;
@@ -108,27 +118,55 @@ class CheckInOutController extends GetxController {
       context: context,
       initialTime: selectedTime.value,
     );
-    if (picked != null && picked != selectedTime.value) {
-      selectedTime.value = picked;
 
-      // Convert TimeOfDay to DateTime to format as HH:mm:ss
+    if (picked != null && picked != selectedTime.value) {
       final now = DateTime.now();
-      final dt = DateTime(
+
+      // Convert picked TimeOfDay to DateTime
+      final pickedDateTime = DateTime(
         now.year,
         now.month,
         now.day,
         picked.hour,
         picked.minute,
       );
-      defaultTime.value = timeFormat.format(dt);
+
+      // Check if selected date is today
+      final isToday =
+          selectedDate.value.year == now.year &&
+          selectedDate.value.month == now.month &&
+          selectedDate.value.day == now.day;
+
+      if (isToday && pickedDateTime.isAfter(now)) {
+        // Show warning - user selected future time today
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Cannot select future time for today's date."),
+          ),
+        );
+        return;
+      }
+
+      selectedTime.value = picked;
+      defaultTime.value = timeFormat.format(pickedDateTime);
     }
+  }
+
+  String timeNow(String inputTime) {
+    List<String> parts = inputTime.split(':');
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+
+    String h = hour < 10 ? '0$hour' : '$hour';
+    String m = minute < 10 ? '0$minute' : '$minute';
+    return '$h:$m';
   }
 
   Future<void> getDropDownListApi({
     required String clientId,
     required String userName,
   }) async {
-    printf('<--clientId-$clientId--userName-->$userName');
+    printf('<--getDropDownListApi-clientId-$clientId--userName-->$userName');
 
     final dio = Dio();
 
@@ -139,6 +177,18 @@ class CheckInOutController extends GetxController {
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
+        final uri = Uri.parse('$baseUrl$endpoint').replace(
+          queryParameters: {
+            'BusObjCode': 'ATTEND_BUS_Attendance_Events',
+            'ScreenMode': 'Display',
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+          },
+        );
+
+        print('Full URL: ${uri.toString()}');
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
@@ -166,6 +216,7 @@ class CheckInOutController extends GetxController {
         if (messageCode == "200") {
           final Map<String, dynamic> json = jsonDecode(response.data);
           final model = AuthResponseModel.fromJson(json);
+
           dropdownItems.value =
               model.authBasedObjectsList.map((e) {
                 return {'id': e.id ?? '', 'label': e.description ?? ''};
@@ -186,6 +237,43 @@ class CheckInOutController extends GetxController {
         } else {
           dropDownBannerError(messageDescription);
         }
+        hideProgress();
+      } catch (e) {
+        printf("Exception: $e");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  Future<void> getUserTimeZoneApi({
+    required String clientId,
+    required String userName,
+  }) async {
+    printf('<--getUserTimeZoneApi-clientId-$clientId--userName-->$userName');
+
+    final dio = Dio();
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.getUserTimeZoneApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {'CPMClientID': clientId, 'CPMUserName': userName},
+        );
+
+        printf('<----response---->$response');
+
+        final List<dynamic> jsonList = jsonDecode(response.toString());
+        userSettingsTimeZone = UserSettingsModel.fromJson(jsonList.first);
+
+        printf('time-zone-->${userSettingsTimeZone.userTimeZone}');
+
         hideProgress();
       } catch (e) {
         printf("Exception: $e");
@@ -267,29 +355,258 @@ class CheckInOutController extends GetxController {
     } else if (selectedPartnerType.value.isEmpty) {
       dropDownBannerError('select employe type');
     } else {
-      // Map<String, dynamic> body = {
-      //   "EmployeeID": selectedAuthId.value,
-      //   "CheckType": 'I',
-      //   "InDate": DateTime.parse(defaultDate.value),
-      //   // or use DateFormat if it's a string
-      //   "TimeZone": timeSettings.userTimeZone,
-      //   "DeviceSno": "",
-      //   "Checktime": timeNow(defaultTime.value),
-      //   // your method that returns time
-      //   "IsmanuallyDone": false,
-      //   "DuplicateDate": DateTime.parse(defaultDate.value),
-      //   "Latitude": latitude,
-      //   "Longitude": longitude,
-      //   "BusObjCode": "ATTEND_BUS_Attendance_Events",
-      //   "filePath": pickedImagePath.value,
-      //   "PartnerType": selectedPartnerType.value,
-      // };
+      printf(
+        'emp->${selectedAuthId.value} date->${defaultDate.value} time->${defaultTime.value}',
+      );
+      printf(
+        'checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',
+      );
+      printf(
+        'file->$pickedImagePath partnertype->${selectedPartnerType.value}',
+      );
+
+      checkInApi(clientId: clientId, userName: userName, type: 'I');
+
+      // timeEventUpdateApi(clientId: clientId, userName: userName, type: 'I');
+
+      //deleteEventApi(clientId: clientId, userName: userName, editId: '31447');
 
       printf('<---call-check-in/out--->');
     }
   }
 
-  void buttonCheckOut() {}
+  Future<void> checkInApi({
+    required String clientId,
+    required String userName,
+    required String type,
+  }) async {
+    printf('<--checkInApi-clientId-$clientId--userName-->$userName');
+
+    Map<String, dynamic> body = {
+      "EmployeeID": selectedAuthId.value,
+      "CheckType": type,
+      "InDate": '2025-07-05T05:00:00.000Z',
+      "ConvertedCheckinDate": "2025-02-04%2010:30:00",
+      "Checktime": timeNow(defaultTime.value).toString(),
+      "IsmanuallyDone": false,
+      "CreatedDate": "2025-02-07T07:41:41.972Z",
+      "Latitude": latitude,
+      "Longitude": longitude,
+      "BusObjCode": "ATTEND_BUS_Attendance_Events",
+      "PartnerType": selectedPartnerType.value,
+    };
+
+    printf('<---json-body--->${jsonEncode(body)}');
+
+    final dio = Dio();
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.checkInApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      final url =
+          '$baseUrl$endpoint?flag=INSERT&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
+
+      printf('<---url-->$url');
+
+      File imageFile = File(image.value!.path);
+      String fileName = imageFile.path.split('/').last;
+      dio_.FormData formData = dio_.FormData.fromMap({
+        'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+      });
+
+      final dio = dio_.Dio();
+      final response = await dio.post(url, data: formData);
+
+      printf('<---response--->$response');
+
+      // try {
+      //   showProgress();
+      //   final response = await dio.get(
+      //     '$baseUrl$endpoint',
+      //     queryParameters: {
+      //       'flag': 'INSERT',
+      //       'CPMClientID': clientId,
+      //       'CPMUserName': userName,
+      //       'AttendanceEventList': json,
+      //      // 'FilePath': pickedImagePath.value,
+      //     },
+      //   );
+      //
+      //   printf('<----response---->$response');
+      //
+      //   final Map<String, dynamic> outerJson = jsonDecode(response.data);
+      //
+      //   final Map<String, dynamic> serviceStatus = jsonDecode(
+      //     outerJson['ServiceStatus'],
+      //   );
+      //
+      //   final String messageCode = serviceStatus['MessageCode'];
+      //   final String messageDescription = serviceStatus['MessageDescription'];
+      //
+      //   printf('MessageCode: $messageCode');
+      //   printf('MessageDescription: $messageDescription');
+      //
+      //   if (messageCode == "200") {
+      //     printf('<----success---check-in----->');
+      //   } else {
+      //     dropDownBannerError(messageDescription);
+      //   }
+      //   hideProgress();
+      // } catch (e) {
+      //   printf("Exception: $e");
+      //   hideProgress();
+      // }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  void buttonCheckOut() {
+    if (pickedImagePath.value.isEmpty) {
+      dropDownBannerError('Upload image');
+    } else if (selectedAuthId.value.isEmpty) {
+      dropDownBannerError('select patner type');
+    } else if (selectedPartnerType.value.isEmpty) {
+      dropDownBannerError('select employe type');
+    } else {
+      printf(
+        'emp->${selectedAuthId.value} date->${defaultDate.value} time->${defaultTime.value}',
+      );
+      printf(
+        'checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',
+      );
+      printf(
+        'file->$pickedImagePath partnertype->${selectedPartnerType.value}',
+      );
+
+      checkOutApi(
+        clientId: clientId,
+        userName: userName,
+        type: 'O',
+        editId: '31447',
+      );
+
+      printf('<---call-check-in/out--->');
+    }
+  }
+
+  Future<void> checkOutApi({
+    required String clientId,
+    required String userName,
+    required String type,
+    required String editId,
+  }) async {
+    printf('<--checkOutApi-clientId-$clientId--userName-->$userName');
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.checkOutApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      final url =
+          '$baseUrl$endpoint?AttendEventID=$editId&CPMClientID=1&CPMUserName=Call'; //; //&FilePath=$encodedPath';
+
+      printf('<---url-->$url');
+
+      File imageFile = File(image.value!.path);
+      String fileName = imageFile.path.split('/').last;
+      dio_.FormData formData = dio_.FormData.fromMap({
+        'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+      });
+
+      final dio = dio_.Dio();
+      final response = await dio.post(url);
+
+      printf('<---response--->$response');
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  Future<void> timeEventUpdateApi({
+    required String clientId,
+    required String userName,
+    required String type,
+  }) async {
+    printf('<--timeEventUpdateApi-clientId-$clientId--userName-->$userName');
+
+    Map<String, dynamic> body = {
+      "CheckInId": '2231447',
+      "EmployeeID": selectedAuthId.value,
+      "CheckType": type,
+      "InDate": '2025-07-05T05:00:00.000Z',
+      "ConvertedCheckinDate": "2025-02-04%2010:30:00",
+      "Checktime": timeNow(defaultTime.value).toString(),
+      "IsmanuallyDone": false,
+      "CreatedDate": "2025-02-07T07:41:41.972Z",
+      "Latitude": latitude,
+      "Longitude": longitude,
+      "PartnerType": selectedPartnerType.value,
+    };
+
+    printf('<---json-body--->${jsonEncode(body)}');
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.timeEventUpdateApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      final url =
+          '$baseUrl$endpoint?flag=UPDATE&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
+
+      printf('<---url-->$url');
+
+      File imageFile = File(image.value!.path);
+      String fileName = imageFile.path.split('/').last;
+      dio_.FormData formData = dio_.FormData.fromMap({
+        'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+      });
+
+      final dio = dio_.Dio();
+      final response = await dio.post(url);
+
+      printf('<---response--->$response');
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  Future<void> deleteEventApi({
+    required String clientId,
+    required String userName,
+    required String editId,
+  }) async {
+    printf('<--deleteEventApi-clientId-$clientId--userName-->$userName');
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.timeEventDeleteApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      final url =
+          '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&AttendEventID=$editId'; //; //&FilePath=$encodedPath';
+
+      printf('<---url-->$url');
+
+      final dio = dio_.Dio();
+      final response = await dio.post(url);
+
+      printf('<---response--->$response');
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
 
   Future<void> getCurrentLocation() async {
     String location = "Fetching...";
@@ -320,6 +637,8 @@ class CheckInOutController extends GetxController {
       desiredAccuracy: LocationAccuracy.high,
     );
 
+    latitude = position.latitude.toString();
+    longitude = position.longitude.toString();
     location =
         "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
     update();
