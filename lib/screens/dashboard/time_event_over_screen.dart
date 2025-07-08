@@ -87,8 +87,10 @@ class TimeEventOverScreen extends StatelessWidget {
                                 }).toList(),
                             onChanged: (value) {
                               controller.selectedYear.value = value!;
-                              printf(
-                                '<--selected-year-->${controller.selectedYear.value}',
+                              printf('<--selected-year-->${controller.selectedYear.value}',);
+                              controller.onYearOrMonthChanged(
+                                controller.selectedYear.value,
+                                controller.selectedMonth.value,
                               );
                             },
                           ),
@@ -125,6 +127,10 @@ class TimeEventOverScreen extends StatelessWidget {
                               controller.selectedMonth.value = value!;
                               printf(
                                 '<--selected-month-->${controller.selectedMonth.value}',
+                              );
+                              controller.onYearOrMonthChanged(
+                                controller.selectedYear.value,
+                                controller.selectedMonth.value,
                               );
                             },
                           ),

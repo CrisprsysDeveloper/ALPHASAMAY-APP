@@ -95,6 +95,31 @@ class TimeEventOverController extends GetxController {
     );
   }
 
+  void onYearOrMonthChanged(String year, String monthName) {
+    final int yearInt = int.parse(year);
+    final int monthInt = monthNameToInt(monthName);
+
+    getFirstAndLastDay(yearInt, monthInt);
+  }
+
+  int monthNameToInt(String monthName) {
+    const months = {
+      'January': 1,
+      'February': 2,
+      'March': 3,
+      'April': 4,
+      'May': 5,
+      'June': 6,
+      'July': 7,
+      'August': 8,
+      'September': 9,
+      'October': 10,
+      'November': 11,
+      'December': 12,
+    };
+
+    return months[monthName]!;
+  }
 
   Future<void> getEventListApi({
     required String clientId,

@@ -13,8 +13,9 @@ class FaceRecognitionResponse {
 
   factory FaceRecognitionResponse.fromJson(Map<String, dynamic> json) {
     return FaceRecognitionResponse(
-      serviceStatus:
-      ServiceStatus.fromJson(jsonDecode(json['ServiceStatus'])),
+      serviceStatus: ServiceStatus.fromJson(
+        jsonDecode(json['ServiceStatus'] ?? '{}'),
+      ),
       attendanceUserList: (json['AttendanceUserList'] as List<dynamic>?)
           ?.map((e) => AttendanceUser.fromJson(e))
           .toList() ??
@@ -38,8 +39,8 @@ class ServiceStatus {
 
   factory ServiceStatus.fromJson(Map<String, dynamic> json) {
     return ServiceStatus(
-      messageCode: json['MessageCode'],
-      messageDescription: json['MessageDescription'],
+      messageCode: json['MessageCode'] ?? '',
+      messageDescription: json['MessageDescription'] ?? '',
     );
   }
 }
@@ -101,24 +102,24 @@ class ScreenControl {
   ScreenControl({
     required this.control,
     required this.icon,
-    required this.roleId,
+    this.roleId,
     required this.modeName,
     required this.controlCode,
     required this.controlId,
-    required this.statusDesc,
-    required this.taskStatus,
+    this.statusDesc,
+    this.taskStatus,
   });
 
   factory ScreenControl.fromJson(Map<String, dynamic> json) {
     return ScreenControl(
       control: json['Control'] ?? '',
       icon: json['Icon'] ?? '',
-      roleId: json['RoleID'],
+      roleId: json['RoleID']?.toString(),
       modeName: json['ModeName'] ?? '',
       controlCode: json['ControlCode'] ?? '',
       controlId: json['ControlID'] ?? 0,
-      statusDesc: json['StatusDesc'],
-      taskStatus: json['TaskStatus'],
+      statusDesc: json['StatusDesc']?.toString(),
+      taskStatus: json['TaskStatus']?.toString(),
     );
   }
 }

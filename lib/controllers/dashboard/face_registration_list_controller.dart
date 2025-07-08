@@ -71,10 +71,7 @@ class FaceRegistrationListController extends GetxController {
     printf("First day: $firstDay");
     printf("Last day: $lastDay");
 
-    getFaceUserListApi(
-      clientId: clientId,
-      userName: userName,
-    );
+    getFaceUserListApi(clientId: clientId, userName: userName);
   }
 
   Future<void> getFaceUserListApi({
@@ -88,27 +85,35 @@ class FaceRegistrationListController extends GetxController {
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
+        final url =
+            '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&BusObjCode=CRIS_BUS_GS_FaceRegistration_OV'; //; //&FilePath=$encodedPath';
+
+        printf('<---url-->$url');
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
             'CPMClientID': clientId,
             'CPMUserName': userName,
             'BusObjCode': 'CRIS_BUS_GS_FaceRegistration_OV',
-            'RequestComingFrom': 'Web',
           },
         );
 
         printf('<----response---->$response');
 
-        final data = jsonDecode(response.data);
+        final Map<String, dynamic> data =
+            response.data is String ? jsonDecode(response.data) : response.data;
+
         final model = FaceRecognitionResponse.fromJson(data);
 
         if (model.serviceStatus.messageCode == "200") {
           faceUserList.value = model.attendanceUserList;
-          screenControls.value = model.screenControlsList;
 
           printf("User Count: ${faceUserList.length}");
-          printf("Controls: ${screenControls.map((e) => e.control).toList()}");
+          for (final user in faceUserList) {
+            printf('User: ${user.faceRegID} - ${user.objectNo}');
+          }
         } else {
           dropDownBannerError(model.serviceStatus.messageDescription);
         }
@@ -123,28 +128,36 @@ class FaceRegistrationListController extends GetxController {
     }
   }
 
-  Future<void> deleteEventApi({
+  Future<void> deleteFaceIdApi({
     required String clientId,
     required String userName,
-    required String eventId,
+    required String faceId,
   }) async {
-    printf('<--clientId-$clientId--userName-->$userName--eventId-->$eventId');
+    printf(
+      '<--deleteFaceIdApi--clientId-$clientId--userName-->$userName--faceId-->$faceId',
+    );
 
     final dio = Dio();
 
     // Construct the full URL
     const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
-    const String endpoint = AppConstants.deleteEventApi;
+    const String endpoint = AppConstants.deleteFaceRegistrationApi;
 
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
+        final url =
+            '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&KeyName=$faceId'; //; //&FilePath=$encodedPath';
+
+        printf('<---url-->$url');
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
             'CPMClientID': clientId,
             'CPMUserName': userName,
-            'AttendEventID': eventId,
+            'KeyName': faceId,
           },
         );
 
@@ -164,15 +177,10 @@ class FaceRegistrationListController extends GetxController {
         printf('MessageDescription: $messageDescription');
 
         if (messageCode == "200") {
-          printf('<----success-delete-event---refresh-event-list-here->');
-
-          // getEventListApi(
-          //   clientId: clientId,
-          //   userName: userName,
-          //   empNo: '',
-          //   startDay: firstDay,
-          //   endDay: lastDay,
-          // );
+          printf(
+            '<----success-delete-face-registration--refresh-face-list-here->',
+          );
+          getFaceUserListApi(clientId: clientId, userName: userName);
         } else {
           dropDownBannerError(messageDescription);
         }
@@ -186,7 +194,7 @@ class FaceRegistrationListController extends GetxController {
     }
   }
 
-  void showDeleteEventDialog() {
+  void showDeleteFaceIdDialog(String faceId) {
     showDialog(
       context: Get.context!,
       barrierDismissible: false, // Prevents closing by tapping outside
@@ -229,6 +237,11 @@ class FaceRegistrationListController extends GetxController {
                       child: Text("YES", style: TextStyle(color: Colors.blue)),
                       onPressed: () async {
                         Get.back(); // Close the current route
+                        deleteFaceIdApi(
+                          clientId: clientId,
+                          userName: userName,
+                          faceId: faceId,
+                        );
                       },
                     ),
                   ],
@@ -271,7 +284,7 @@ class FaceRegistrationListController extends GetxController {
     );
 
     location =
-    "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+        "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
     update();
 
     printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");

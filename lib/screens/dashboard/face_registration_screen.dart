@@ -39,47 +39,46 @@ class FaceRegistrationScreen extends StatelessWidget {
           children: [
             20.sbh,
             Obx(
-            () =>
-            Container(
-                      height: 120,
-                      width: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.deepPurple, // border color
-                          width: 1, // border width
-                        ),
-                      ),
-                      child: Stack(
-                        children: [
-                          ClipOval(
-                            child:
-                            controller.image.value != null
-                                ? Image.file(
-                              controller.image.value!,
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                            )
-                                : Image.asset(
-                              'assets/icons/ic_user_profile.png',
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.center,
-                            child: IconButton(
-                              icon: Icon(Icons.camera_alt_outlined),
-                              onPressed: () {
-                                controller.showImageSourceDialog();
-                              },
-                            ),
-                          ),
-                        ],
+              () => Container(
+                height: 120,
+                width: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.deepPurple, // border color
+                    width: 1, // border width
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    ClipOval(
+                      child:
+                          controller.image.value != null
+                              ? Image.file(
+                                controller.image.value!,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              )
+                              : Image.asset(
+                                'assets/icons/ic_user_profile.png',
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: IconButton(
+                        icon: Icon(Icons.camera_alt_outlined),
+                        onPressed: () {
+                          controller.showImageSourceDialog();
+                        },
                       ),
                     ),
+                  ],
+                ),
+              ),
             ),
             20.sbh,
             Column(
@@ -96,31 +95,33 @@ class FaceRegistrationScreen extends StatelessWidget {
                 ),
                 2.sbh,
                 Obx(
-                      () => Container(
+                  () => Container(
                     color: Colors.grey.shade300,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.w),
                       child: DropdownButtonFormField<String>(
-                        value: controller.selectedAuthId.value.isEmpty
-                            ? null
-                            : controller.selectedAuthId.value,
+                        value:
+                            controller.selectedObject.value.isEmpty
+                                ? null
+                                : controller.selectedObject.value,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                         ),
-                        items: controller.dropdownItems
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                            value: item['id'],
-                            child: Text(item['label'] ?? ''),
-                          ),
-                        )
-                            .toList(),
+                        items:
+                            controller.businessObjectDropdownItems
+                                .map(
+                                  (item) => DropdownMenuItem<String>(
+                                    value: item['id'],
+                                    child: Text(item['label'] ?? ''),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (value) {
-                          controller.selectedPartnerType.value = value ?? '';
-                          controller.selectedObjectNumber.value='1009-Ashok Kumar Gudi';
-                          // controller.filterObjectNumbersByPType(); // ⬅️ Add this function
+                          printf('<---selected-business-object-->$value');
+                          controller.selectedObject.value = value ?? '';
+                          controller.filterAttendanceListBySelectedObject();
                         },
                       ),
                     ),
@@ -129,7 +130,6 @@ class FaceRegistrationScreen extends StatelessWidget {
               ],
             ),
             30.sbh,
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -157,19 +157,23 @@ class FaceRegistrationScreen extends StatelessWidget {
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                         ),
-                        items: controller.filteredObjectNumbers
-                            .map((item) => DropdownMenuItem<String>(
-                          value: item['id'],
-                          child: Text(item['label'] ?? ''),
-                        ))
+                        items: controller.filteredAttendanceUserList
+                            .map(
+                              (item) => DropdownMenuItem<String>(
+                            value: item.id,
+                            child: Text(item.description),
+                          ),
+                        )
                             .toList(),
                         onChanged: (value) {
                           controller.selectedObjectNumber.value = value ?? '';
+                          printf('<--selected-object-number--->${controller.selectedObjectNumber}');
                         },
                       ),
                     ),
                   ),
                 ),
+
               ],
             ),
             30.sbh,

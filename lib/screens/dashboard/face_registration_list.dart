@@ -40,7 +40,9 @@ class FaceRegistrationListScreen extends StatelessWidget {
         //   SizedBox(width: 10),
         // ],
       ),
-      body: Expanded(
+      body: SizedBox(
+        height: Get.height,
+        width: Get.width,
         child: Obx(() {
           return Padding(
             padding: EdgeInsets.all(10),
@@ -60,7 +62,7 @@ class FaceRegistrationListScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Container(
+                      SizedBox(
                         height: 96,
                         width: 90,
                         child: CachedNetworkImage(
@@ -119,8 +121,7 @@ class FaceRegistrationListScreen extends StatelessWidget {
                               borderColor: ColorConstants.appColor,
                               iconColor: Colors.white,
                               onTap: () {
-                                printf('<---on-tap-delete--->');
-                                controller.showDeleteEventDialog();
+                                controller.showDeleteFaceIdDialog(emp.faceRegID);
                               },
                             ),
                             10.sbw,

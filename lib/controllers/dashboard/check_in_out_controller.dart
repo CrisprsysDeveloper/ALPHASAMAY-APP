@@ -200,7 +200,7 @@ class CheckInOutController extends GetxController {
       // Store for submission
       convertedCheckInDate.value = convertedDate;
 
-      print("ConvertedCheckinDate: $convertedDate");
+
     }
   }
 
