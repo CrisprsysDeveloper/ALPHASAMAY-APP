@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
 import 'package:crysprsys/model/dashboard/time_event_model.dart';
@@ -32,6 +32,7 @@ class TimeEventOverController extends GetxController {
 
   String firstDay = '';
   String lastDay = '';
+  RxString currentMonthName = ''.obs;
 
   var clientId = '1';
   var userName = 'Call';
@@ -43,7 +44,8 @@ class TimeEventOverController extends GetxController {
     loadSavedCredentials();
     getCurrentLocation();
     DateTime now = DateTime.now();
-    getFirstAndLastDay(now.year, now.month);
+    currentMonthName.value = DateFormat.MMMM().format(now); // "July"
+    getFirstAndLastDay(now.year, now.month, true);
   }
 
   void loadSavedCredentials() {
@@ -65,7 +67,7 @@ class TimeEventOverController extends GetxController {
     return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
-  void getFirstAndLastDay(int year, int month) {
+  void getFirstAndLastDay(int year, int month, bool isRefresh) {
     DateTime fd = DateTime(year, month, 1);
     DateTime ld = DateTime(year, month + 1, 0);
 
@@ -76,6 +78,7 @@ class TimeEventOverController extends GetxController {
     printf("Last day: $lastDay");
 
     getEventListApi(
+      isRefresh,
       clientId: clientId,
       userName: userName,
       empNo: '',
@@ -84,9 +87,9 @@ class TimeEventOverController extends GetxController {
     );
   }
 
-  void getList()
-  {
+  void getList() {
     getEventListApi(
+      false,
       clientId: clientId,
       userName: userName,
       empNo: '',
@@ -99,7 +102,7 @@ class TimeEventOverController extends GetxController {
     final int yearInt = int.parse(year);
     final int monthInt = monthNameToInt(monthName);
 
-    getFirstAndLastDay(yearInt, monthInt);
+    getFirstAndLastDay(yearInt, monthInt, false);
   }
 
   int monthNameToInt(String monthName) {
@@ -121,7 +124,8 @@ class TimeEventOverController extends GetxController {
     return months[monthName]!;
   }
 
-  Future<void> getEventListApi({
+  Future<void> getEventListApi(
+    isRefresh, {
     required String clientId,
     required String userName,
     required String empNo,
@@ -176,6 +180,7 @@ class TimeEventOverController extends GetxController {
         printf('MessageDescription: $messageDescription');
 
         if (messageCode == "200") {
+          attendanceList.clear();
           printf('<----success-getting-event-list---->');
 
           final Map<String, dynamic> outerJson = jsonDecode(response.data);
@@ -185,16 +190,21 @@ class TimeEventOverController extends GetxController {
             attendanceList.value = model.attendanceList;
           }
 
-          if (model.objYearsList.isNotEmpty) {
-            yearList.value = model.objYearsList;
-            selectedYear.value = model.objYearsList.last.value; // Optional
+          printf('<----list-of-events---->${attendanceList.length}');
+
+          if (isRefresh) {
+            if (model.objYearsList.isNotEmpty) {
+              yearList.value = model.objYearsList;
+              selectedYear.value = model.objYearsList.last.value; // Optional
+            }
+            if (model.objMonthsList.isNotEmpty) {
+              monthList.value = model.objMonthsList;
+              selectedMonth.value = model.objMonthsList.first.value;
+            }
+            selectedMonth.value = currentMonthName.value;
           }
-          if (model.objMonthsList.isNotEmpty) {
-            monthList.value = model.objMonthsList;
-            selectedMonth.value = model.objMonthsList.first.value;
-          }
-          for (final emp in model.employeeList) {
-            printf('Employee: ${emp.id} - ${emp.value}');
+          for (final emp in model.attendanceList) {
+            printf('Employee: ${emp.employeeName} - ${emp.employeeID}');
           }
         } else {
           dropDownBannerError(messageDescription);
@@ -241,6 +251,7 @@ class TimeEventOverController extends GetxController {
           final messageText = response.data['MessageText'];
           dropDownBannerSuccess(messageText);
           getEventListApi(
+            true,
             clientId: clientId,
             userName: userName,
             empNo: '',
@@ -287,6 +298,7 @@ class TimeEventOverController extends GetxController {
         final messageText = response.data['MessageText'];
         dropDownBannerSuccess(messageText);
         getEventListApi(
+          true,
           clientId: clientId,
           userName: userName,
           empNo: '',
@@ -390,11 +402,8 @@ class TimeEventOverController extends GetxController {
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    location =
-        "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+    location = "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
     update();
-
     printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
   }
 }
-
