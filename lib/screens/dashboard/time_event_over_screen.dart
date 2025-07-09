@@ -79,13 +79,13 @@ class TimeEventOverScreen extends StatelessWidget {
                               focusedBorder: InputBorder.none,
                             ),
                             items:
-                                controller.yearList.map((year) {
+                            controller.yearList.map((year) {
                                   return DropdownMenuItem<String>(
                                     value: year.value,
                                     child: Text(year.value),
                                   );
                                 }).toList(),
-                            onChanged: (value) {
+                                onChanged: (value) {
                               controller.selectedYear.value = value!;
                               printf('<--selected-year-->${controller.selectedYear.value}',);
                               controller.onYearOrMonthChanged(

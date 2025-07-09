@@ -122,61 +122,82 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      height: 40,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: DropdownButtonFormField<String>(
-                          value: controller.selectedYear,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                          ),
-                          items: ['2024', '2025', '2026']
-                              .map(
-                                (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e),
+                    child: Obx(
+                      () =>  Container(
+                        height: 40,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: DropdownButtonFormField<String>(
+                            value:
+                            controller.selectedYear.value.isEmpty
+                                ? null
+                                : controller.selectedYear.value,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
                             ),
-                          )
-                              .toList(),
-                          onChanged: (_) {},
+                            items:
+                            controller.yearList.map((year) {
+                              return DropdownMenuItem<String>(
+                                value: year.value,
+                                child: Text(year.value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              controller.selectedYear.value = value!;
+                              printf('<--selected-year-->${controller.selectedYear.value}',);
+                              controller.onYearOrMonthChanged(
+                                controller.selectedYear.value,
+                                controller.selectedMonth.value,
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
                   ),
                   16.sbw,
-                  Expanded(
-                    child: Container(
-                      height: 40,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: DropdownButtonFormField<String>(
-                          value: controller.selectedMonth,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                          ),
-                          items: [
-                            'January',
-                            'February',
-                            'March',
-                            'April',
-                            'May',
-                            'June',
-                          ]
-                              .map(
-                                (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e),
-                            ),
-                          )
-                              .toList(),
-                          onChanged: (_) {},
-                        ),
-                      ),
-                    ),
+                Expanded(
+          child: Obx(
+                () => Container(
+              height: 40,
+              color: Colors.grey.shade300,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: DropdownButtonFormField<String>(
+                  value:
+                  controller.selectedMonth.value.isEmpty
+                      ? null
+                      : controller.selectedMonth.value,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                   ),
+                  items:
+                  controller.monthList.map((month) {
+                    return DropdownMenuItem<String>(
+                      value: month.value,
+                      child: Text(month.value),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    controller.selectedMonth.value = value!;
+                    printf(
+                      '<--selected-month-->${controller.selectedMonth.value}',
+                    );
+                    controller.onYearOrMonthChanged(
+                      controller.selectedYear.value,
+                      controller.selectedMonth.value,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
                 ],
               ),
 
