@@ -402,7 +402,8 @@ class TimeEventOverController extends GetxController {
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    location = "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+    location =
+        "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
     update();
     printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
   }

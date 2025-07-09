@@ -282,24 +282,21 @@ class FaceRegistrationController extends GetxController {
   }
 
   void registerFace() async {
-    // if (selectedPartnerType.value.isEmpty || selectedObjectNumber.value.isEmpty) {
-    //   dropDownBannerError('Please select Business Object and Object Number');
-    //   return;
-    // }
-    //
-    // if (pickedImagePath.value.isEmpty) {
-    //   dropDownBannerError("Please take a photo");
-    //   return;
-    // }
+    if (selectedObject.value.isEmpty || selectedObjectNumber.value.isEmpty) {
+      dropDownBannerError('Please select Business Object and Object Number');
+      return;
+    }
 
-    // final Dio dio = Dio();
-    final String baseUrl = AppConstants.baseUrl;
-    const String endpoint = AppConstants.saveMobileAttendanceUserProfileApi;
+    if (pickedImagePath.value.isEmpty) {
+      dropDownBannerError("Please take a photo");
+      return;
+    }
 
-    //showProgress();
+    showProgress();
 
     final url =
-        'https://apis.crisprsys.net/api//FaceRekognition/AttendanceUserProfilePic?CPMClientID=1&CPMUserName=Call&BusObjCode=CRIS_BUS_GM_NewHRData_Empl&ObjectNumber=1005&FilePath=${pickedImagePath.value}&FaceId=';
+        'https://apis.crisprsys.net/api//FaceRekognition/SaveMobileAttendanceUserProfile?CPMClientID=$clientId&CPMUserName=$userName&BusObjCode=${selectedObject.value}&ObjectNumber=${selectedObjectNumber.value}&FilePath=${pickedImagePath.value}&FaceId=';
+    // final url = 'https://apis.crisprsys.net/api//FaceRekognition/AttendanceUserProfilePic?CPMClientID=1&CPMUserName=Call&BusObjCode=CRIS_BUS_GM_NewHRData_Empl&ObjectNumber=1005&FilePath=${pickedImagePath.value}&FaceId=';
 
     printf('<--url---->$url');
     final dio = dio_.Dio();
@@ -315,7 +312,18 @@ class FaceRegistrationController extends GetxController {
 
     printf('<---response--->$response');
 
-    //hideProgress();
+    final Map<String, dynamic> outerJson =
+        response.data is String ? jsonDecode(response.data) : response.data;
+
+    final Map<String, dynamic> serviceStatus = jsonDecode(
+      outerJson['ServiceStatus'],
+    );
+
+    final String message =
+        serviceStatus['MessageDescription'] ?? 'Unknown response';
+
+    dropDownBannerError(message);
+    hideProgress();
   }
 }
 
