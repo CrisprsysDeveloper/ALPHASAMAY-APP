@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/dashboard/leave_model.dart';
@@ -22,12 +23,16 @@ class LeaveQuotaController extends GetxController {
   final box = GetStorage();
 
   RxList<LeaveItem> employeeList = <LeaveItem>[].obs;
+  RxList<DropdownItem> yearList = <DropdownItem>[].obs;
+  RxList<DropdownItem> monthList = <DropdownItem>[].obs;
 
-  String selectedYear = '2025';
-  String selectedMonth = 'February';
+  final RxString selectedYear = ''.obs;
+  final RxString selectedMonth = ''.obs;
 
   String firstDay = '';
   String lastDay = '';
+  RxString currentMonthName = ''.obs;
+
 
   var clientId = '1';
   var userName = 'Call';
@@ -39,7 +44,9 @@ class LeaveQuotaController extends GetxController {
     loadSavedCredentials();
     getCurrentLocation();
     DateTime now = DateTime.now();
-    getFirstAndLastDay(now.year, now.month);
+    currentMonthName.value = DateFormat.MMMM().format(now); // "July"
+
+    getFirstAndLastDay(now.year, now.month, true);
   }
 
   void loadSavedCredentials() {
@@ -61,7 +68,7 @@ class LeaveQuotaController extends GetxController {
     return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
-  void getFirstAndLastDay(int year, int month) {
+  void getFirstAndLastDay(int year, int month, bool isRefresh) {
     DateTime fd = DateTime(year, month, 1);
     DateTime ld = DateTime(year, month + 1, 0);
 
@@ -72,6 +79,7 @@ class LeaveQuotaController extends GetxController {
     printf("Last day: $lastDay");
 
     getLeaveQuotaListApi(
+      isRefresh,
       clientId: clientId,
       userName: userName,
       empNo: '',
@@ -79,8 +87,44 @@ class LeaveQuotaController extends GetxController {
       endDay: lastDay,
     );
   }
+  void getList() {
+    getLeaveQuotaListApi(
+      false,
+      clientId: clientId,
+      userName: userName,
+      empNo: '',
+      startDay: firstDay,
+      endDay: lastDay,
+    );
+  }
+  void onYearOrMonthChanged(String year, String monthName) {
+    final int yearInt = int.parse(year);
+    final int monthInt = monthNameToInt(monthName);
 
-  Future<void> getLeaveQuotaListApi({
+    getFirstAndLastDay(yearInt, monthInt, false);
+  }
+
+  int monthNameToInt(String monthName) {
+    const months = {
+      'January': 1,
+      'February': 2,
+      'March': 3,
+      'April': 4,
+      'May': 5,
+      'June': 6,
+      'July': 7,
+      'August': 8,
+      'September': 9,
+      'October': 10,
+      'November': 11,
+      'December': 12,
+    };
+
+    return months[monthName]!;
+  }
+
+
+  Future<void> getLeaveQuotaListApi(    isRefresh, {
     required String clientId,
     required String userName,
     required String empNo,
@@ -106,8 +150,8 @@ class LeaveQuotaController extends GetxController {
             'ClientID': clientId,
             'UserName': userName,
             'EmployeeNo': empNo,
-            'StartDate': startDay="2025-02-01",
-            'EndDate': endDay="2025-02-28",
+            'StartDate': startDay,
+            'EndDate': endDay,
             'BusObjCode': 'LM_LR_BUS_OV',
             'RequestComingFrom': 'Mobile',
           },
@@ -125,6 +169,19 @@ class LeaveQuotaController extends GetxController {
         employeeList.value = model.employeesLeavesList;
 
         printf('<---employeeList--->${employeeList.value.length}');
+
+        if (isRefresh) {
+          if (model.yearsList.isNotEmpty) {
+            yearList.value = model.yearsList;
+            selectedYear.value = model.yearsList.last.value; // Optional
+          }
+          if (model.monthsList.isNotEmpty) {
+            monthList.value = model.monthsList;
+            selectedMonth.value = model.monthsList.first.value;
+          }
+          selectedMonth.value = currentMonthName.value;
+        }
+
 
         for (final emp in employeeList.value) {
           printf('Employee: ${emp.leaveID} - ${emp.leaveType}');
