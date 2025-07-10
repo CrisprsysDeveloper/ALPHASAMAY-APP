@@ -1,6 +1,7 @@
 import 'package:crysprsys/controllers/dashboard/time_event_over_controller.dart';
 import 'package:crysprsys/controllers/dashboard/time_justification_controller.dart';
 import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/model/dashboard/justification_model.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../route/app_pages.dart';
+import '../../utils/app_constants.dart';
 
 class TimeJustificationScreen extends StatefulWidget {
   const TimeJustificationScreen({super.key});
@@ -121,57 +123,78 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      height: 40,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: DropdownButtonFormField<String>(
-                          value: controller.selectedYear,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                          ),
-                          items: ['2024', '2025', '2026']
-                              .map(
-                                (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e),
+                    child: Obx(
+                          () => Container(
+                        height: 40,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: DropdownButtonFormField<String>(
+                            value:
+                            controller.selectedYear.value.isEmpty
+                                ? null
+                                : controller.selectedYear.value,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
                             ),
-                          )
-                              .toList(),
-                          onChanged: (_) {},
+                            items:
+                            controller.yearList.map((year) {
+                              return DropdownMenuItem<String>(
+                                value: year.value,
+                                child: Text(year.value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              controller.selectedYear.value = value!;
+                              printf('<--selected-year-->${controller.selectedYear.value}',);
+                              controller.onYearOrMonthChanged(
+                                controller.selectedYear.value,
+                                controller.selectedMonth.value,
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
                   ),
                   16.sbw,
                   Expanded(
-                    child: Container(
-                      height: 40,
-                      color: Colors.grey.shade300,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: DropdownButtonFormField<String>(
-                          value: controller.selectedMonth,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                          ),
-                          items: [
-                            'January',
-                            'February',
-                            'March',
-                            'April',
-                            'May',
-                            'June',
-                          ]
-                              .map(
-                                (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(e),
+                    child: Obx(
+                          () => Container(
+                        height: 40,
+                        color: Colors.grey.shade300,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: DropdownButtonFormField<String>(
+                            value:
+                            controller.selectedMonth.value.isEmpty
+                                ? null
+                                : controller.selectedMonth.value,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
                             ),
-                          )
-                              .toList(),
-                          onChanged: (_) {},
+                            items:
+                            controller.monthList.map((month) {
+                              return DropdownMenuItem<String>(
+                                value: month.value,
+                                child: Text(month.value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              controller.selectedMonth.value = value!;
+                              printf(
+                                '<--selected-month-->${controller.selectedMonth.value}',
+                              );
+                              controller.onYearOrMonthChanged(
+                                controller.selectedYear.value,
+                                controller.selectedMonth.value,
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -183,24 +206,20 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
 
               // List of Records (Filtered by selected tab)
               Expanded(
-                child: ListView.builder(
-                  itemCount: controller.records.length,
-                  itemBuilder: (context, index) {
-                    var record = controller.records[index];
-
-                    // Optional: Filter based on selectedIndex (Online/Offline)
-                    // if you have type field, filter records accordingly
-
-                    bool isCheckIn = record['checkType'] == 'Check In';
-                    Color borderColor =
-                    isCheckIn ? Colors.green : Colors.orange;
-
-                    return widgetTimeEvents(
-                      record: record,
-                      borderColor: borderColor,
-                    );
-                  },
-                ),
+                child: Obx(() {
+                  return controller.employeeList.isNotEmpty
+                      ? ListView.builder(
+                    itemCount: controller.employeeList.length,
+                    itemBuilder: (context, index) {
+                      final emp = controller.employeeList[index];
+                      return widgetTimeEvents(
+                        emp,
+                        borderColor: Colors.green,
+                      );
+                    },
+                  )
+                      : Center(child: Text(AppConstants.noDataFound));
+                }),
               ),
             ],
           ),
@@ -217,7 +236,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
     );
   }
 
-  Widget widgetTimeEvents({required borderColor, required record}) {
+  Widget widgetTimeEvents(JustificationItem employee, {borderColor}) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -233,10 +252,10 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Employee/UserName", record['name']),
+                child: buildTextColumn("Employee/UserName", employee.employeeName),
               ),
               Expanded(
-                child: buildTextColumn("Justification No", "100008798911"),
+                child: buildTextColumn("Justification No", employee.justid),
               ),
             ],
           ),
@@ -244,24 +263,24 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Violation Type", "Late Coming"),
+                child: buildTextColumn("Violation Type", employee.partnerType),
               ),
               Expanded(
-                child: buildTextColumn("Cost Center", "ST Branch"),
+                child: buildTextColumn("Comment", employee.justifyComments),
               ),
             ],
           ),
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Date", "27/06/2025")),
-              Expanded(child: buildTextColumn("Time-In", "21:58:00")),
+              Expanded(child: buildTextColumn("Date", employee.date)),
+              Expanded(child: buildTextColumn("Time-In", employee.date)),
             ],
           ),
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Status", "Submitted")),
+              Expanded(child: buildTextColumn("Status",employee.status)),
               widgetContainer(
                 icon: Icons.remove_red_eye,
                 bgColors: Colors.white,
