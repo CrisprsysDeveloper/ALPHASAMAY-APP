@@ -10,6 +10,7 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,53 @@ void main() async {
     DeviceOrientation.portraitDown, // Upside-Down Portrait
   ]);
 
+  await _requestPermissions();
   runApp(const MyApp());
+}
+
+// Future<void> _requestPermissions() async {
+//   if (await Permission.camera.isDenied) {
+//     await Permission.camera.request();
+//   }
+//
+//   if (await Permission.photos.isDenied) {
+//     await Permission.photos
+//         .request(); // For Android 13+, maps to READ_MEDIA_IMAGES
+//   }
+//
+//   // Optional: For Android below 13, you may also check storage
+//   if (await Permission.storage.isDenied) {
+//     await Permission.storage.request();
+//   }
+// }
+
+Future<void> _requestPermissions() async {
+  // Camera permission
+  if (await Permission.camera.isDenied) {
+    await Permission.camera.request();
+  }
+
+  // Photos permission (iOS + Android 13+)
+  if (await Permission.photos.isDenied) {
+    await Permission.photos
+        .request(); // For Android 13+, maps to READ_MEDIA_IMAGES
+  }
+
+  // Storage (Android < 13)
+  if (await Permission.storage.isDenied) {
+    await Permission.storage.request();
+  }
+
+  // Location (fine location for latitude and longitude)
+  if (await Permission.location.isDenied) {
+    await Permission.location.request();
+  }
+
+  // Optionally check for permanently denied permissions
+  if (await Permission.location.isPermanentlyDenied) {
+    // You can prompt user to open app settings
+    openAppSettings();
+  }
 }
 
 class MyApp extends StatelessWidget {

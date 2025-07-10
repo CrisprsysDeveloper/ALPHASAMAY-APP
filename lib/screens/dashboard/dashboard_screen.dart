@@ -150,13 +150,13 @@ class DashboardScreen extends StatelessWidget {
                     Get.toNamed(Routes.myAccount);
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.group, color: ColorConstants.appColor),
-                  title: Text("Workforce Management"),
-                  onTap: () {
-                    Get.back();
-                  },
-                ),
+                // ListTile(
+                //   leading: Icon(Icons.group, color: ColorConstants.appColor),
+                //   title: Text("Workforce Management"),
+                //   onTap: () {
+                //     Get.back();
+                //   },
+                // ),
                 ListTile(
                   leading: Icon(Icons.login, color: ColorConstants.appColor),
                   title: Text("Check-in/Out"),
@@ -226,26 +226,26 @@ class DashboardScreen extends StatelessWidget {
                     Get.back();
                   },
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.bar_chart,
-                    color: ColorConstants.appColor,
-                  ),
-                  title: Text("Measurements"),
-                  onTap: () {
-                    Get.back();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.summarize,
-                    color: ColorConstants.appColor,
-                  ),
-                  title: Text("Measurement Summary"),
-                  onTap: () {
-                    Get.back();
-                  },
-                ),
+                // ListTile(
+                //   leading: Icon(
+                //     Icons.bar_chart,
+                //     color: ColorConstants.appColor,
+                //   ),
+                //   title: Text("Measurements"),
+                //   onTap: () {
+                //     Get.back();
+                //   },
+                // ),
+                // ListTile(
+                //   leading: Icon(
+                //     Icons.summarize,
+                //     color: ColorConstants.appColor,
+                //   ),
+                //   title: Text("Measurement Summary"),
+                //   onTap: () {
+                //     Get.back();
+                //   },
+                // ),
               ],
             ),
           ),

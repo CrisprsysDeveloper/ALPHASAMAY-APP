@@ -40,9 +40,9 @@ class LeaveQuotaController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--TimeEventOverController----->');
+    printf('<------init--LeaveQuotaController----->');
     loadSavedCredentials();
-    getCurrentLocation();
+    //getCurrentLocation();
     DateTime now = DateTime.now();
     currentMonthName.value = DateFormat.MMMM().format(now); // "July"
 
