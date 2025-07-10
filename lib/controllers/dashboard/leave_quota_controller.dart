@@ -15,6 +15,8 @@ import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import '../../model/dashboard/delete_message_model.dart';
+
 class LeaveQuotaController extends GetxController {
   final TokenRepository authRepository;
 
@@ -199,12 +201,12 @@ class LeaveQuotaController extends GetxController {
   }
 
 
-  Future<void> deleteEventApi({
+  Future<void> deleteLeaveApi({
     required String clientId,
     required String userName,
-    required String eventId,
+    required String deleteId,
   }) async {
-    printf('<--clientId-$clientId--userName-->$userName--eventId-->$eventId');
+    printf('<--clientId-$clientId--userName-->$userName--eventId-->$deleteId');
 
     final dio = Dio();
 
@@ -218,41 +220,35 @@ class LeaveQuotaController extends GetxController {
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
-            'CPMClientID': clientId,
-            'CPMUserName': userName,
-            'AttendEventID': eventId,
+            'ClientID': clientId,
+            'UserName': userName,
+            'LeaveID': deleteId,
+            'BusObjCode': "LM_LR_BUS_NT",
+            'DeleteFlag': "Delete",
           },
         );
 
         printf('<----response---->$response');
 
-        final Map<String, dynamic> outerJson = jsonDecode(response.data);
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> outerJson = response.data;
+          final model = DeleteMessageModel.fromJson(outerJson);
 
-        // Step 2: Decode the nested JSON string in "ServiceStatus"
-        final Map<String, dynamic> serviceStatus = jsonDecode(
-          outerJson['ServiceStatus'],
-        );
-
-        final String messageCode = serviceStatus['MessageCode'];
-        final String messageDescription = serviceStatus['MessageDescription'];
-
-        printf('MessageCode: $messageCode');
-        printf('MessageDescription: $messageDescription');
-
-        if (messageCode == "200") {
-          printf('<----success-delete-event---refresh-event-list-here->');
-
-          // getEventListApi(
-          //   clientId: clientId,
-          //   userName: userName,
-          //   empNo: '',
-          //   startDay: firstDay,
-          //   endDay: lastDay,
-          // );
+          final messageText = model.messageText;
+          printf('<----messageText---->$messageText');
+          dropDownBannerSuccess(messageText!);
+          getLeaveQuotaListApi(
+            true,
+            clientId: clientId,
+            userName: userName,
+            empNo: '',
+            startDay: firstDay,
+            endDay: lastDay,
+          );
         } else {
-          dropDownBannerError(messageDescription);
+          dropDownBannerSuccess('Failed to delete.');
+          hideProgress();
         }
-        hideProgress();
       } catch (e) {
         printf("Exception: $e");
         hideProgress();
@@ -262,7 +258,7 @@ class LeaveQuotaController extends GetxController {
     }
   }
 
-  void showDeleteEventDialog() {
+  void showDeleteEventDialog(String id) {
     showDialog(
       context: Get.context!,
       barrierDismissible: false, // Prevents closing by tapping outside
@@ -289,7 +285,7 @@ class LeaveQuotaController extends GetxController {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Do you want to delete this Attendance Event?",
+                  "Do you want to delete this Leave ?",
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 24),
@@ -305,6 +301,11 @@ class LeaveQuotaController extends GetxController {
                       child: Text("YES", style: TextStyle(color: Colors.blue)),
                       onPressed: () async {
                         Get.back(); // Close the current route
+                        deleteLeaveApi(
+                          clientId: clientId,
+                          userName: userName,
+                          deleteId: id,
+                        );
                       },
                     ),
                   ],

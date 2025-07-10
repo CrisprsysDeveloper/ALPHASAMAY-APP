@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../model/dashboard/leave_model.dart';
 import '../../route/app_pages.dart';
 
 class LeaveQuotaScreen extends StatefulWidget {
@@ -210,7 +211,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                     itemBuilder: (context, index) {
                       final emp = controller.employeeList[index];
                       return widgetTimeEvents(
-                        record: emp,
+                         emp,
                         borderColor: Colors.green,
                       );
                     },
@@ -254,7 +255,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
     );
   }
 
-  Widget widgetTimeEvents({ borderColor, record}) {
+  Widget widgetTimeEvents(LeaveItem leaveData, {borderColor}) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -270,10 +271,10 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Employee/UserName", record.empName),
+                child: buildTextColumn("Employee/UserName", leaveData.empName),
               ),
               Expanded(
-                child: buildTextColumn("LeaveID No", record.leaveID),
+                child: buildTextColumn("LeaveID No", leaveData.leaveID),
               ),
             ],
           ),
@@ -281,7 +282,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Leave Type", record.leaveType),
+                child: buildTextColumn("Leave Type", leaveData.leaveType),
               ),
               Expanded(
                 child: buildTextColumn("Cost Center", "ST Branch"),
@@ -291,14 +292,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Start Date", record.leaveStartDate)),
-              Expanded(child: buildTextColumn("End Date", record.leaveEndDate)),
+              Expanded(child: buildTextColumn("Start Date", leaveData.leaveStartDate)),
+              Expanded(child: buildTextColumn("End Date", leaveData.leaveEndDate)),
             ],
           ),
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Leave Status", record.leaveStatus)),
+              Expanded(child: buildTextColumn("Leave Status", leaveData.leaveStatus)),
               widgetContainer(
                 icon: Icons.remove_red_eye,
                 bgColors: Colors.white,
@@ -324,9 +325,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-delete--->');
-                },
+                  onTap: () {
+                    controller.showDeleteEventDialog(leaveData.leaveID.toString());
+                    // controller.deleteJustificationApi(
+                    //   clientId: controller.clientId,
+                    //   userName: controller.userName,
+                    //   deleteId: employee.justid.toString(),
+                    // );
+                  },
               ),
             ],
           ),
