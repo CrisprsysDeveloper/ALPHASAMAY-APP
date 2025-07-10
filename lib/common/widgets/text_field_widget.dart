@@ -1,5 +1,4 @@
 import 'package:crysprsys/helper/common.dart';
-import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -43,6 +42,7 @@ class TextFieldState extends State<AppTextField> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         child: TextField(
+          textCapitalization: TextCapitalization.sentences,
           keyboardType: widget.textType ?? TextInputType.text,
           controller: widget.controller,
           obscureText: _obscureText,

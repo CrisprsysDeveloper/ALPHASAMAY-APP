@@ -4,14 +4,11 @@ import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/repositories/token_repository.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
-import 'package:crysprsys/repositories/token_repository.dart';
 import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -44,9 +41,9 @@ class TimeJustificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--TimeEventOverController----->');
+    printf('<------init--TimeJustificationController----->');
     loadSavedCredentials();
-    getCurrentLocation();
+
     DateTime now = DateTime.now();
     currentMonthName.value = DateFormat.MMMM().format(now); // "July"
     getFirstAndLastDay(now.year, now.month, true);
@@ -81,22 +78,20 @@ class TimeJustificationController extends GetxController {
     printf("First day: $firstDay");
     printf("Last day: $lastDay");
 
-    getEventListApi(
+    getJustificationList(
       isRefresh,
       clientId: clientId,
       userName: userName,
-      empNo: '',
       startDay: firstDay,
       endDay: lastDay,
     );
   }
 
   void getList() {
-    getEventListApi(
+    getJustificationList(
       false,
       clientId: clientId,
       userName: userName,
-      empNo: '',
       startDay: firstDay,
       endDay: lastDay,
     );
@@ -128,14 +123,13 @@ class TimeJustificationController extends GetxController {
     return months[monthName]!;
   }
 
-  Future<void> getEventListApi(
-      isRefresh, {
-        required String clientId,
-        required String userName,
-        required String empNo,
-        required String startDay,
-        required String endDay,
-      }) async {
+  Future<void> getJustificationList(
+    isRefresh, {
+    required String clientId,
+    required String userName,
+    required String startDay,
+    required String endDay,
+  }) async {
     printf(
       '<--clientId-$clientId--userName-->$userName--start-day-->$startDay--end-day-->$endDay',
     );
@@ -170,7 +164,7 @@ class TimeJustificationController extends GetxController {
               "UserID": "1",
               "RoleID": "1",
               "ScreenType": "ATTEND_BUS_Justification",
-              "DefaultName": "ATTEND_Justification"
+              "DefaultName": "ATTEND_Justification",
             }),
           },
         );
@@ -192,7 +186,7 @@ class TimeJustificationController extends GetxController {
 
         if (messageCode == "200") {
           employeeList.clear();
-          printf('<----success-getting-event-list---->');
+          printf('<----success-getting-justification-list---->');
 
           final Map<String, dynamic> outerJson = jsonDecode(response.data);
           final model = JustificationModel.fromJson(outerJson);
@@ -201,7 +195,7 @@ class TimeJustificationController extends GetxController {
             employeeList.value = model.justifyResults.justificationList;
           }
 
-          printf('<----list-of-events---->${employeeList.length}');
+          printf('<----list-of-justification---->${employeeList.length}');
 
           if (isRefresh) {
             if (model.objYearsList.isNotEmpty) {
@@ -230,74 +224,23 @@ class TimeJustificationController extends GetxController {
     }
   }
 
-  Future<void> deleteEventApiOld({
+  Future<void> deleteJustificationApi({
     required String clientId,
     required String userName,
-    required String eventId,
+    required String deleteId,
   }) async {
-    printf('<--clientId-$clientId--userName-->$userName--deleteId-->$eventId');
+    printf(
+      '<--deleteJustificationApi-clientId-$clientId--userName-->$userName---deletId-->$deleteId',
+    );
 
-    final dio = Dio();
-
-    // Construct the full URL
     const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
-    const String endpoint = AppConstants.deleteEventApi;
-
-    if (await InternetConnection().hasInternetAccess) {
-      showProgress();
-      try {
-        showProgress();
-        final response = await dio.get(
-          '$baseUrl$endpoint',
-          queryParameters: {
-            'CPMClientID': clientId,
-            'CPMUserName': userName,
-            'AttendEventID': '',
-          },
-        );
-
-        printf('<----response---->$response');
-
-        if (response.data['Message'] == "Success") {
-          final messageText = response.data['MessageText'];
-          dropDownBannerSuccess(messageText);
-          getEventListApi(
-            true,
-            clientId: clientId,
-            userName: userName,
-            empNo: '',
-            startDay: firstDay,
-            endDay: lastDay,
-          );
-        } else {
-          dropDownBannerError(AppConstants.somethingWentWrong);
-        }
-
-        hideProgress();
-      } catch (e) {
-        printf("Exception: $e");
-        hideProgress();
-      }
-    } else {
-      Utility.showToastMessage(AppConstants.internetConnectionError);
-    }
-  }
-
-  Future<void> deleteEventApi({
-    required String clientId,
-    required String userName,
-    required String editId,
-  }) async {
-    printf('<--deleteEventApi-clientId-$clientId--userName-->$userName');
-
-    // Construct the full URL
-    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
-    const String endpoint = AppConstants.timeEventDeleteApi;
+    const String endpoint = AppConstants.deleteJustificationApi;
 
     if (await InternetConnection().hasInternetAccess) {
       final url =
-          '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&AttendEventID=$editId'; //; //&FilePath=$encodedPath';
+          '$baseUrl$endpoint?CPMClientID=$clientId&CPMUserName=$userName&DeleteID=$deleteId'; //; //&FilePath=$encodedPath';
 
+      showProgress();
       printf('<---url-->$url');
 
       final dio = dio_.Dio();
@@ -305,26 +248,27 @@ class TimeJustificationController extends GetxController {
 
       printf('<---response--->$response');
 
-      if (response.data['Message'] == "Success") {
-        final messageText = response.data['MessageText'];
-        dropDownBannerSuccess(messageText);
-        getEventListApi(
-          true,
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.data);
+        final messageText = responseData['MessageText'];
+        dropDownBannerSuccess(messageText ?? 'No message received.');
+        getJustificationList(
+          false,
           clientId: clientId,
           userName: userName,
-          empNo: '',
           startDay: firstDay,
           endDay: lastDay,
         );
       } else {
-        dropDownBannerError(AppConstants.somethingWentWrong);
+        dropDownBannerSuccess('Failed to delete justification.');
+        hideProgress();
       }
     } else {
       Utility.showToastMessage(AppConstants.internetConnectionError);
     }
   }
 
-  void showDeleteEventDialog(String checkInId) {
+  void showDeleteJustificationDialog(String id) {
     showDialog(
       context: Get.context!,
       barrierDismissible: false, // Prevents closing by tapping outside
@@ -351,7 +295,7 @@ class TimeJustificationController extends GetxController {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Do you want to delete this Attendance Event?",
+                  "Do you want to delete this Justification?",
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
                 const SizedBox(height: 24),
@@ -367,10 +311,10 @@ class TimeJustificationController extends GetxController {
                       child: Text("YES", style: TextStyle(color: Colors.blue)),
                       onPressed: () async {
                         Get.back(); // Close the current route
-                        deleteEventApi(
+                        deleteJustificationApi(
                           clientId: clientId,
                           userName: userName,
-                          editId: checkInId,
+                          deleteId: id,
                         );
                       },
                     ),
@@ -413,7 +357,8 @@ class TimeJustificationController extends GetxController {
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    location = "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
+    location =
+        "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
     update();
     printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
   }

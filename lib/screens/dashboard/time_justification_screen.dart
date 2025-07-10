@@ -1,4 +1,3 @@
-import 'package:crysprsys/controllers/dashboard/time_event_over_controller.dart';
 import 'package:crysprsys/controllers/dashboard/time_justification_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/dashboard/justification_model.dart';
@@ -25,7 +24,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
   final tabs = ["Online Data", "Offline Data"];
   final icons = [Icons.cloud, Icons.cloud_off];
   final TimeJustificationController controller =
-  Get.find<TimeJustificationController>();
+      Get.find<TimeJustificationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +69,10 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: isSelected ? Color(0xFF5E3E9B) : Colors.transparent,
+                            color:
+                                isSelected
+                                    ? Color(0xFF5E3E9B)
+                                    : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
@@ -78,14 +80,20 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                             children: [
                               Icon(
                                 icons[index],
-                                color: isSelected ? Colors.white : Color(0xFF5E3E9B),
+                                color:
+                                    isSelected
+                                        ? Colors.white
+                                        : Color(0xFF5E3E9B),
                                 size: 18,
                               ),
                               SizedBox(width: 6),
                               Text(
                                 tabs[index],
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Color(0xFF5E3E9B),
+                                  color:
+                                      isSelected
+                                          ? Colors.white
+                                          : Color(0xFF5E3E9B),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -124,31 +132,33 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 children: [
                   Expanded(
                     child: Obx(
-                          () => Container(
+                      () => Container(
                         height: 40,
                         color: Colors.grey.shade300,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
                             value:
-                            controller.selectedYear.value.isEmpty
-                                ? null
-                                : controller.selectedYear.value,
+                                controller.selectedYear.value.isEmpty
+                                    ? null
+                                    : controller.selectedYear.value,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
                             ),
                             items:
-                            controller.yearList.map((year) {
-                              return DropdownMenuItem<String>(
-                                value: year.value,
-                                child: Text(year.value),
-                              );
-                            }).toList(),
+                                controller.yearList.map((year) {
+                                  return DropdownMenuItem<String>(
+                                    value: year.value,
+                                    child: Text(year.value),
+                                  );
+                                }).toList(),
                             onChanged: (value) {
                               controller.selectedYear.value = value!;
-                              printf('<--selected-year-->${controller.selectedYear.value}',);
+                              printf(
+                                '<--selected-year-->${controller.selectedYear.value}',
+                              );
                               controller.onYearOrMonthChanged(
                                 controller.selectedYear.value,
                                 controller.selectedMonth.value,
@@ -162,28 +172,28 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                   16.sbw,
                   Expanded(
                     child: Obx(
-                          () => Container(
+                      () => Container(
                         height: 40,
                         color: Colors.grey.shade300,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
                             value:
-                            controller.selectedMonth.value.isEmpty
-                                ? null
-                                : controller.selectedMonth.value,
+                                controller.selectedMonth.value.isEmpty
+                                    ? null
+                                    : controller.selectedMonth.value,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
                             ),
                             items:
-                            controller.monthList.map((month) {
-                              return DropdownMenuItem<String>(
-                                value: month.value,
-                                child: Text(month.value),
-                              );
-                            }).toList(),
+                                controller.monthList.map((month) {
+                                  return DropdownMenuItem<String>(
+                                    value: month.value,
+                                    child: Text(month.value),
+                                  );
+                                }).toList(),
                             onChanged: (value) {
                               controller.selectedMonth.value = value!;
                               printf(
@@ -209,15 +219,15 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 child: Obx(() {
                   return controller.employeeList.isNotEmpty
                       ? ListView.builder(
-                    itemCount: controller.employeeList.length,
-                    itemBuilder: (context, index) {
-                      final emp = controller.employeeList[index];
-                      return widgetTimeEvents(
-                        emp,
-                        borderColor: Colors.green,
-                      );
-                    },
-                  )
+                        itemCount: controller.employeeList.length,
+                        itemBuilder: (context, index) {
+                          final emp = controller.employeeList[index];
+                          return widgetTimeEvents(
+                            emp,
+                            borderColor: Colors.green,
+                          );
+                        },
+                      )
                       : Center(child: Text(AppConstants.noDataFound));
                 }),
               ),
@@ -227,7 +237,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Get.toNamed(Routes.justificationAddScreen);
-            },
+          },
           backgroundColor: ColorConstants.appColor,
           shape: const CircleBorder(),
           child: Icon(Icons.add, color: Colors.white),
@@ -252,7 +262,10 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Employee/UserName", employee.employeeName),
+                child: buildTextColumn(
+                  "Employee/UserName",
+                  employee.employeeName,
+                ),
               ),
               Expanded(
                 child: buildTextColumn("Justification No", employee.justid),
@@ -280,7 +293,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           15.sbh,
           Row(
             children: [
-              Expanded(child: buildTextColumn("Status",employee.status)),
+              Expanded(child: buildTextColumn("Status", employee.status)),
               widgetContainer(
                 icon: Icons.remove_red_eye,
                 bgColors: Colors.white,
@@ -297,7 +310,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
                 onTap: () {
-                  print('<---on-tap-edit--->');
+
                 },
               ),
               10.sbw,
@@ -307,7 +320,12 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
                 onTap: () {
-                  print('<---on-tap-delete--->');
+                  controller.showDeleteJustificationDialog(employee.justid.toString());
+                  // controller.deleteJustificationApi(
+                  //   clientId: controller.clientId,
+                  //   userName: controller.userName,
+                  //   deleteId: employee.justid.toString(),
+                  // );
                 },
               ),
             ],
@@ -323,14 +341,18 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
       children: [
         Text(
           label,
-          style:
-          interTextStyle(fontWeight: FontWeight.w500, color: Colors.grey),
+          style: interTextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.grey,
+          ),
         ),
         3.sbh,
         Text(
           value,
-          style:
-          interTextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: interTextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
       ],
     );

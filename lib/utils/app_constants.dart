@@ -25,9 +25,12 @@ class AppConstants {
   // Time Events
   static const String timeEventListApi = 'api/TimeEvents/GetTimeEventsData';
   static const String deleteEventApi = 'api/TimeEvents/DELETEAttendEvents';
-  static const String leaveRequestOverviewApi = 'api/LeaveRequest/LeaveRequestOverview';
-  static const String deleteLeaveRequestApi = 'api/LeaveRequest/DeleteLeaveRequest';
-  static const String getJustDashboardDataApi = 'api/Justification/GetJustDashboardData';
+  static const String leaveRequestOverviewApi =
+      'api/LeaveRequest/LeaveRequestOverview';
+  static const String deleteLeaveRequestApi =
+      'api/LeaveRequest/DeleteLeaveRequest';
+  static const String getJustDashboardDataApi =
+      'api/Justification/GetJustDashboardData';
 
   static const String approvalListApi =
       'api/TimeEventApprovals/GetTimeEventApprovalsData';
@@ -54,7 +57,13 @@ class AppConstants {
 
   static const String timeEventDeleteApi = 'api//TimeEvents/DELETEAttendEvents';
 
-  static const String deleteFaceRegistrationApi = 'api//FaceRekognition/DeleteAttendanceUserProfilePic';
+  static const String deleteFaceRegistrationApi =
+      'api//FaceRekognition/DeleteAttendanceUserProfilePic';
+
+
+  static const String deleteJustificationApi =
+      'api//Justification/DELETE_Justifications';
+
   //
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
@@ -105,89 +114,6 @@ class AppConstants {
   static const String emailIsRequired = 'Email is required';
   static const String passwordIsRequired = 'Password is required';
 
-  static const String whatDidYouGet = 'What did you get done this week?';
-  static const String continueWithEmail = 'Continue with Email/Phone';
-  static const String continueWitX = 'Continue with X';
-  static const String continueWithGoogle = 'Continue with Google';
-
-  static const String byContinueYouAgree = 'By continuing you agree to the';
-  static const String termsOfServices = 'Terms of Service';
-  static const String privacyPolicy = 'Privacy policy';
-
-  static const String and = 'and';
-
-  static const String completed = 'Completed';
-  static const String total = 'Total';
-  static const String reminders = 'Reminders';
-  static const String completionRate = 'Completion Rate';
-  static const String tasks = 'Tasks';
-  static const String notes = 'Notes';
-  static const String reminder = 'Reminder';
-  static const String from = 'From';
-
-
-  static const String viewAdd = 'View/Add Description';
-  static const String assignTask = 'Assign Task';
-  static const String addReviewer = 'Add Reviewer';
-  static const String moveTo = 'Move to';
-  static const String category = 'Category';
-  static const String delete = 'Delete';
-
-  static const String lessonLearned = 'Lessons Learned';
-  static const String visionForNextWeek = 'Vision for Next Week';
-
-  static const String setCustomTimer = 'Set Custom Timer';
-  static const String cancel = 'Cancel';
-  static const String start = 'Start';
-  static const String taskTest = 'Task Test';
-
-  static const String addCategory = 'Add Category';
-  static const String personalCare = 'Personal Care';
-  static const String exercise = 'Exercise';
-  static const String workStudy = 'Work/Study';
-  static const String houseHold = 'Household';
-  static const String social = 'Social';
-  static const String leisure = 'Leisure';
-  static const String travel = 'Travel';
-  static const String wellness = 'Wellness';
-  static const String spirituality = 'Spirituality';
-
-
-  static const String addTask = 'Add Task';
-  static const String addNewTask = 'Add New Task';
-
-  static const String monday = 'Monday';
-  static const String tuesday = 'Tuesday';
-  static const String wednesday = 'Wednesday';
-  static const String thursday = 'Thursday';
-  static const String friday = 'Friday';
-  static const String saturday = 'Saturday';
-  static const String sunday = 'Sunday';
-
-  static const String assign = 'Assign';
-  static const String deleteTask = 'Delete Task';
-  static const String yesDelete = 'Yes,Delete';
-
-  static const String addDescription = 'Add Description';
-  static const String taskName = 'Task Name';
-  static const String dateDay = 'Date & Day';
-  static const String update = 'Update';
-  static const String verify = 'Verify';
-  static const String description = 'Description';
-  static const String setTimer = 'Set Timer';
-  static const String editTask = 'Edit Task';
-
-  static const String titleForAssignTask =
-      'Enter the email address or phone number of the person you want to assign this task.';
-  static const String titleForAddReviewer =
-      'Enter the email address or phone number of the person you want to review this task.';
-
-  static const String areYouSureYouWantToDelete =
-      'Are you sure you want to delete this task from your list?';
-
-  static const String deleteAccountContent =
-      "You will lose all of your data by deleting your account. This action cannot be undone.";
-
   //
 
   static const String addName = 'Please add full name';
@@ -231,21 +157,6 @@ class AppConstants {
   static const String visibilityAssignee = 'assignee';
   static const String visibilityReviewer = 'reviewer';
   static const String visibilityCreator = '';
-
-  // test4   assign  test3  --> assign from test 4
-  // assign to test3 name
-
-  //
-
-  //By continuing you agree to the Terms of Service and
-  // Privacy policy
-
-  // dashboard screen
-
-  //static value
-  // static const String isLogin = 'isLogin';
-  // static const String isIntro = 'isIntro';
-  // static const String userToken = 'userToken';
 
   // error messages
   static const String internetConnectionError =

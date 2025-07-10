@@ -2,7 +2,6 @@ import 'package:crysprsys/controllers/authentication/login_controller.dart';
 import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:crysprsys/common/widgets/app_bar.dart';
 import 'package:crysprsys/common/widgets/custom_button.dart';
 import 'package:crysprsys/common/widgets/text_field_widget.dart';
 import 'package:crysprsys/helper/common.dart';
@@ -71,6 +70,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     6.sbh,
                     AppTextField(
+                      textType: TextInputType.text,
                       controller: controller.textUserName,
                       isPassword: false,
                       textHint: AppConstants.userName,
@@ -82,10 +82,10 @@ class LoginScreen extends StatelessWidget {
                     ),
                     6.sbh,
                     AppTextField(
+                      textType: TextInputType.emailAddress,
                       controller: controller.textPassword,
                       isPassword: true,
                       textHint: AppConstants.password,
-
                     ),
                     10.sbh,
                     Row(
