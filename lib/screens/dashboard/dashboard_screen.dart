@@ -203,7 +203,7 @@ class DashboardScreen extends StatelessWidget {
                     Icons.calendar_today,
                     color: ColorConstants.appColor,
                   ),
-                  title: Text("Leave Quota"),
+                  title: Text("Leave Overview"),
                   onTap: () {
                     Get.toNamed(Routes.leaveQuotaScreen);
                   },

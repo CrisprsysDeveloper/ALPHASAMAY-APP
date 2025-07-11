@@ -12,12 +12,16 @@ class ColorConstants {
 
   // App colors
 
-  static const primaryColor = Color(0xFF543e7e);
-  static const secondaryColor = Color(0xFF32db64);
-  static const danger = Color(0xFFf53d3d);
-  static const btnColor = Color(0xFF543e7e);
+  // #245cb4 1848ac
+
+  //543e7e
+
+  static const primaryColor = Color(0xFF1848ac);
+  static const secondaryColor = Color(0xFF1848ac);
+  static const danger = Color(0xFFf245cb4);
+  static const btnColor = Color(0xFF1848ac);
   static const light = Color(0xFFf4f4f4);
-  static const appColor = Color(0xFF543e7e);
-  static const btnBorderColor = Color(0xFF543e7e);
-  static const btnBorderColorForWhite = Color(0xFF543e7e);
+  static const appColor = Color(0xFF1848ac);
+  static const btnBorderColor = Color(0xFF1848ac);
+  static const btnBorderColorForWhite = Color(0xFF1848ac);
 }

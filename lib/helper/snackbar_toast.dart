@@ -1,4 +1,3 @@
-import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -17,7 +16,7 @@ dropDownBannerError(String message) {
   Get.snackbar(
     'Failed',
     message,
-    backgroundColor: ColorConstants.appColor,
+    backgroundColor: Colors.red,
     borderWidth: 1,
     colorText: Colors.white,
     borderColor: Colors.white,
@@ -29,7 +28,7 @@ dropDownBannerSuccess(String message, {duration = 5000}) {
     'Success',
     message,
     duration: Duration(milliseconds: duration),
-    backgroundColor: ColorConstants.appColor,
+    backgroundColor: Colors.green,
     borderWidth: 1,
     colorText: Colors.white,
     borderColor: Colors.white,

@@ -45,7 +45,7 @@ class FaceRegistrationScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.deepPurple, // border color
+                    color: ColorConstants.appColor,
                     width: 1, // border width
                   ),
                 ),

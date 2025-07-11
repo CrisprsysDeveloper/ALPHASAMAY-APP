@@ -48,15 +48,15 @@ class CheckInOutScreen extends StatelessWidget {
                     width: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.deepPurple, width: 1),
+                      border: Border.all(color: ColorConstants.appColor, width: 1),
                     ),
                     child: Stack(
                       children: [
                         ClipOval(
                           child:
-                              controller.image!.value != null
+                              controller.image.value != null
                                   ? Image.file(
-                                    controller.image!.value!,
+                                    controller.image.value!,
                                     width: 120,
                                     height: 120,
                                     fit: BoxFit.cover,
@@ -87,7 +87,7 @@ class CheckInOutScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.deepPurple, // border color
+                      color: ColorConstants.appColor, // border color
                       width: 1, // border width
                     ),
                   ),

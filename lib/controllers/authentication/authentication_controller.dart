@@ -24,6 +24,7 @@ class AuthenticationController extends GetxController {
   void onInit() {
     super.onInit();
     printf('<------init--AuthenticationController----->');
+    textCompany.text = '1';
   }
 
   @override
@@ -52,7 +53,11 @@ class AuthenticationController extends GetxController {
     }
   }
 
-  Future<void> getOtpApi({required String clientId, required String userName, required String email,}) async {
+  Future<void> getOtpApi({
+    required String clientId,
+    required String userName,
+    required String email,
+  }) async {
     final dio = Dio();
 
     // Construct the full URL
@@ -61,50 +66,46 @@ class AuthenticationController extends GetxController {
         AppConstants
             .clientAuthenticationApi; //"/api/ClientAuthorization/GetCrisprsysMobAppOTP";
 
-    if (await InternetConnection().hasInternetAccess)
-      {
-        try {
-          showProgress();
-          final response = await dio.get(
-            '$baseUrl$endpoint',
-            queryParameters: {
-              'ClientID': clientId,
-              'UserName': userName,
-              'Email': email,
-            },
-          );
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'ClientID': clientId,
+            'UserName': userName,
+            'Email': email,
+          },
+        );
 
-          printf('<----response---->$response');
+        printf('<----response---->$response');
 
-          final Map<String, dynamic> outerJson = jsonDecode(response.data);
+        final Map<String, dynamic> outerJson = jsonDecode(response.data);
 
-          // Step 2: Decode the nested JSON string in "ServiceStatus"
-          final Map<String, dynamic> serviceStatus = jsonDecode(
-            outerJson['ServiceStatus'],
-          );
+        // Step 2: Decode the nested JSON string in "ServiceStatus"
+        final Map<String, dynamic> serviceStatus = jsonDecode(
+          outerJson['ServiceStatus'],
+        );
 
-          final String messageCode = serviceStatus['MessageCode'];
-          final String messageDescription = serviceStatus['MessageDescription'];
+        final String messageCode = serviceStatus['MessageCode'];
+        final String messageDescription = serviceStatus['MessageDescription'];
 
-          printf('MessageCode: $messageCode');
-          printf('MessageDescription: $messageDescription');
+        printf('MessageCode: $messageCode');
+        printf('MessageDescription: $messageDescription');
 
-          if (messageCode == "200") {
-            Get.to(() => OtpScreen(clientID: clientId, email: email));
-          } else {
-            dropDownBannerError(messageDescription);
-          }
-          hideProgress();
-        } catch (e) {
-          printf("Exception: $e");
-          hideProgress();
+        if (messageCode == "200") {
+          Get.to(() => OtpScreen(clientID: clientId, email: email));
+        } else {
+          dropDownBannerError(messageDescription);
         }
+        hideProgress();
+      } catch (e) {
+        printf("Exception: $e");
+        hideProgress();
       }
-    else
-      {
-        Utility.showToastMessage(AppConstants.internetConnectionError);
-      }
-
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
   }
 }
 

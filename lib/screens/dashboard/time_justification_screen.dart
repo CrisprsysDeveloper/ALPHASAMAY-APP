@@ -56,7 +56,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 width: double.infinity,
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Color(0xFF5E3E9B).withOpacity(0.1),
+                  color: ColorConstants.appColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -71,7 +71,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                           decoration: BoxDecoration(
                             color:
                                 isSelected
-                                    ? Color(0xFF5E3E9B)
+                                    ? ColorConstants.appColor
                                     : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -83,7 +83,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                                 color:
                                     isSelected
                                         ? Colors.white
-                                        : Color(0xFF5E3E9B),
+                                        : ColorConstants.appColor,
                                 size: 18,
                               ),
                               SizedBox(width: 6),
@@ -93,7 +93,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                                   color:
                                       isSelected
                                           ? Colors.white
-                                          : Color(0xFF5E3E9B),
+                                          : ColorConstants.appColor,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

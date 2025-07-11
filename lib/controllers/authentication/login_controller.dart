@@ -72,101 +72,89 @@ class LoginController extends GetxController {
     const String baseUrl = AppConstants.baseUrl;
     const String endpoint = AppConstants.loginApi;
 
-    if (await InternetConnection().hasInternetAccess)
-      {
-        try {
-          showProgress();
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
 
-          final response = await dio.get(
-            '$baseUrl$endpoint',
-            queryParameters: {
-              'clientId': clientId,
-              'userName': userName,
-              'passWord': password,
-            },
-          );
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'clientId': clientId,
+            'userName': userName,
+            'passWord': password,
+          },
+        );
 
-          printf('<----login-api-url----> ${response.realUri}');
-          printf('<----login-api-response----> ${response.data}');
+        printf('<----login-api-url----> ${response.realUri}');
+        printf('<----login-api-response----> ${response.data}');
 
-          // Decode outer JSON
-          final Map<String, dynamic> outerJson = jsonDecode(response.data);
+        // Decode outer JSON
+        final Map<String, dynamic> outerJson = jsonDecode(response.data);
 
-          // Parse ServiceStatus
-          final String serviceStatusRaw = outerJson['ServiceStatus'];
-          final Map<String, dynamic> serviceStatus = jsonDecode(serviceStatusRaw);
+        // Parse ServiceStatus
+        final String serviceStatusRaw = outerJson['ServiceStatus'];
+        final Map<String, dynamic> serviceStatus = jsonDecode(serviceStatusRaw);
 
-          final String messageCode = serviceStatus['MessageCode'];
-          final String messageDescription = serviceStatus['MessageDescription'];
+        final String messageCode = serviceStatus['MessageCode'];
+        final String messageDescription = serviceStatus['MessageDescription'];
 
-          printf('MessageCode: $messageCode');
-          printf('MessageDescription: $messageDescription');
+        printf('MessageCode: $messageCode');
+        printf('MessageDescription: $messageDescription');
 
-          if (messageCode == "200") {
-            // ✅ Parse token
-            final List<dynamic> tokenList = outerJson['token'] ?? [];
-            final String? token = tokenList.isNotEmpty ? tokenList[0] : null;
-            printf('Token: $token');
+        if (messageCode == "200") {
+          final List<dynamic> tokenList = outerJson['token'] ?? [];
+          final String? token = tokenList.isNotEmpty ? tokenList[0] : null;
+          printf('Token: $token');
+          final Map<String, dynamic> listOfApplications =
+              outerJson['ListOfApplications'];
 
-            // ✅ Parse ListOfApplications
-            final Map<String, dynamic> listOfApplications =
-            outerJson['ListOfApplications'];
+          final List<dynamic> appJsonList =
+              listOfApplications['listOfAuthorizedApplications'] ?? [];
+          final List<AuthorizedApplication> apps =
+              appJsonList
+                  .map((e) => AuthorizedApplication.fromJson(e))
+                  .toList();
+          printf('Parsed Applications: ${apps.length}');
 
-            // Authorized Applications
-            final List<dynamic> appJsonList =
-                listOfApplications['listOfAuthorizedApplications'] ?? [];
-            final List<AuthorizedApplication> apps =
-            appJsonList.map((e) => AuthorizedApplication.fromJson(e)).toList();
-            printf('Parsed Applications: ${apps.length}');
+          // Authorized Components
+          final List<dynamic> componentJsonList =
+              listOfApplications['listOfAuthorizedComponents'] ?? [];
+          final List<AuthorizedComponent> components =
+              componentJsonList
+                  .map((e) => AuthorizedComponent.fromJson(e))
+                  .toList();
+          printf('Parsed Components: ${components.length}');
 
-            // Authorized Components
-            final List<dynamic> componentJsonList =
-                listOfApplications['listOfAuthorizedComponents'] ?? [];
-            final List<AuthorizedComponent> components =
-            componentJsonList
-                .map((e) => AuthorizedComponent.fromJson(e))
-                .toList();
-            printf('Parsed Components: ${components.length}');
+          // Authorized Business Objects
+          final List<dynamic> businessObjectJsonList =
+              listOfApplications['listOfAuthorizedBusinessObjects'] ?? [];
+          final List<AuthorizedBusinessObject> businessObjects =
+              businessObjectJsonList
+                  .map((e) => AuthorizedBusinessObject.fromJson(e))
+                  .toList();
+          printf('Parsed BusinessObjects: ${businessObjects.length}');
 
-            // Authorized Business Objects
-            final List<dynamic> businessObjectJsonList =
-                listOfApplications['listOfAuthorizedBusinessObjects'] ?? [];
-            final List<AuthorizedBusinessObject> businessObjects =
-            businessObjectJsonList
-                .map((e) => AuthorizedBusinessObject.fromJson(e))
-                .toList();
-            printf('Parsed BusinessObjects: ${businessObjects.length}');
-
-            printf('<---set-pin--->$setPin');
-            if (setPin == 'null' || setPin.isEmpty) {
-              Get.to(() => SetPinScreen());
-            } else {
-              printf('<---navigate-to-dashboard--->');
-              // Get.toNamed(Routes.dashboardScreen);
-            }
-
-            // TODO: Save token or store parsed lists into controller state
-            // Example if using GetX:
-            // listAuthorizedApps.assignAll(apps);
-            // listAuthorizedComponents.assignAll(components);
-            // listAuthorizedBusinessObjects.assignAll(businessObjects);
+          printf('<---set-pin--->$setPin');
+          if (setPin == 'null' || setPin.isEmpty) {
+            Get.to(() => SetPinScreen());
           } else {
-            dropDownBannerError(messageDescription);
+            printf('<---navigate-to-dashboard--->');
+            // Get.toNamed(Routes.dashboardScreen);
           }
-
-          hideProgress();
-        } catch (e, stackTrace) {
-          printf("Exception: $e");
-          printf("StackTrace: $stackTrace");
-          dropDownBannerError("Something went wrong. Please try again.");
-          hideProgress();
+        } else {
+          dropDownBannerError(messageDescription);
         }
-      }
-    else
-      {
-        Utility.showToastMessage(AppConstants.internetConnectionError);
-      }
 
+        hideProgress();
+      } catch (e, stackTrace) {
+        printf("Exception: $e");
+        printf("StackTrace: $stackTrace");
+        dropDownBannerError("Something went wrong. Please try again.");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
   }
 
   Future<void> loginApiOld({

@@ -5,83 +5,81 @@ import '../../utils/color_constants.dart';
 class MyAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Account'),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-          _buildSectionCard(
-          title: 'General Information',
-          content: Column(
+    return SafeArea(
+      bottom: true,
+      top: false,
+      child: Scaffold(
+        appBar: AppBar(title: Text('My Account')),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
             children: [
-              _buildInfoRow('Client ID', '1'),
-              _buildInfoRow('Client Name', 'Crisprays Eportal'),
-              _buildInfoRow('User Name', 'Suresh'),
-              _buildInfoRow('Full Name', 'Suresh'),
-              _buildInfoRow('Position', 'NA'),
-            ],
-          ),
-          ),
-            SizedBox(height: 16),
-            _buildSectionCard(
-              title: 'Role Assignments',
-              content: Column(
-                children: [
-                  _buildRoleAssignmentTable(),
-                ],
+              _buildSectionCard(
+                title: 'General Information',
+                content: Column(
+                  children: [
+                    _buildInfoRow('Client ID', '1'),
+                    _buildInfoRow('Client Name', 'Crisprays Eportal'),
+                    _buildInfoRow('User Name', 'Suresh'),
+                    _buildInfoRow('Full Name', 'Suresh'),
+                    _buildInfoRow('Position', 'NA'),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            _buildSectionCard(
-              title: 'Contact Information',
-              content: Column(
-                children: [
-                  _buildInfoRow('Email', 'Suresh@crisprsys.net'),
-                  _buildInfoRow('Phone', '9963023494'),
-                ],
+              SizedBox(height: 16),
+              _buildSectionCard(
+                title: 'Role Assignments',
+                content: Column(children: [_buildRoleAssignmentTable()]),
               ),
-            ),
+              SizedBox(height: 16),
+              _buildSectionCard(
+                title: 'Contact Information',
+                content: Column(
+                  children: [
+                    _buildInfoRow('Email', 'Suresh@crisprsys.net'),
+                    _buildInfoRow('Phone', '9963023494'),
+                  ],
+                ),
+              ),
 
-            SizedBox(height: 16),
-            _buildSectionCard(
-              title: 'Other Information',
-              content: Column(
-                children: [
-                  _buildInfoRow('Time Zone', 'India Standard Time'),
-                  _buildInfoRow('Date Format', 'dd/MM/yyyy HH:mm:ss'),
-                  _buildInfoRow('Number Format', 'ZZZ,ZZZ,ZZZ.DDDD'),
-                ],
+              SizedBox(height: 16),
+              _buildSectionCard(
+                title: 'Other Information',
+                content: Column(
+                  children: [
+                    _buildInfoRow('Time Zone', 'India Standard Time'),
+                    _buildInfoRow('Date Format', 'dd/MM/yyyy HH:mm:ss'),
+                    _buildInfoRow('Number Format', 'ZZZ,ZZZ,ZZZ.DDDD'),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              alignment: Alignment.centerRight,
-              margin: EdgeInsets.only(top: 16),
-              child: GestureDetector(
-                onTap: () {
-                  // Handle reset pin action
-                  print('Reset PIN tapped');
-                },
-                child: Text(
-                  'RESET PIN',
-                  style: TextStyle(
-                    color: ColorConstants.primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    decoration: TextDecoration.underline,
+              SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                alignment: Alignment.centerRight,
+                margin: EdgeInsets.only(top: 16),
+                child: GestureDetector(
+                  onTap: () {
+                    // Handle reset pin action
+                    print('Reset PIN tapped');
+                  },
+                  child: Text(
+                    'RESET PIN',
+                    style: TextStyle(
+                      color: ColorConstants.primaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            _buildProfileCard(),
-            SizedBox(height: 20),
-            _buildCheckInCard(),
-          ],
+              _buildProfileCard(),
+              SizedBox(height: 20),
+              _buildCheckInCard(),
+            ],
+          ),
         ),
       ),
     );
@@ -122,6 +120,7 @@ class MyAccount extends StatelessWidget {
       ],
     );
   }
+
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -142,7 +141,6 @@ class MyAccount extends StatelessWidget {
     );
   }
 
-
   Widget _buildRoleAssignmentTable() {
     return Container(
       decoration: BoxDecoration(
@@ -150,9 +148,7 @@ class MyAccount extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Table(
-        border: TableBorder.symmetric(
-          inside: BorderSide(color: Colors.grey),
-        ),
+        border: TableBorder.symmetric(inside: BorderSide(color: Colors.grey)),
         columnWidths: {
           0: FlexColumnWidth(2),
           1: FlexColumnWidth(1),
@@ -160,9 +156,7 @@ class MyAccount extends StatelessWidget {
         },
         children: [
           TableRow(
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-            ),
+            decoration: BoxDecoration(color: Colors.grey[200]),
             children: [
               _buildTableCell('Role', isHeader: true),
               _buildTableCell('ValidFrom', isHeader: true),
@@ -206,10 +200,7 @@ class MyAccount extends StatelessWidget {
               children: [
                 Text(
                   'User Profile',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   'CheckIn Profile',
@@ -229,11 +220,7 @@ class MyAccount extends StatelessWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.grey[300],
-                  child: Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.grey[600],
-                  ),
+                  child: Icon(Icons.person, size: 40, color: Colors.grey[600]),
                 ),
                 SizedBox(width: 16),
                 Expanded(
@@ -264,10 +251,7 @@ class MyAccount extends StatelessWidget {
           children: [
             Text(
               'CheckIn Details',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Divider(thickness: 1, height: 24),
             _buildInfoRow1('Check Type', 'Check In'),
@@ -287,20 +271,10 @@ class MyAccount extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(height: 1.4),
-            ),
-          ),
+          Expanded(child: Text(value, style: TextStyle(height: 1.4))),
         ],
       ),
     );
