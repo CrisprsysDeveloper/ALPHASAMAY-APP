@@ -205,6 +205,16 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   title: Text("Leave Overview"),
                   onTap: () {
+                    Get.toNamed(Routes.leaveOverviewScreen);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.calendar_today,
+                    color: ColorConstants.appColor,
+                  ),
+                  title: Text("Leave Quota"),
+                  onTap: () {
                     Get.toNamed(Routes.leaveQuotaScreen);
                   },
                 ),

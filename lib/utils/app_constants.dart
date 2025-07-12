@@ -27,6 +27,8 @@ class AppConstants {
   static const String deleteEventApi = 'api/TimeEvents/DELETEAttendEvents';
   static const String leaveRequestOverviewApi =
       'api/LeaveRequest/LeaveRequestOverview';
+  static const String leaveRequestGetLeaveQuotaApi =
+      'api/LeaveQuota/GetLeaveQuotaOverview';
   static const String deleteLeaveRequestApi =
       'api/LeaveRequest/DeleteLeaveRequest';
   static const String getJustDashboardDataApi =
