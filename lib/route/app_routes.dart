@@ -16,6 +16,7 @@ abstract class Routes {
   static const timeJustificationScreen = '/timeJustificationScreen';
   static const justificationAddScreen = '/justificationAddScreen';
   static const leaveRequestScreen = '/leaveRequestScreen';
+  static const leaveOverviewScreen = '/leaveOverviewScreen';
   static const leaveQuotaScreen = '/leaveQuotaScreen';
 
 

@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 import 'package:crysprsys/helper/common.dart';
-import 'package:crysprsys/model/dashboard/leave_quota_model.dart';
+import 'package:crysprsys/model/dashboard/leave_model.dart';
 import 'package:crysprsys/repositories/token_repository.dart';
 import 'package:get/get.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
@@ -15,22 +15,23 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 
 import '../../model/dashboard/delete_message_model.dart';
 
-class LeaveQuotaController extends GetxController {
+class LeaveOverviewController extends GetxController {
   final TokenRepository authRepository;
 
-  LeaveQuotaController({required this.authRepository});
+  LeaveOverviewController({required this.authRepository});
 
   final box = GetStorage();
 
-  RxList<LeaveQuotaItem> employeesLeavesList = <LeaveQuotaItem>[].obs;
+  RxList<LeaveItem> employeeList = <LeaveItem>[].obs;
   RxList<DropdownItem> yearList = <DropdownItem>[].obs;
-  RxList<DropdownItem> employeeList = <DropdownItem>[].obs;
+  RxList<DropdownItem> monthList = <DropdownItem>[].obs;
 
   final RxString selectedYear = ''.obs;
-  final RxString selectedEmp = ''.obs;
+  final RxString selectedMonth = ''.obs;
 
   String firstDay = '';
   String lastDay = '';
+  RxString currentMonthName = ''.obs;
 
 
   var clientId = '1';
@@ -43,6 +44,7 @@ class LeaveQuotaController extends GetxController {
     loadSavedCredentials();
     //getCurrentLocation();
     DateTime now = DateTime.now();
+    currentMonthName.value = DateFormat.MMMM().format(now); // "July"
 
     getFirstAndLastDay(now.year, now.month, true);
   }
@@ -67,11 +69,22 @@ class LeaveQuotaController extends GetxController {
   }
 
   void getFirstAndLastDay(int year, int month, bool isRefresh) {
+    DateTime fd = DateTime(year, month, 1);
+    DateTime ld = DateTime(year, month + 1, 0);
+
+    firstDay = dateToYMD(fd);
+    lastDay = dateToYMD(ld);
+
+    printf("First day: $firstDay");
+    printf("Last day: $lastDay");
+
     getLeaveQuotaListApi(
       isRefresh,
       clientId: clientId,
       userName: userName,
       empNo: '',
+      startDay: firstDay,
+      endDay: lastDay,
     );
   }
   void getList() {
@@ -80,36 +93,67 @@ class LeaveQuotaController extends GetxController {
       clientId: clientId,
       userName: userName,
       empNo: '',
+      startDay: firstDay,
+      endDay: lastDay,
     );
   }
   void onYearOrMonthChanged(String year, String monthName) {
     final int yearInt = int.parse(year);
-    getFirstAndLastDay(yearInt, 0, false);
+    final int monthInt = monthNameToInt(monthName);
+
+    getFirstAndLastDay(yearInt, monthInt, false);
   }
 
+  int monthNameToInt(String monthName) {
+    const months = {
+      'January': 1,
+      'February': 2,
+      'March': 3,
+      'April': 4,
+      'May': 5,
+      'June': 6,
+      'July': 7,
+      'August': 8,
+      'September': 9,
+      'October': 10,
+      'November': 11,
+      'December': 12,
+    };
+
+    return months[monthName]!;
+  }
 
 
   Future<void> getLeaveQuotaListApi(    isRefresh, {
     required String clientId,
     required String userName,
     required String empNo,
+    required String startDay,
+    required String endDay,
   }) async {
-
+    printf(
+      '<--clientId-$clientId--userName-->$userName--start-day-->$startDay--end-day-->$endDay',
+    );
 
     final dio = Dio();
     const String baseUrl = AppConstants.baseUrl;
-    const String endpoint = AppConstants.leaveRequestGetLeaveQuotaApi;
+    const String endpoint = AppConstants.leaveRequestOverviewApi;
 
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {
+            'flag': 'get',
             'ClientID': clientId,
             'UserName': userName,
             'EmployeeNo': empNo,
-            'Year': '2025',
+            'StartDate': startDay,
+            'EndDate': endDay,
+            'BusObjCode': 'LM_LR_BUS_OV',
+            'RequestComingFrom': 'Mobile',
           },
         );
 
@@ -120,25 +164,28 @@ class LeaveQuotaController extends GetxController {
 
         printf('<----success-getting-event-list---->');
 
-        final model = LeaveQuotaModel.fromJson(outerJson);
+        final model = LeaveResponseModel.fromJson(outerJson);
 
-        employeesLeavesList.value = model.leaveQuotaList;
+        employeeList.value = model.employeesLeavesList;
 
         printf('<---leaveList--->${employeeList.value.length}');
 
         if (isRefresh) {
-          if (model.yearList.isNotEmpty) {
-            yearList.value = model.yearList;
-            selectedYear.value = model.yearList.last.value; // Optional
+          if (model.yearsList.isNotEmpty) {
+            yearList.value = model.yearsList;
+            selectedYear.value = model.yearsList.last.value; // Optional
           }
-          if (model.employeesList.isNotEmpty) {
-            employeeList.value = model.employeesList;
-            selectedEmp.value = model.employeesList.first.value;
+          if (model.monthsList.isNotEmpty) {
+            monthList.value = model.monthsList;
+            selectedMonth.value = model.monthsList.first.value;
           }
+          selectedMonth.value = currentMonthName.value;
         }
 
 
-
+        for (final emp in employeeList.value) {
+          printf('Employee: ${emp.leaveID} - ${emp.leaveType}');
+        }
         hideProgress();
       } catch (e, stackTrace) {
         printf("Exception: $e");
@@ -193,6 +240,8 @@ class LeaveQuotaController extends GetxController {
             clientId: clientId,
             userName: userName,
             empNo: '',
+            startDay: firstDay,
+            endDay: lastDay,
           );
         } else {
           dropDownBannerSuccess('Failed to delete.');

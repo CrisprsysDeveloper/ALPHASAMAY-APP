@@ -5,6 +5,7 @@ import 'package:crysprsys/bindings/dashboard_binding.dart';
 import 'package:crysprsys/bindings/face_registration_binding.dart';
 import 'package:crysprsys/bindings/face_registration_list_binding.dart';
 import 'package:crysprsys/bindings/justification_add_binding.dart';
+import 'package:crysprsys/bindings/leave_overview_binding.dart';
 import 'package:crysprsys/bindings/leave_quota_binding.dart';
 import 'package:crysprsys/bindings/login_binding.dart';
 import 'package:crysprsys/bindings/time_event_over_binding.dart';
@@ -28,6 +29,7 @@ import 'package:get/get.dart';
 import '../bindings/leave_request_binding.dart';
 import '../bindings/my_account_binding.dart';
 import '../bindings/time_justification_binding.dart';
+import '../screens/dashboard/leave_overview_screen.dart';
 import '../screens/dashboard/leave_request_screen.dart';
 
 part 'app_routes.dart';
@@ -117,6 +119,12 @@ class AppPages {
       name: Routes.leaveRequestScreen,
       page: () => LeaveRequestScreen(),
       binding: LeaveRequestBinding(),
+      transition: Transition.rightToLeftWithFade,
+    ),
+    GetPage(
+      name: Routes.leaveOverviewScreen,
+      page: () => LeaveOverviewScreen(),
+      binding: LeaveOverviewBinding(),
       transition: Transition.rightToLeftWithFade,
     ),
     GetPage(
