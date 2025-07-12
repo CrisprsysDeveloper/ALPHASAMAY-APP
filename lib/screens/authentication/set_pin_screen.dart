@@ -51,7 +51,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
           await Future.delayed(const Duration(milliseconds: 200));
           if (setPin == pin.join()) {
             printf('<---navigate-to-dashboard--->');
-            Get.toNamed(Routes.dashboardScreen);
+            Get.offAndToNamed(Routes.dashboardScreen);
           } else {
             Fluttertoast.showToast(
               msg: "Incorrect PIN",

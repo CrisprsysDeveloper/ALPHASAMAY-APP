@@ -136,7 +136,7 @@ class LoginController extends GetxController {
 
           printf('<---set-pin--->$setPin');
           if (setPin == 'null' || setPin.isEmpty) {
-            Get.to(() => SetPinScreen());
+            Get.offAll(() => SetPinScreen());
           } else {
             printf('<---navigate-to-dashboard--->');
             // Get.toNamed(Routes.dashboardScreen);

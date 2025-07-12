@@ -79,15 +79,17 @@ class TimeEventOverScreen extends StatelessWidget {
                               focusedBorder: InputBorder.none,
                             ),
                             items:
-                            controller.yearList.map((year) {
+                                controller.yearList.map((year) {
                                   return DropdownMenuItem<String>(
                                     value: year.value,
                                     child: Text(year.value),
                                   );
                                 }).toList(),
-                                onChanged: (value) {
+                            onChanged: (value) {
                               controller.selectedYear.value = value!;
-                              printf('<--selected-year-->${controller.selectedYear.value}',);
+                              printf(
+                                '<--selected-year-->${controller.selectedYear.value}',
+                              );
                               controller.onYearOrMonthChanged(
                                 controller.selectedYear.value,
                                 controller.selectedMonth.value,
@@ -224,7 +226,15 @@ class TimeEventOverScreen extends StatelessWidget {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {},
+                onTap: () async {
+                  final result = await Get.toNamed(
+                    Routes.checkInOutScreen,
+                    arguments: {'from': AppConstants.view, 'emp': employee},
+                  );
+                  if (result) {
+                    controller.getList();
+                  }
+                },
               ),
               10.sbw,
               widgetContainer(

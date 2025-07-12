@@ -48,7 +48,10 @@ class CheckInOutScreen extends StatelessWidget {
                     width: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: ColorConstants.appColor, width: 1),
+                      border: Border.all(
+                        color: ColorConstants.appColor,
+                        width: 1,
+                      ),
                     ),
                     child: Stack(
                       children: [
@@ -112,53 +115,6 @@ class CheckInOutScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Partner Type",
-                  style: interTextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w700,
-                    size: 12.sp,
-                  ),
-                ),
-                2.sbh,
-                Obx(
-                  () => Container(
-                    color: Colors.grey.shade300,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w),
-                      child: DropdownButtonFormField<String>(
-                        value:
-                            controller.selectedAuthId.value.isEmpty
-                                ? null
-                                : controller.selectedAuthId.value,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                        ),
-                        items:
-                            controller.dropdownItems
-                                .map(
-                                  (item) => DropdownMenuItem<String>(
-                                    value: item['id'],
-                                    child: Text(item['label'] ?? ''),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (value) {
-                          controller.selectedAuthId.value = value ?? '';
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            30.sbh,
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
                   "Employee Type",
                   style: interTextStyle(
                     color: Colors.grey,
@@ -170,34 +126,124 @@ class CheckInOutScreen extends StatelessWidget {
                 Obx(
                   () => Container(
                     color: Colors.grey.shade300,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w),
-                      child: DropdownButtonFormField<String>(
-                        value:
-                            controller.selectedPartnerType.value.isEmpty
-                                ? null
-                                : controller.selectedPartnerType.value,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                        ),
-                        items:
-                            controller.partnerDropdownItems
-                                .map<DropdownMenuItem<String>>((item) {
-                                  return DropdownMenuItem(
-                                    value: item['id'],
-                                    child: Text(item['label'] ?? ''),
-                                  );
-                                })
-                                .toList(),
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.selectedPartnerType.value = value;
-                          }
-                        },
-                      ),
-                    ),
+                    child:
+                        controller.isView.value
+                            ? SizedBox(
+                              width: Get.width,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 10.w,
+                                  top: 12.h,
+                                  bottom: 12.h,
+                                ),
+                                child: Text(
+                                  controller.selectedPartnerType.value,
+                                  style: interTextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                    size: 14.sp,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.w),
+                              child: DropdownButtonFormField<String>(
+                                value:
+                                    controller.selectedPartnerType.value.isEmpty
+                                        ? null
+                                        : controller.selectedPartnerType.value,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                ),
+                                items:
+                                    controller.partnerTypeDropdown
+                                        .map<DropdownMenuItem<String>>((item) {
+                                          return DropdownMenuItem(
+                                            value: item['id'],
+                                            child: Text(item['label'] ?? ''),
+                                          );
+                                        })
+                                        .toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    controller.selectedPartnerType.value =
+                                        value;
+                                    controller.filterListBySelectedEmployee();
+                                  }
+                                },
+                              ),
+                            ),
+                  ),
+                ),
+              ],
+            ),
+            30.sbh,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Partner Type",
+                  style: interTextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w700,
+                    size: 12.sp,
+                  ),
+                ),
+                2.sbh,
+                Obx(
+                  () => Container(
+                    color: Colors.grey.shade300,
+                    child:
+                        controller.isView.value
+                            ? SizedBox(
+                              width: Get.width,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 10.w,
+                                  top: 12.h,
+                                  bottom: 12.h,
+                                ),
+                                child: Text(
+                                  controller.selectedEmpType.value,
+                                  style: interTextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                    size: 14.sp,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.w),
+                              child: DropdownButtonFormField<String>(
+                                value:
+                                    controller.selectedEmpType.value.isEmpty
+                                        ? null
+                                        : controller.selectedEmpType.value,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                ),
+                                items:
+                                    controller.filteredPartnerTypeList
+                                        .map(
+                                          (item) => DropdownMenuItem<String>(
+                                            value: item.id,
+                                            child: Text(item.description),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (value) {
+                                  controller.selectedEmpType.value =
+                                      value ?? '';
+                                },
+                              ),
+                            ),
                   ),
                 ),
               ],
@@ -220,7 +266,9 @@ class CheckInOutScreen extends StatelessWidget {
                       2.sbh,
                       GestureDetector(
                         onTap: () {
-                          controller.selectDate(context);
+                          if (!controller.isView.value) {
+                            controller.selectDate(context);
+                          }
                         },
                         child: Obx(
                           () => Container(
@@ -261,7 +309,9 @@ class CheckInOutScreen extends StatelessWidget {
                       2.sbh,
                       GestureDetector(
                         onTap: () {
-                          controller.selectTime(context);
+                          if (!controller.isView.value) {
+                            controller.selectTime(context);
+                          }
                         },
                         child: Obx(
                           () => Container(
@@ -288,31 +338,33 @@ class CheckInOutScreen extends StatelessWidget {
               ],
             ),
             30.sbh,
-            Row(
-              children: [
-                Expanded(
-                  child: CustomButton(
-                    horizontalMargin: 0,
-                    icon: "",
-                    text: 'Check in'.toUpperCase(),
-                    onPressed: () {
-                      controller.buttonCheckIn();
-                    },
-                  ),
+            controller.isView.value
+                ? SizedBox()
+                : Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        horizontalMargin: 0,
+                        icon: "",
+                        text: 'Check in'.toUpperCase(),
+                        onPressed: () {
+                          controller.buttonCheckIn();
+                        },
+                      ),
+                    ),
+                    10.sbw,
+                    Expanded(
+                      child: CustomButton(
+                        horizontalMargin: 0,
+                        icon: "",
+                        text: 'Check out'.toUpperCase(),
+                        onPressed: () {
+                          controller.buttonCheckOut();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                10.sbw,
-                Expanded(
-                  child: CustomButton(
-                    horizontalMargin: 0,
-                    icon: "",
-                    text: 'Check out'.toUpperCase(),
-                    onPressed: () {
-                      controller.buttonCheckOut();
-                    },
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

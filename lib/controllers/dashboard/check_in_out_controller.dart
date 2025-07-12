@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:crysprsys/model/dashboard/time_event_model.dart';
 import 'package:crysprsys/model/dashboard/user_time_zone_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:crysprsys/helper/common.dart';
@@ -39,12 +40,15 @@ class CheckInOutController extends GetxController {
   var clientId = '1';
   var userName = 'Call';
 
-  var selectedAuthId = ''.obs;
-  RxList<Map<String, String>> dropdownItems = <Map<String, String>>[].obs;
+  var selectedEmpType = ''.obs;
+  RxList<Map<String, String>> employeeTypeDropDown =
+      <Map<String, String>>[].obs;
 
   var selectedPartnerType = ''.obs;
-  RxList<Map<String, String>> partnerDropdownItems =
-      <Map<String, String>>[].obs;
+  RxList<Map<String, String>> partnerTypeDropdown = <Map<String, String>>[].obs;
+
+  RxList<AuthObject> fullPartnerTypeList = <AuthObject>[].obs;
+  RxList<AuthObject> filteredPartnerTypeList = <AuthObject>[].obs;
 
   Rx<DateTime> selectedDate = DateTime.now().obs;
   Rx<TimeOfDay> selectedTime = TimeOfDay.now().obs;
@@ -67,27 +71,15 @@ class CheckInOutController extends GetxController {
   RxString selectedInDate = ''.obs;
   RxString convertedCheckInDate = ''.obs;
 
+  RxBool isView = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     printf('<------init--CheckInOutController----->');
 
-    try {
-      from = Get.arguments['from'] ?? AppConstants.add;
-      checkInId = Get.arguments['checkInId'];
-      printf('<---from---->$from--check-in-id-->$checkInId');
-    } catch (e) {
-      printf('exe-from-->$e');
-    }
-
-    // Format and store the default date
     defaultDate.value = dateFormat.format(selectedDate.value);
-
-    // Store UTC ISO string for selected date
     selectedInDate.value = selectedDate.value.toUtc().toIso8601String();
-
-    // Get location
-    getCurrentLocation();
 
     // Combine selectedDate and selectedTime to build fullDateTime
     final DateTime fullDateTime = DateTime(
@@ -114,9 +106,42 @@ class CheckInOutController extends GetxController {
 
     // Load saved data and dropdowns
     loadSavedCredentials();
-    getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(() {
-      getDropDownListApi(clientId: clientId, userName: userName);
-    });
+
+    try {
+      from = Get.arguments['from'] ?? AppConstants.add;
+      if (from == AppConstants.view) {
+        isView.value = true;
+        AttendanceModel employee = Get.arguments['emp'];
+        printf('ptype--->${employee.partnerType} -- ${employee.employeeName}');
+        printf(
+          '${employee.partnerType} --${employee.employeeName} --${employee.pernr} --${employee.ccode}',
+        );
+
+        selectedPartnerType.value = employee.partnerType;
+        selectedEmpType.value = '${employee.employeeID} ${employee.employeeName}';
+
+        defaultDate.value = employee.checkInDate.toString();
+        defaultTime.value = employee.checktime.toString();
+      } else if (from == AppConstants.edit) {
+        checkInId = Get.arguments['checkInId'];
+        printf('<---from---->$from--check-in-id-->$checkInId');
+        getCurrentLocation();
+        getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(
+          () {
+            getDropDownListApi(clientId: clientId, userName: userName);
+          },
+        );
+      } else {
+        getCurrentLocation();
+        getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(
+          () {
+            getDropDownListApi(clientId: clientId, userName: userName);
+          },
+        );
+      }
+    } catch (e) {
+      printf('exe-from-->$e');
+    }
   }
 
   void loadSavedCredentials() {
@@ -237,7 +262,7 @@ class CheckInOutController extends GetxController {
           },
         );
 
-        print('Full URL: ${uri.toString()}');
+        printf('Full URL: ${uri.toString()}');
 
         final response = await dio.get(
           '$baseUrl$endpoint',
@@ -267,22 +292,25 @@ class CheckInOutController extends GetxController {
           final Map<String, dynamic> json = jsonDecode(response.data);
           final model = AuthResponseModel.fromJson(json);
 
-          dropdownItems.value =
+          fullPartnerTypeList.value = model.authBasedObjectsList;
+
+          employeeTypeDropDown.value =
               model.authBasedObjectsList.map((e) {
                 return {'id': e.id ?? '', 'label': e.description ?? ''};
               }).toList();
 
-          partnerDropdownItems.value =
+          if (employeeTypeDropDown.isNotEmpty) {
+            selectedEmpType.value = employeeTypeDropDown.first['id'] ?? '';
+          }
+
+          partnerTypeDropdown.value =
               model.partnerTypeList.map((e) {
                 return {'id': e.id ?? '', 'label': e.value ?? ''};
               }).toList();
 
-          if (partnerDropdownItems.isNotEmpty) {
-            selectedPartnerType.value = partnerDropdownItems.first['id'] ?? '';
-          }
-
-          if (dropdownItems.isNotEmpty) {
-            selectedAuthId.value = dropdownItems.first['id'] ?? '';
+          if (partnerTypeDropdown.isNotEmpty) {
+            selectedPartnerType.value = partnerTypeDropdown.first['id'] ?? '';
+            filterListBySelectedEmployee();
           }
         } else {
           dropDownBannerError(messageDescription);
@@ -294,6 +322,23 @@ class CheckInOutController extends GetxController {
       }
     } else {
       Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  void filterListBySelectedEmployee() {
+    final selectedId = selectedPartnerType.value;
+
+    printf('<--filter--partner-list---->$selectedId');
+
+    filteredPartnerTypeList.value =
+        fullPartnerTypeList.where((user) => user.pType == selectedId).toList();
+
+    for (var obj in filteredPartnerTypeList) {
+      printf('filteredPartnerTypeList: ${obj.id}, ${obj.description}');
+    }
+
+    if (filteredPartnerTypeList.isNotEmpty) {
+      selectedEmpType.value = filteredPartnerTypeList.first.id;
     }
   }
 
@@ -400,13 +445,13 @@ class CheckInOutController extends GetxController {
   Future<void> buttonCheckIn() async {
     if (pickedImagePath.value.isEmpty) {
       dropDownBannerError('Upload image');
-    } else if (selectedAuthId.value.isEmpty) {
+    } else if (selectedEmpType.value.isEmpty) {
       dropDownBannerError('select patner type');
     } else if (selectedPartnerType.value.isEmpty) {
       dropDownBannerError('select employe type');
     } else {
       printf(
-        'emp->${selectedAuthId.value} date->${defaultDate.value} time->${defaultTime.value}',
+        'emp->${selectedEmpType.value} date->${defaultDate.value} time->${defaultTime.value}',
       );
       printf(
         'checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',
@@ -451,7 +496,7 @@ class CheckInOutController extends GetxController {
     final String createdDate = nowUtc.toIso8601String();
 
     Map<String, dynamic> body = {
-      "EmployeeID": selectedAuthId.value,
+      "EmployeeID": selectedEmpType.value,
       "CheckType": type,
       "InDate": selectedInDate.value,
       "ConvertedCheckinDate": convertedCheckInDate.value,
@@ -507,13 +552,13 @@ class CheckInOutController extends GetxController {
   void buttonCheckOut() {
     if (pickedImagePath.value.isEmpty) {
       dropDownBannerError('Upload image');
-    } else if (selectedAuthId.value.isEmpty) {
+    } else if (selectedEmpType.value.isEmpty) {
       dropDownBannerError('select patner type');
     } else if (selectedPartnerType.value.isEmpty) {
       dropDownBannerError('select employe type');
     } else {
       printf(
-        'emp->${selectedAuthId.value} date->${defaultDate.value} time->${defaultTime.value}',
+        'emp->${selectedEmpType.value} date->${defaultDate.value} time->${defaultTime.value}',
       );
       printf(
         'checkTime->${timeNow(defaultTime.value).toString()} lati->$latitude long->$longitude',
@@ -592,7 +637,7 @@ class CheckInOutController extends GetxController {
     final String createdDate = nowUtc.toIso8601String();
     Map<String, dynamic> body = {
       "CheckInId": checkInId,
-      "EmployeeID": selectedAuthId.value,
+      "EmployeeID": selectedEmpType.value,
       "CheckType": type,
       "InDate": selectedInDate.value,
       "ConvertedCheckinDate": convertedCheckInDate.value,

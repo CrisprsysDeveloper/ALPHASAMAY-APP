@@ -50,13 +50,14 @@ class SplashController extends GetxController {
   void _route() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    //Get.offAndToNamed(Routes.dashboardScreen);
+    Get.offAndToNamed(Routes.dashboardScreen);
 
-    if (setPin.isNotEmpty) {
-      Get.to(() => SetPinScreen());
-    } else {
-      redirect();
-    }
+    // if (setPin.isNotEmpty) {
+    //   Get.offAll(() => SetPinScreen());
+    // } else {
+    //   redirect();
+    // }
+
   }
 
   Future<void> redirect() async {

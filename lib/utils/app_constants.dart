@@ -76,6 +76,8 @@ class AppConstants {
 
   static const add = 'Add';
   static const edit = 'Edit';
+  static const view = 'View';
+
 
   static const somethingWentWrong =
       'Something went wrong...please try again later';

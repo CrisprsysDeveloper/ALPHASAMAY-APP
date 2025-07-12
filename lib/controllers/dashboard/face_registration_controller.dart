@@ -157,9 +157,9 @@ class FaceRegistrationController extends GetxController {
             AttendanceUserResponse.fromJson(outerJson);
 
         final serviceStatus = attendanceUserResponse.serviceStatus;
-        final List<AttendanceUser> attendanceUsers =
-            attendanceUserResponse.attendanceUserList;
+        final List<AttendanceUser> attendanceUsers = attendanceUserResponse.attendanceUserList;
         fullAttendanceUserList.value = attendanceUsers;
+
         final List<BusinessObject> businessObjects =
             attendanceUserResponse.businessObjectsList;
 
