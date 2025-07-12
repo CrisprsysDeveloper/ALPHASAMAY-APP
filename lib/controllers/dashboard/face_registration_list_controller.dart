@@ -37,7 +37,7 @@ class FaceRegistrationListController extends GetxController {
     super.onInit();
     printf('<------init--FaceRegistrationListController----->');
     loadSavedCredentials();
-    getCurrentLocation();
+    //getCurrentLocation();
     DateTime now = DateTime.now();
     getFirstAndLastDay(now.year, now.month);
   }

@@ -28,16 +28,11 @@ class DashboardScreen extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          // actions: [
-          //   Icon(Icons.pie_chart_outline),
-          //   const SizedBox(width: 10),
-          //   Icon(Icons.notifications_none),
-          //   const SizedBox(width: 10),
-          //   Padding(
-          //     padding: const EdgeInsets.only(right: 16.0),
-          //     child: Center(child: Text("0")),
-          //   ),
-          // ],
+          actions: [
+            IconButton(icon: Icon(Icons.pie_chart_outline), onPressed: () {}),
+
+            IconButton(icon: Icon(Icons.notifications_none), onPressed: () {}),
+          ],
         ),
         drawer: widgetDrawer(),
         body: SingleChildScrollView(

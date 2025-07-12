@@ -8,7 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../model/dashboard/leave_quota_model.dart';
-import '../../route/app_pages.dart';
 
 class LeaveQuotaScreen extends StatefulWidget {
   const LeaveQuotaScreen({super.key});
@@ -72,29 +71,31 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                 children: [
                   Expanded(
                     child: Obx(
-                          () => Container(
+                      () => Container(
                         height: 40,
                         color: Colors.grey.shade300,
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: DropdownButtonFormField<String>(
                           isExpanded: true,
-                          value: controller.selectedYear.value.isEmpty
-                              ? null
-                              : controller.selectedYear.value,
+                          value:
+                              controller.selectedYear.value.isEmpty
+                                  ? null
+                                  : controller.selectedYear.value,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
                           ),
-                          items: controller.yearList.map((year) {
-                            return DropdownMenuItem<String>(
-                              value: year.value,
-                              child: Text(
-                                year.value,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
+                          items:
+                              controller.yearList.map((year) {
+                                return DropdownMenuItem<String>(
+                                  value: year.value,
+                                  child: Text(
+                                    year.value,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              }).toList(),
                           onChanged: (value) {
                             controller.selectedYear.value = value!;
                             controller.onYearOrMonthChanged(
@@ -109,29 +110,31 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                   SizedBox(width: 8.w), // reduced from 16.w
                   Expanded(
                     child: Obx(
-                          () => Container(
+                      () => Container(
                         height: 40,
                         color: Colors.grey.shade300,
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: DropdownButtonFormField<String>(
                           isExpanded: true,
-                          value: controller.employeeList.value.isEmpty
-                              ? null
-                              : controller.selectedEmp.value,
+                          value:
+                              controller.employeeList.value.isEmpty
+                                  ? null
+                                  : controller.selectedEmp.value,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
                           ),
-                          items: controller.employeeList.map((month) {
-                            return DropdownMenuItem<String>(
-                              value: month.value,
-                              child: Text(
-                                month.value,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
+                          items:
+                              controller.employeeList.map((month) {
+                                return DropdownMenuItem<String>(
+                                  value: month.value,
+                                  child: Text(
+                                    month.value,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              }).toList(),
                           onChanged: (value) {
                             controller.selectedEmp.value = value!;
                             controller.onYearOrMonthChanged(
@@ -144,9 +147,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                     ),
                   ),
                 ],
-              )
-,
-
+              ),
               20.sbh,
               Expanded(
                 child: Obx(() {
@@ -164,28 +165,6 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                       : Center(child: Text(AppConstants.noDataFound));
                 }),
               ),
-
-              // List of Records (Filtered by selected tab)
-              /*  Expanded(
-                child: ListView.builder(
-                  itemCount: controller.records.length,
-                  itemBuilder: (context, index) {
-                    var record = controller.records[index];
-
-                    // Optional: Filter based on selectedIndex (Online/Offline)
-                    // if you have type field, filter records accordingly
-
-                    bool isCheckIn = record['checkType'] == 'Check In';
-                    Color borderColor =
-                    isCheckIn ? Colors.green : Colors.orange;
-
-                    return widgetTimeEvents(
-                      record: record,
-                      borderColor: borderColor,
-                    );
-                  },
-                ),
-              ),*/
             ],
           ),
         ),
@@ -269,11 +248,6 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                   controller.showDeleteEventDialog(
                     leaveData.leaveID.toString(),
                   );
-                  // controller.deleteJustificationApi(
-                  //   clientId: controller.clientId,
-                  //   userName: controller.userName,
-                  //   deleteId: employee.justid.toString(),
-                  // );
                 },
               ),
             ],

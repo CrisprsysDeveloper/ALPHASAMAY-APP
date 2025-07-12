@@ -144,36 +144,39 @@ class FaceRegistrationScreen extends StatelessWidget {
                 ),
                 2.sbh,
                 Obx(
-                      () => Container(
+                  () => Container(
                     color: Colors.grey.shade300,
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10.w),
                       child: DropdownButtonFormField<String>(
-                        value: controller.selectedObjectNumber.value.isEmpty
-                            ? null
-                            : controller.selectedObjectNumber.value,
+                        value:
+                            controller.selectedObjectNumber.value.isEmpty
+                                ? null
+                                : controller.selectedObjectNumber.value,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                         ),
-                        items: controller.filteredAttendanceUserList
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                            value: item.id,
-                            child: Text(item.description),
-                          ),
-                        )
-                            .toList(),
+                        items:
+                            controller.filteredAttendanceUserList
+                                .map(
+                                  (item) => DropdownMenuItem<String>(
+                                    value: item.id,
+                                    child: Text(item.description),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (value) {
                           controller.selectedObjectNumber.value = value ?? '';
-                          printf('<--selected-object-number--->${controller.selectedObjectNumber}');
+                          printf(
+                            '<--selected-object-number--->${controller.selectedObjectNumber}',
+                          );
                         },
                       ),
                     ),
                   ),
                 ),
-
               ],
             ),
             30.sbh,
@@ -181,8 +184,12 @@ class FaceRegistrationScreen extends StatelessWidget {
               horizontalMargin: 0,
               icon: "",
               text: 'Register'.toUpperCase(),
-              onPressed: () {
-                controller.registerFace();
+              onPressed: () async {
+                if (controller.faceId.isNotEmpty) {
+                  controller.updateRegisterFace();
+                } else {
+                  controller.registerFace();
+                }
               },
             ),
           ],

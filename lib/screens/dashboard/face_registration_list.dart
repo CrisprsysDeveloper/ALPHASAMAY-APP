@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crysprsys/controllers/dashboard/face_registration_list_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/route/app_pages.dart';
+import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +122,9 @@ class FaceRegistrationListScreen extends StatelessWidget {
                               borderColor: ColorConstants.appColor,
                               iconColor: Colors.white,
                               onTap: () {
-                                controller.showDeleteFaceIdDialog(emp.faceRegID);
+                                controller.showDeleteFaceIdDialog(
+                                  emp.faceRegID,
+                                );
                               },
                             ),
                             10.sbw,
@@ -130,8 +133,22 @@ class FaceRegistrationListScreen extends StatelessWidget {
                               bgColors: ColorConstants.appColor,
                               borderColor: ColorConstants.appColor,
                               iconColor: Colors.white,
-                              onTap: () {
-                                printf('<---on-tap-edit--->');
+                              onTap: () async {
+                                final result = await Get.toNamed(
+                                  Routes.faceRegistrationScreen,
+                                  arguments: {
+                                    'from': AppConstants.edit,
+                                    'id': emp.faceRegID,
+                                    'faceId': emp.faceId,
+                                  },
+                                );
+
+                                if (result) {
+                                  controller.getFaceUserListApi(
+                                    clientId: controller.clientId,
+                                    userName: controller.userName,
+                                  );
+                                }
                               },
                             ),
                           ],
@@ -147,8 +164,17 @@ class FaceRegistrationListScreen extends StatelessWidget {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.toNamed(Routes.faceRegistrationScreen);
+        onPressed: () async {
+          final result = await Get.toNamed(
+            Routes.faceRegistrationScreen,
+            arguments: {'from': AppConstants.add},
+          );
+          if (result) {
+            controller.getFaceUserListApi(
+              clientId: controller.clientId,
+              userName: controller.userName,
+            );
+          }
         }, // Change icon if needed
         backgroundColor: ColorConstants.appColor,
         shape: const CircleBorder(),

@@ -55,6 +55,10 @@ class FaceRegistrationController extends GetxController {
   RxList<AttendanceUser> fullAttendanceUserList = <AttendanceUser>[].obs;
   RxList<AttendanceUser> filteredAttendanceUserList = <AttendanceUser>[].obs;
 
+  var from = AppConstants.add;
+  var editId = '';
+  var faceId = '';
+
   @override
   void onInit() {
     super.onInit();
@@ -73,6 +77,17 @@ class FaceRegistrationController extends GetxController {
 
     loadSavedCredentials();
     getDropDownListApi(clientId: clientId, userName: userName);
+
+    try {
+      from = Get.arguments['from'] ?? AppConstants.add;
+      if (from == AppConstants.edit) {
+        editId = Get.arguments['id'];
+        faceId = Get.arguments['faceId'];
+        printf('----edit---id--->$editId--faceId--->$faceId');
+      }
+    } catch (e) {
+      printf('exe-from-->$e');
+    }
   }
 
   void loadSavedCredentials() {
@@ -157,7 +172,8 @@ class FaceRegistrationController extends GetxController {
             AttendanceUserResponse.fromJson(outerJson);
 
         final serviceStatus = attendanceUserResponse.serviceStatus;
-        final List<AttendanceUser> attendanceUsers = attendanceUserResponse.attendanceUserList;
+        final List<AttendanceUser> attendanceUsers =
+            attendanceUserResponse.attendanceUserList;
         fullAttendanceUserList.value = attendanceUsers;
 
         final List<BusinessObject> businessObjects =
@@ -322,8 +338,63 @@ class FaceRegistrationController extends GetxController {
     final String message =
         serviceStatus['MessageDescription'] ?? 'Unknown response';
 
-    dropDownBannerError(message);
+    if (message == 'Success') {
+      hideProgress();
+      Get.back(result: true);
+      dropDownBannerSuccess(message);
+    } else {
+      dropDownBannerError(message);
+    }
     hideProgress();
+  }
+
+  Future<void> updateRegisterFace() async {
+    if (selectedObject.value.isEmpty || selectedObjectNumber.value.isEmpty) {
+      dropDownBannerError('Please select Business Object and Object Number');
+    } else if (pickedImagePath.value.isEmpty) {
+      dropDownBannerError("Please take a photo");
+    } else {
+      showProgress();
+
+      final url =
+          'https://apis.crisprsys.net/api//FaceRekognition/SaveMobileAttendanceUserProfile?CPMClientID=$clientId'
+          '&CPMUserName=$userName&BusObjCode=${selectedObject.value}&ObjectNumber=${selectedObjectNumber.value}'
+          '&FilePath=${pickedImagePath.value}&FaceId=$faceId';
+
+      printf('<--url---->$url');
+      final dio = dio_.Dio();
+
+      final file = await MultipartFile.fromFile(
+        pickedImagePath.value,
+        filename: pickedImagePath.value.split('/').last,
+      );
+
+      final formData = FormData.fromMap({'AttendanceUserProfilePic': file});
+
+      final response = await dio.post(url, data: formData);
+
+      printf('<---response--->$response');
+
+      final Map<String, dynamic> outerJson =
+          response.data is String ? jsonDecode(response.data) : response.data;
+
+      final Map<String, dynamic> serviceStatus = jsonDecode(
+        outerJson['ServiceStatus'],
+      );
+
+      final String message =
+          serviceStatus['MessageDescription'] ?? 'Unknown response';
+
+      hideProgress();
+
+      if (message == 'Success') {
+        hideProgress();
+        Get.back(result: true);
+        dropDownBannerSuccess(message);
+      } else {
+        dropDownBannerError(message);
+      }
+    }
   }
 }
 
