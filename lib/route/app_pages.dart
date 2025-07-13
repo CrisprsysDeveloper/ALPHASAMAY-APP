@@ -8,6 +8,7 @@ import 'package:crysprsys/bindings/justification_add_binding.dart';
 import 'package:crysprsys/bindings/leave_overview_binding.dart';
 import 'package:crysprsys/bindings/leave_quota_binding.dart';
 import 'package:crysprsys/bindings/login_binding.dart';
+import 'package:crysprsys/bindings/time_event_approval_binding.dart';
 import 'package:crysprsys/bindings/time_event_over_binding.dart';
 import 'package:crysprsys/controllers/dashboard/time_justification_controller.dart';
 import 'package:crysprsys/screens/authentication/authentication_screen.dart';
@@ -31,6 +32,7 @@ import '../bindings/my_account_binding.dart';
 import '../bindings/time_justification_binding.dart';
 import '../screens/dashboard/leave_overview_screen.dart';
 import '../screens/dashboard/leave_request_screen.dart';
+import '../screens/dashboard/time_event_approval.dart';
 
 part 'app_routes.dart';
 
@@ -131,6 +133,12 @@ class AppPages {
       name: Routes.leaveQuotaScreen,
       page: () => LeaveQuotaScreen(),
       binding: LeaveQuotaBinding(),
+      transition: Transition.rightToLeftWithFade,
+    ),
+    GetPage(
+      name: Routes.timeEventApprovalScreen,
+      page: () => TimeEventApproval(),
+      binding: TimeEventApprovalBinding(),
       transition: Transition.rightToLeftWithFade,
     ),
     // GetPage(

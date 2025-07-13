@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../model/dashboard/leave_quota_model.dart';
+import '../../route/app_pages.dart';
 
 class LeaveQuotaScreen extends StatefulWidget {
   const LeaveQuotaScreen({super.key});
@@ -156,9 +157,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         itemCount: controller.employeesLeavesList.length,
                         itemBuilder: (context, index) {
                           final emp = controller.employeesLeavesList[index];
-                          return widgetTimeEvents(
-                            emp,
-                            borderColor: Colors.green,
+                          return InkWell(
+                            onTap: () {
+                              Get.toNamed(Routes.timeEventApprovalScreen);
+                            },
+                            child: widgetTimeEvents(
+                              emp,
+                              borderColor: Colors.green,
+                            ),
                           );
                         },
                       )
@@ -236,44 +242,6 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
             ],
           ),
           15.sbh,
-          Row(
-            children: [
-              Expanded(
-                child: buildTextColumn("Leave Status", leaveData.leaveStatus),
-              ),
-              widgetContainer(
-                icon: Icons.remove_red_eye,
-                bgColors: Colors.white,
-                borderColor: ColorConstants.appColor,
-                iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-view--->');
-                },
-              ),
-              10.sbw,
-              widgetContainer(
-                icon: Icons.edit,
-                bgColors: Colors.white,
-                borderColor: ColorConstants.appColor,
-                iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-edit--->');
-                },
-              ),
-              10.sbw,
-              widgetContainer(
-                icon: Icons.delete,
-                bgColors: Colors.white,
-                borderColor: ColorConstants.appColor,
-                iconColor: ColorConstants.appColor,
-                onTap: () {
-                  controller.showDeleteEventDialog(
-                    leaveData.leaveID.toString(),
-                  );
-                },
-              ),
-            ],
-          ),
         ],
       ),
     );
