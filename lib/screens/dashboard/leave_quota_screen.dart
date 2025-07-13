@@ -217,6 +217,28 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
           Row(
             children: [
               Expanded(
+                child: buildTextColumn("Actual Quota", leaveData.actualQuota),
+              ),
+              Expanded(
+                child: buildTextColumn("Utilized Quota", leaveData.usedQuota),
+              ),
+            ],
+          ),
+          15.sbh,
+          Row(
+            children: [
+              Expanded(
+                child: buildTextColumn("Balance Quota", leaveData.balanceQuota),
+              ),
+              Expanded(
+                child: buildTextColumn("Grade", leaveData.grade),
+              ),
+            ],
+          ),
+          15.sbh,
+          Row(
+            children: [
+              Expanded(
                 child: buildTextColumn("Leave Status", leaveData.leaveStatus),
               ),
               widgetContainer(
