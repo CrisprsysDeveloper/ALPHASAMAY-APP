@@ -72,8 +72,8 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                   Expanded(
                     child: Obx(
                       () => Container(
-                        height: 40,
-                        color: Colors.grey.shade300,
+                        height: 40.h,
+                        color: Colors.grey.shade200,
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: DropdownButtonFormField<String>(
                           isExpanded: true,
@@ -111,8 +111,8 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                   Expanded(
                     child: Obx(
                       () => Container(
-                        height: 40,
-                        color: Colors.grey.shade300,
+                        height: 40.h,
+                        color: Colors.grey.shade200,
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: DropdownButtonFormField<String>(
                           isExpanded: true,
@@ -155,10 +155,8 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                       ? ListView.builder(
                         itemCount: controller.employeesLeavesList.length,
                         itemBuilder: (context, index) {
-                          final emp = controller.employeesLeavesList[index];
-                          return widgetTimeEvents(
-                            emp,
-                            borderColor: Colors.green,
+                          return widgetLeaveQuota(
+                            controller.employeesLeavesList[index],
                           );
                         },
                       )
@@ -167,6 +165,282 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget widgetLeaveQuota(LeaveQuotaItem data) {
+    return Card(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 2.h),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        'Employee No',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Employee Name',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 40.w,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          'Grade',
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                            size: 14.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        data.pernr.toString(),
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        data.empName.toString(),
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 40.w,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          '0',
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                            size: 16.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        'Start Date',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'End Date',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 80.w,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          'Leave Type',
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                            size: 14.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        data.leaveStartDate.toString(),
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        data.leaveEndDate.toString(),
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100.w,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          data.leaveType.toString(),
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                            size: 16.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        'Actual Quota',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Utilized Quota',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                          size: 14.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100.w,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          'Balance Quota',
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                            size: 14.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100.w,
+                      child: Text(
+                        data.actualQuota, // '0',
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        data.usedQuota,
+                        style: interTextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          size: 16.sp,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100.w,
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text(
+                          data.balanceQuota,
+                          style: interTextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                            size: 16.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 2.h),
+          ],
         ),
       ),
     );
@@ -230,48 +504,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
               Expanded(
                 child: buildTextColumn("Balance Quota", leaveData.balanceQuota),
               ),
-              Expanded(
-                child: buildTextColumn("Grade", leaveData.grade),
-              ),
-            ],
-          ),
-          15.sbh,
-          Row(
-            children: [
-              Expanded(
-                child: buildTextColumn("Leave Status", leaveData.leaveStatus),
-              ),
-              widgetContainer(
-                icon: Icons.remove_red_eye,
-                bgColors: Colors.white,
-                borderColor: ColorConstants.appColor,
-                iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-view--->');
-                },
-              ),
-              10.sbw,
-              widgetContainer(
-                icon: Icons.edit,
-                bgColors: Colors.white,
-                borderColor: ColorConstants.appColor,
-                iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-edit--->');
-                },
-              ),
-              10.sbw,
-              widgetContainer(
-                icon: Icons.delete,
-                bgColors: Colors.white,
-                borderColor: ColorConstants.appColor,
-                iconColor: ColorConstants.appColor,
-                onTap: () {
-                  controller.showDeleteEventDialog(
-                    leaveData.leaveID.toString(),
-                  );
-                },
-              ),
+              Expanded(child: buildTextColumn("Grade", leaveData.grade)),
             ],
           ),
         ],

@@ -8,6 +8,7 @@ import 'package:crysprsys/bindings/justification_add_binding.dart';
 import 'package:crysprsys/bindings/leave_overview_binding.dart';
 import 'package:crysprsys/bindings/leave_quota_binding.dart';
 import 'package:crysprsys/bindings/login_binding.dart';
+import 'package:crysprsys/bindings/notification_list_binding.dart';
 import 'package:crysprsys/bindings/time_event_over_binding.dart';
 import 'package:crysprsys/controllers/dashboard/time_justification_controller.dart';
 import 'package:crysprsys/screens/authentication/authentication_screen.dart';
@@ -21,6 +22,7 @@ import 'package:crysprsys/screens/dashboard/face_registration_screen.dart';
 import 'package:crysprsys/screens/dashboard/justification_add_screen.dart';
 import 'package:crysprsys/screens/dashboard/leave_quota_screen.dart';
 import 'package:crysprsys/screens/dashboard/my_account.dart';
+import 'package:crysprsys/screens/dashboard/notification_list_screen.dart';
 import 'package:crysprsys/screens/dashboard/time_event_over_screen.dart';
 import 'package:crysprsys/screens/dashboard/time_justification_screen.dart';
 import 'package:crysprsys/screens/splash_screen.dart';
@@ -131,6 +133,12 @@ class AppPages {
       name: Routes.leaveQuotaScreen,
       page: () => LeaveQuotaScreen(),
       binding: LeaveQuotaBinding(),
+      transition: Transition.rightToLeftWithFade,
+    ),
+    GetPage(
+      name: Routes.notificationListScreen,
+      page: () => NotificationListScreen(),
+      binding: NotificationListBinding(),
       transition: Transition.rightToLeftWithFade,
     ),
     // GetPage(

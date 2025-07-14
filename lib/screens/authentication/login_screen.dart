@@ -93,8 +93,7 @@ class LoginScreen extends StatelessWidget {
                         Obx(
                           () => Checkbox(
                             visualDensity: VisualDensity.compact,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             value: controller.isRememberMe.value,
                             onChanged: (bool? value) {
                               controller.isRememberMe.value = value ?? false;

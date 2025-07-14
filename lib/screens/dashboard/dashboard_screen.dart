@@ -29,9 +29,18 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           actions: [
-            IconButton(icon: Icon(Icons.pie_chart_outline), onPressed: () {}),
-
-            IconButton(icon: Icon(Icons.notifications_none), onPressed: () {}),
+            IconButton(
+              icon: Icon(Icons.pie_chart_outline),
+              onPressed: () {
+                Get.toNamed(Routes.timeEventOverScreen);
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.notifications_none),
+              onPressed: () {
+                // Get.toNamed(Routes.notificationListScreen);
+              },
+            ),
           ],
         ),
         drawer: widgetDrawer(),
@@ -169,16 +178,16 @@ class DashboardScreen extends StatelessWidget {
                     Get.toNamed(Routes.checkInOutApproveScreen);
                   },
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.access_time,
-                    color: ColorConstants.appColor,
-                  ),
-                  title: Text("Time Events"),
-                  onTap: () {
-                    Get.toNamed(Routes.timeEventOverScreen);
-                  },
-                ),
+                // ListTile(
+                //   leading: Icon(
+                //     Icons.access_time,
+                //     color: ColorConstants.appColor,
+                //   ),
+                //   title: Text("Time Events"),
+                //   onTap: () {
+                //     Get.toNamed(Routes.timeEventOverScreen);
+                //   },
+                // ),
                 ListTile(
                   leading: Icon(Icons.schedule, color: ColorConstants.appColor),
                   title: Text("Time Justification"),
@@ -221,16 +230,16 @@ class DashboardScreen extends StatelessWidget {
                     // Get.back();
                   },
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.notifications,
-                    color: ColorConstants.appColor,
-                  ),
-                  title: Text("Notification Dashboard"),
-                  onTap: () {
-                    Get.back();
-                  },
-                ),
+                // ListTile(
+                //   leading: Icon(
+                //     Icons.notifications,
+                //     color: ColorConstants.appColor,
+                //   ),
+                //   title: Text("Notification Dashboard"),
+                //   onTap: () {
+                //     Get.back();
+                //   },
+                // ),
                 // ListTile(
                 //   leading: Icon(
                 //     Icons.bar_chart,
