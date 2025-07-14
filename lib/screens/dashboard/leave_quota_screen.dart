@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../model/dashboard/leave_quota_model.dart';
+import '../../route/app_pages.dart';
 
 class LeaveQuotaScreen extends StatefulWidget {
   const LeaveQuotaScreen({super.key});

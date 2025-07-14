@@ -19,6 +19,7 @@ abstract class Routes {
   static const leaveOverviewScreen = '/leaveOverviewScreen';
   static const leaveQuotaScreen = '/leaveQuotaScreen';
   static const notificationListScreen = '/notificationListScreen';
+  static const timeEventApprovalScreen = '/timeEventApprovalScreen';
 
 
 
