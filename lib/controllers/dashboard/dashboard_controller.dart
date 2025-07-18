@@ -21,10 +21,31 @@ class DashboardController extends GetxController {
   RootModel? rootModel;
   final box = GetStorage();
 
+  // Add dashboard data property
+  Map<String, dynamic>? dashboardData;
+  RxBool isLoadingDashboard = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     printf('<------init--DashboardController----->');
+    // Load dashboard data when controller initializes
+    _initializeDashboard();
+  }
+
+  Future<void> _initializeDashboard() async {
+    // First get user account details if not already loaded
+    if (rootModel == null) {
+      final clientId = await GetStorage().read(AppConstants.prefClientID) ?? "1";
+      final userName = await GetStorage().read(AppConstants.prefUsername) ?? "Admin";
+
+      if (clientId.isNotEmpty && userName.isNotEmpty) {
+        await getUerAccountDetails(clientId: clientId, userName: userName);
+      }
+    }
+
+    // Then load dashboard data
+    await getDashboardData();
   }
 
   Future<void> getUerAccountDetails({
@@ -39,16 +60,15 @@ class DashboardController extends GetxController {
       try {
         showProgress();
 
-        final fullUrl =
-            Uri.parse('$baseUrl$endpoint')
-                .replace(
-                  queryParameters: {
-                    'CPMClientID': clientId,
-                    'CPMUserName': userName,
-                    'flag': '',
-                  },
-                )
-                .toString();
+        final fullUrl = Uri.parse('$baseUrl$endpoint')
+            .replace(
+          queryParameters: {
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'flag': '',
+          },
+        )
+            .toString();
 
         printf('Full URL: $fullUrl');
 
@@ -108,14 +128,85 @@ class DashboardController extends GetxController {
         printf("Exception: $e");
         printf("StackTrace: $stackTrace");
         dropDownBannerError("Something went wrong. Please try again.");
-
         hideProgress();
       }
     } else {
       Utility.showToastMessage(AppConstants.internetConnectionError);
-
       hideProgress();
     }
+  }
+
+  Future<void> getDashboardData() async {
+    final dio = Dio();
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.getDynamicDashboardsGetChnagedUserTemplateDataApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        isLoadingDashboard.value = true;
+        showProgress();
+
+        // Get stored user data
+        String clientId = await GetStorage().read(AppConstants.prefClientID) ?? "1";
+        String userName = await GetStorage().read(AppConstants.prefUsername) ?? "Admin";
+        String userId = await GetStorage().read(AppConstants.prefUserId) ?? "1";
+        String roleId = await GetStorage().read(AppConstants.prefRole) ?? "1";
+
+        final queryParameters = {
+          'ChangedTempCode': 'Time Attendance',
+          'CPMClientID': clientId,
+          'CPMUserName': userName,
+          'UserID': userId,
+          'RoleID': roleId,
+          'MethodType': 'Mobile',
+        };
+
+        final fullUrl = Uri.parse('$baseUrl$endpoint')
+            .replace(queryParameters: queryParameters)
+            .toString();
+
+        printf('Dashboard API URL: $fullUrl');
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: queryParameters,
+        );
+
+        printf('<----Dashboard Response---->${response.data}');
+
+        final Map<String, dynamic> jsonMap = response.data is String
+            ? json.decode(response.data)
+            : response.data;
+
+        if (jsonMap['MessageCode'] == "200") {
+          dashboardData = jsonMap;
+          printf('Dashboard data loaded successfully');
+          printf('Number of tiles: ${jsonMap['listofDashboardQueries']?.length ?? 0}');
+          update(); // Notify UI to rebuild
+        } else {
+          dropDownBannerError(
+            jsonMap['Message'] ?? "Failed to load dashboard data",
+          );
+        }
+
+        hideProgress();
+        isLoadingDashboard.value = false;
+      } catch (e, stackTrace) {
+        printf("Dashboard API Exception: $e");
+        printf("StackTrace: $stackTrace");
+        dropDownBannerError("Failed to load dashboard data. Please try again.");
+        hideProgress();
+        isLoadingDashboard.value = false;
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+      hideProgress();
+      isLoadingDashboard.value = false;
+    }
+  }
+
+  Future<void> refreshDashboard() async {
+    await getDashboardData();
   }
 
   void buttonLogout() {
@@ -125,7 +216,7 @@ class DashboardController extends GetxController {
   void showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevents closing by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -168,8 +259,7 @@ class DashboardController extends GetxController {
                           AppConstants.isLoggedIn,
                           false,
                         );
-                        //await GetStorage().erase();
-                        Get.back(); // Close the current route
+                        Get.back();
                         Get.offAllNamed(Routes.loginScreen);
                       },
                     ),

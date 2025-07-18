@@ -72,6 +72,9 @@ class AppConstants {
   static const String getJustificationDropDownListApi =
       'api/Justification/GettingJustifyDropdown';
 
+  static const String getDynamicDashboardsGetChnagedUserTemplateDataApi =
+      'api/DynamicDashboards/GetChnagedUserTemplateData';
+
   //
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
