@@ -13,7 +13,6 @@ import 'package:get/get.dart';
 import '../../model/dashboard/dashboard_response.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-
 class DashboardScreen extends StatelessWidget {
   final DashboardController controller = Get.find<DashboardController>();
 
@@ -44,7 +43,7 @@ class DashboardScreen extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.notifications_none),
               onPressed: () {
-                // Get.toNamed(Routes.notificationListScreen);
+                Get.toNamed(Routes.notificationListScreen);
               },
             ),
           ],
@@ -66,7 +65,6 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       );
                     }
-
                     if (controller.dashboardData == null) {
                       return Center(
                         child: Text(
@@ -80,16 +78,15 @@ class DashboardScreen extends StatelessWidget {
                     }
 
                     try {
-                      final dashboardResponse = DashboardResponse.fromJson(controller.dashboardData!);
+                      final dashboardResponse = DashboardResponse.fromJson(
+                        controller.dashboardData!,
+                      );
                       return _buildDynamicDashboard(dashboardResponse);
                     } catch (e) {
                       return Center(
                         child: Text(
                           'Error loading dashboard data',
-                          style: interTextStyle(
-                            color: Colors.red,
-                            size: 14.sp,
-                          ),
+                          style: interTextStyle(color: Colors.red, size: 14.sp),
                         ),
                       );
                     }
@@ -127,9 +124,7 @@ class DashboardScreen extends StatelessWidget {
       } else if (tile.typeOfReport.toLowerCase() == 'chart') {
         // If we have items in current row, add them first
         if (currentRow.isNotEmpty) {
-          widgets.add(
-            Row(children: List.from(currentRow)),
-          );
+          widgets.add(Row(children: List.from(currentRow)));
           currentRow.clear();
         }
 
@@ -145,11 +140,10 @@ class DashboardScreen extends StatelessWidget {
       }
 
       // Add row when we have 3 items or reached the end
-      if (currentRow.length == 3 || i == dashboardResponse.listOfDashboardQueries.length - 1) {
+      if (currentRow.length == 3 ||
+          i == dashboardResponse.listOfDashboardQueries.length - 1) {
         if (currentRow.isNotEmpty) {
-          widgets.add(
-            Row(children: List.from(currentRow)),
-          );
+          widgets.add(Row(children: List.from(currentRow)));
           currentRow.clear();
         }
       }
@@ -205,9 +199,10 @@ class DashboardScreen extends StatelessWidget {
     required Color bgColor,
   }) {
     return Card(
-      elevation: 2,
+      elevation: 0,
+
       margin: const EdgeInsets.symmetric(vertical: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       child: Container(
         height: 300,
         decoration: BoxDecoration(
@@ -224,9 +219,10 @@ class DashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: graphId == 'Bar-chart'
-                  ? BarChartWidget(queryResult: queryResult)
-                  : PieChartWidget(queryResult: queryResult),
+              child:
+                  graphId == 'Bar-chart'
+                      ? BarChartWidget(queryResult: queryResult)
+                      : PieChartWidget(queryResult: queryResult),
             ),
           ],
         ),
@@ -407,7 +403,6 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-
 class BarChartWidget extends StatelessWidget {
   final List<dynamic> queryResult;
 
@@ -422,14 +417,17 @@ class BarChartWidget extends StatelessWidget {
       final count = (item['Count'] ?? 0).toDouble();
 
       barGroups.add(
-        BarChartGroupData(x: i, barRods: [
-          BarChartRodData(
-            toY: count,
-            color: Colors.blue,
-            width: 20,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ]),
+        BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: count,
+              color: Colors.blue,
+              width: 30,
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ],
+        ),
       );
     }
 
@@ -441,10 +439,7 @@ class BarChartWidget extends StatelessWidget {
           gridData: FlGridData(show: true),
           borderData: FlBorderData(
             show: true,
-            border: const Border(
-              left: BorderSide(),
-              bottom: BorderSide(),
-            ),
+            border: const Border(left: BorderSide(), bottom: BorderSide()),
           ),
           titlesData: FlTitlesData(
             bottomTitles: AxisTitles(
@@ -519,13 +514,7 @@ class PieChartWidget extends StatelessWidget {
     }
 
     return PieChart(
-      PieChartData(
-        sections: sections,
-        centerSpaceRadius: 30,
-        sectionsSpace: 4,
-      ),
+      PieChartData(sections: sections, centerSpaceRadius: 30, sectionsSpace: 4),
     );
   }
 }
-
-

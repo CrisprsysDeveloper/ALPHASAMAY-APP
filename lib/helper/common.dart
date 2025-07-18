@@ -70,8 +70,8 @@ widgetContainer({
   return GestureDetector(
     onTap: onTap,
     child: Container(
-      height: 32,
-      width: 32,
+      height: 28,
+      width: 28,
       decoration: BoxDecoration(
         color: bgColors,
         borderRadius: BorderRadius.circular(4),
@@ -80,7 +80,7 @@ widgetContainer({
           width: 1, // Optional: adjust thickness
         ),
       ),
-      child: Center(child: Icon(icon, color: iconColor, size: 18)),
+      child: Center(child: Icon(icon, color: iconColor, size: 16)),
     ),
   );
 }

@@ -75,6 +75,10 @@ class AppConstants {
   static const String getDynamicDashboardsGetChnagedUserTemplateDataApi =
       'api/DynamicDashboards/GetChnagedUserTemplateData';
 
+  static const String getNotificationListApi =
+      'api/Notifications/GetNotifications';
+
+
   //
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath

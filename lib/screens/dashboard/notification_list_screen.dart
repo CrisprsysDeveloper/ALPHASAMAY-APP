@@ -1,12 +1,13 @@
 import 'package:crysprsys/controllers/dashboard/notification_list_controller.dart';
 import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/model/notification/notification_list_model.dart';
+import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class NotificationListScreen extends StatefulWidget {
-
   const NotificationListScreen({super.key});
 
   @override
@@ -51,24 +52,30 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
           width: Get.width,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return widgetNotificationItem(borderColor: Colors.orange);
-              },
-            ),
+            child: Obx(() {
+              return controller.notifications.isNotEmpty
+                  ? ListView.builder(
+                    itemCount: controller.notifications.length,
+                    itemBuilder: (context, index) {
+                      return widgetNotificationItem(
+                        controller.notifications[index],
+                      );
+                    },
+                  )
+                  : Center(child: Text(AppConstants.noDataFound));
+            }),
           ),
         ),
       ),
     );
   }
 
-  Widget widgetNotificationItem({borderColor}) {
+  Widget widgetNotificationItem(ObjUNotification data) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        border: Border(left: BorderSide(color: borderColor, width: 4)),
-        color: Colors.white,
+        border: Border(left: BorderSide(color: Colors.orangeAccent, width: 4)),
+        color: Colors.grey.shade50,
         boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
         borderRadius: BorderRadius.circular(4),
       ),
@@ -93,7 +100,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -105,7 +112,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                       style: interTextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.grey,
-                        size: 14.sp,
+                        size: 12.sp,
                       ),
                     ),
                   ),
@@ -116,22 +123,22 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      '100899797979',
+                      data.notificationNo,
                       style: interTextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        size: 16.sp,
+                        size: 13.sp,
                       ),
                     ),
                   ),
                   Expanded(
                     child: Text(
-                      'Suresh-suresh',
+                      data.senderID,
                       textAlign: TextAlign.end,
                       style: interTextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        size: 16.sp,
+                        size: 13.sp,
                       ),
                     ),
                   ),
@@ -139,7 +146,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
               ),
             ],
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -154,7 +161,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -166,7 +173,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                       style: interTextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.grey,
-                        size: 14.sp,
+                        size: 12.sp,
                       ),
                     ),
                   ),
@@ -177,22 +184,22 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      '100899797979',
+                      data.appCode,
                       style: interTextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        size: 16.sp,
+                        size: 13.sp,
                       ),
                     ),
                   ),
                   Expanded(
                     child: Text(
-                      'Suresh-suresh',
+                      data.busObjCode,
                       textAlign: TextAlign.end,
                       style: interTextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        size: 16.sp,
+                        size: 13.sp,
                       ),
                     ),
                   ),
@@ -200,7 +207,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
               ),
             ],
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -215,7 +222,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -227,7 +234,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                       style: interTextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.grey,
-                        size: 14.sp,
+                        size: 12.sp,
                       ),
                     ),
                   ),
@@ -238,22 +245,22 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      '100899797979',
+                      data.notification_Type,
                       style: interTextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        size: 16.sp,
+                        size: 13.sp,
                       ),
                     ),
                   ),
                   Expanded(
                     child: Text(
-                      'Suresh-suresh',
+                      data.objectNo,
                       textAlign: TextAlign.end,
                       style: interTextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
-                        size: 16.sp,
+                        size: 13.sp,
                       ),
                     ),
                   ),
@@ -261,7 +268,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
               ),
             ],
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -279,7 +286,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                                 style: interTextStyle(
                                   fontWeight: FontWeight.w500,
                                   color: Colors.grey,
-                                  size: 14.sp,
+                                  size: 12.sp,
                                 ),
                               ),
                             ),
@@ -289,7 +296,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                                 style: interTextStyle(
                                   fontWeight: FontWeight.w500,
                                   color: Colors.grey,
-                                  size: 14.sp,
+                                  size: 12.sp,
                                 ),
                               ),
                             ),
@@ -300,21 +307,21 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                'Submitted',
+                                data.notification_Status,
                                 style: interTextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
-                                  size: 16.sp,
+                                  size: 13.sp,
                                 ),
                               ),
                             ),
                             Expanded(
                               child: Text(
-                                'Suresh-suresh',
+                                data.createdDate,
                                 style: interTextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
-                                  size: 16.sp,
+                                  size: 13.sp,
                                 ),
                               ),
                             ),
@@ -324,13 +331,21 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                     ),
                   ),
                   SizedBox(width: 50.w),
-                  widgetContainer(
-                    icon: Icons.add_alert_rounded,
-                    bgColors: Colors.white,
-                    borderColor: ColorConstants.appColor,
-                    iconColor: ColorConstants.appColor,
-                    onTap: () async {},
-                  ),
+                  data.notification_Status == 'Informed'
+                      ? widgetContainer(
+                        icon: Icons.remove_red_eye,
+                        bgColors: Colors.white,
+                        borderColor: ColorConstants.appColor,
+                        iconColor: ColorConstants.appColor,
+                        onTap: () async {},
+                      )
+                      : widgetContainer(
+                        icon: Icons.check_circle,
+                        bgColors: Colors.white,
+                        borderColor: ColorConstants.appColor,
+                        iconColor: ColorConstants.appColor,
+                        onTap: () async {},
+                      ),
                 ],
               ),
             ],

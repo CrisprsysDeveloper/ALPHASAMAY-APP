@@ -36,16 +36,20 @@ class DashboardController extends GetxController {
   Future<void> _initializeDashboard() async {
     // First get user account details if not already loaded
     if (rootModel == null) {
-      final clientId = await GetStorage().read(AppConstants.prefClientID) ?? "1";
-      final userName = await GetStorage().read(AppConstants.prefUsername) ?? "Admin";
+      final clientId =
+          await GetStorage().read(AppConstants.prefClientID) ?? "1";
+      final userName =
+          await GetStorage().read(AppConstants.prefUsername) ?? "Admin";
 
       if (clientId.isNotEmpty && userName.isNotEmpty) {
-        await getUerAccountDetails(clientId: clientId, userName: userName);
+        await getUerAccountDetails(
+          clientId: clientId,
+          userName: userName,
+        ).whenComplete(() {
+          getDashboardData();
+        });
       }
     }
-
-    // Then load dashboard data
-    await getDashboardData();
   }
 
   Future<void> getUerAccountDetails({
@@ -60,15 +64,16 @@ class DashboardController extends GetxController {
       try {
         showProgress();
 
-        final fullUrl = Uri.parse('$baseUrl$endpoint')
-            .replace(
-          queryParameters: {
-            'CPMClientID': clientId,
-            'CPMUserName': userName,
-            'flag': '',
-          },
-        )
-            .toString();
+        final fullUrl =
+            Uri.parse('$baseUrl$endpoint')
+                .replace(
+                  queryParameters: {
+                    'CPMClientID': clientId,
+                    'CPMUserName': userName,
+                    'flag': '',
+                  },
+                )
+                .toString();
 
         printf('Full URL: $fullUrl');
 
@@ -139,7 +144,8 @@ class DashboardController extends GetxController {
   Future<void> getDashboardData() async {
     final dio = Dio();
     const String baseUrl = AppConstants.baseUrl;
-    const String endpoint = AppConstants.getDynamicDashboardsGetChnagedUserTemplateDataApi;
+    const String endpoint =
+        AppConstants.getDynamicDashboardsGetChnagedUserTemplateDataApi;
 
     if (await InternetConnection().hasInternetAccess) {
       try {
@@ -147,8 +153,10 @@ class DashboardController extends GetxController {
         showProgress();
 
         // Get stored user data
-        String clientId = await GetStorage().read(AppConstants.prefClientID) ?? "1";
-        String userName = await GetStorage().read(AppConstants.prefUsername) ?? "Admin";
+        String clientId =
+            await GetStorage().read(AppConstants.prefClientID) ?? "1";
+        String userName =
+            await GetStorage().read(AppConstants.prefUsername) ?? "Admin";
         String userId = await GetStorage().read(AppConstants.prefUserId) ?? "1";
         String roleId = await GetStorage().read(AppConstants.prefRole) ?? "1";
 
@@ -161,9 +169,10 @@ class DashboardController extends GetxController {
           'MethodType': 'Mobile',
         };
 
-        final fullUrl = Uri.parse('$baseUrl$endpoint')
-            .replace(queryParameters: queryParameters)
-            .toString();
+        final fullUrl =
+            Uri.parse(
+              '$baseUrl$endpoint',
+            ).replace(queryParameters: queryParameters).toString();
 
         printf('Dashboard API URL: $fullUrl');
 
@@ -174,14 +183,17 @@ class DashboardController extends GetxController {
 
         printf('<----Dashboard Response---->${response.data}');
 
-        final Map<String, dynamic> jsonMap = response.data is String
-            ? json.decode(response.data)
-            : response.data;
+        final Map<String, dynamic> jsonMap =
+            response.data is String
+                ? json.decode(response.data)
+                : response.data;
 
         if (jsonMap['MessageCode'] == "200") {
           dashboardData = jsonMap;
           printf('Dashboard data loaded successfully');
-          printf('Number of tiles: ${jsonMap['listofDashboardQueries']?.length ?? 0}');
+          printf(
+            'Number of tiles: ${jsonMap['listofDashboardQueries']?.length ?? 0}',
+          );
           update(); // Notify UI to rebuild
         } else {
           dropDownBannerError(
