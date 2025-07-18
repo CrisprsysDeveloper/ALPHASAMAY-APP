@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:crysprsys/controllers/dashboard/dashboard_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/route/app_pages.dart';
@@ -7,6 +9,10 @@ import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../../model/dashboard/dashboard_response.dart';
+import 'package:fl_chart/fl_chart.dart';
+
 
 class DashboardScreen extends StatelessWidget {
   final DashboardController controller = Get.find<DashboardController>();
@@ -50,65 +56,179 @@ class DashboardScreen extends StatelessWidget {
             child: Column(
               children: [
                 10.sbh,
-                Row(
-                  children: [
-                    Expanded(
-                      child: widgetDashboardItem(
-                        title: '5',
-                        desc: 'No.of Employees/Users',
-                        onTap: () {},
-                        bgColor: Color(0xFF354B5E),
-                      ),
-                    ),
-                    Expanded(
-                      child: widgetDashboardItem(
-                        title: '1',
-                        desc: 'Employees on Leave',
-                        onTap: () {},
-                        bgColor: Color(0xFF00B6C0),
-                      ),
-                    ),
-                    Expanded(
-                      child: widgetDashboardItem(
-                        title: '0',
-                        desc: 'Check-ins',
-                        onTap: () {},
-                        bgColor: Color(0xFF00B4D8),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: widgetDashboardItem(
-                        title: '0',
-                        desc: 'Early Going on yesterday',
-                        onTap: () {},
-                        bgColor: Color(0xFFF44A89),
-                      ),
-                    ),
-                    Expanded(
-                      child: widgetDashboardItem(
-                        title: '0',
-                        desc: 'Late comings today',
-                        onTap: () {},
-                        bgColor: Color(0xFFFFD034),
-                      ),
-                    ),
-                    Expanded(
-                      child: widgetDashboardItem(
-                        title: '1',
-                        desc: 'Violations under approval',
-                        onTap: () {},
-                        bgColor: Color(0xFF6A6A6A),
-                      ),
-                    ),
-                  ],
+                // Dynamic dashboard items based on API response
+                GetBuilder<DashboardController>(
+                  builder: (controller) {
+                    if (controller.isLoadingDashboard.value) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: ColorConstants.appColor,
+                        ),
+                      );
+                    }
+
+                    if (controller.dashboardData == null) {
+                      return Center(
+                        child: Text(
+                          'No dashboard data available',
+                          style: interTextStyle(
+                            color: Colors.grey,
+                            size: 14.sp,
+                          ),
+                        ),
+                      );
+                    }
+
+                    try {
+                      final dashboardResponse = DashboardResponse.fromJson(controller.dashboardData!);
+                      return _buildDynamicDashboard(dashboardResponse);
+                    } catch (e) {
+                      return Center(
+                        child: Text(
+                          'Error loading dashboard data',
+                          style: interTextStyle(
+                            color: Colors.red,
+                            size: 14.sp,
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDynamicDashboard(DashboardResponse dashboardResponse) {
+    List<Widget> widgets = [];
+    List<Widget> currentRow = [];
+
+    for (int i = 0; i < dashboardResponse.listOfDashboardQueries.length; i++) {
+      final tile = dashboardResponse.listOfDashboardQueries[i];
+
+      if (tile.typeOfReport.toLowerCase() == 'count') {
+        currentRow.add(
+          Expanded(
+            child: widgetDashboardItem(
+              title: _extractValueFromQueryResult(tile.queryResult),
+              desc: tile.tileName,
+              onTap: () {
+                // Handle tap action based on navigationTargetBusObject
+                _handleTileNavigation(tile);
+              },
+              bgColor: _parseColor(tile.tileBgColor),
+            ),
+          ),
+        );
+      } else if (tile.typeOfReport.toLowerCase() == 'chart') {
+        // If we have items in current row, add them first
+        if (currentRow.isNotEmpty) {
+          widgets.add(
+            Row(children: List.from(currentRow)),
+          );
+          currentRow.clear();
+        }
+
+        // Add chart widget
+        widgets.add(
+          widgetChart(
+            graphId: tile.graphId,
+            tileName: tile.tileName,
+            queryResult: tile.queryResult, // already a List<dynamic>
+            bgColor: _parseColor(tile.tileBgColor),
+          ),
+        );
+      }
+
+      // Add row when we have 3 items or reached the end
+      if (currentRow.length == 3 || i == dashboardResponse.listOfDashboardQueries.length - 1) {
+        if (currentRow.isNotEmpty) {
+          widgets.add(
+            Row(children: List.from(currentRow)),
+          );
+          currentRow.clear();
+        }
+      }
+    }
+
+    return Column(children: widgets);
+  }
+
+  String _extractValueFromQueryResult(List<dynamic> queryResult) {
+    try {
+      if (queryResult.isNotEmpty && queryResult[0] is Map<String, dynamic>) {
+        final firstResult = queryResult[0] as Map<String, dynamic>;
+        return firstResult['Value']?.toString() ?? '0';
+      }
+    } catch (e) {
+      print('Error extracting value from query result: $e');
+    }
+    return '0';
+  }
+
+  Color _parseColor(String colorString) {
+    try {
+      if (colorString.isEmpty) return Color(0xFF354B5E); // Default color
+
+      // Remove # if present
+      String cleanColor = colorString.replaceAll('#', '');
+
+      // Add alpha if not present
+      if (cleanColor.length == 6) {
+        cleanColor = 'FF$cleanColor';
+      }
+
+      return Color(int.parse(cleanColor, radix: 16));
+    } catch (e) {
+      print('Error parsing color: $colorString, Error: $e');
+      return Color(0xFF354B5E); // Default color
+    }
+  }
+
+  void _handleTileNavigation(DashboardTile tile) {
+    // Handle navigation based on navigationTargetBusObject
+    if (tile.navigationTargetBusObject.isNotEmpty) {
+      // Add your navigation logic here
+      print('Navigate to: ${tile.navigationTargetBusObject}');
+      // Example: Get.toNamed(tile.navigationTargetBusObject);
+    }
+  }
+
+  Widget widgetChart({
+    required String graphId,
+    required String tileName,
+    required List<dynamic> queryResult,
+    required Color bgColor,
+  }) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Container(
+        height: 300,
+        decoration: BoxDecoration(
+          color: bgColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              tileName,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: graphId == 'Bar-chart'
+                  ? BarChartWidget(queryResult: queryResult)
+                  : PieChartWidget(queryResult: queryResult),
+            ),
+          ],
         ),
       ),
     );
@@ -154,13 +274,6 @@ class DashboardScreen extends StatelessWidget {
                     Get.toNamed(Routes.myAccount);
                   },
                 ),
-                // ListTile(
-                //   leading: Icon(Icons.group, color: ColorConstants.appColor),
-                //   title: Text("Workforce Management"),
-                //   onTap: () {
-                //     Get.back();
-                //   },
-                // ),
                 ListTile(
                   leading: Icon(Icons.login, color: ColorConstants.appColor),
                   title: Text("Check-in/Out"),
@@ -178,16 +291,6 @@ class DashboardScreen extends StatelessWidget {
                     Get.toNamed(Routes.checkInOutApproveScreen);
                   },
                 ),
-                // ListTile(
-                //   leading: Icon(
-                //     Icons.access_time,
-                //     color: ColorConstants.appColor,
-                //   ),
-                //   title: Text("Time Events"),
-                //   onTap: () {
-                //     Get.toNamed(Routes.timeEventOverScreen);
-                //   },
-                // ),
                 ListTile(
                   leading: Icon(Icons.schedule, color: ColorConstants.appColor),
                   title: Text("Time Justification"),
@@ -227,39 +330,8 @@ class DashboardScreen extends StatelessWidget {
                   title: Text("Leave Request"),
                   onTap: () {
                     Get.toNamed(Routes.leaveRequestScreen);
-                    // Get.back();
                   },
                 ),
-                // ListTile(
-                //   leading: Icon(
-                //     Icons.notifications,
-                //     color: ColorConstants.appColor,
-                //   ),
-                //   title: Text("Notification Dashboard"),
-                //   onTap: () {
-                //     Get.back();
-                //   },
-                // ),
-                // ListTile(
-                //   leading: Icon(
-                //     Icons.bar_chart,
-                //     color: ColorConstants.appColor,
-                //   ),
-                //   title: Text("Measurements"),
-                //   onTap: () {
-                //     Get.back();
-                //   },
-                // ),
-                // ListTile(
-                //   leading: Icon(
-                //     Icons.summarize,
-                //     color: ColorConstants.appColor,
-                //   ),
-                //   title: Text("Measurement Summary"),
-                //   onTap: () {
-                //     Get.back();
-                //   },
-                // ),
               ],
             ),
           ),
@@ -334,3 +406,126 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
+
+
+class BarChartWidget extends StatelessWidget {
+  final List<dynamic> queryResult;
+
+  const BarChartWidget({super.key, required this.queryResult});
+
+  @override
+  Widget build(BuildContext context) {
+    List<BarChartGroupData> barGroups = [];
+
+    for (int i = 0; i < queryResult.length; i++) {
+      final item = queryResult[i];
+      final count = (item['Count'] ?? 0).toDouble();
+
+      barGroups.add(
+        BarChartGroupData(x: i, barRods: [
+          BarChartRodData(
+            toY: count,
+            color: Colors.blue,
+            width: 20,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ]),
+      );
+    }
+
+    return SizedBox(
+      height: 280,
+      child: BarChart(
+        BarChartData(
+          barGroups: barGroups,
+          gridData: FlGridData(show: true),
+          borderData: FlBorderData(
+            show: true,
+            border: const Border(
+              left: BorderSide(),
+              bottom: BorderSide(),
+            ),
+          ),
+          titlesData: FlTitlesData(
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 42,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  final index = value.toInt();
+                  if (index < queryResult.length) {
+                    final label = queryResult[index]['Name'] ?? '';
+                    return SideTitleWidget(
+                      meta: meta,
+                      space: 8,
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 10),
+                  );
+                },
+              ),
+            ),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PieChartWidget extends StatelessWidget {
+  final List<dynamic> queryResult;
+
+  const PieChartWidget({super.key, required this.queryResult});
+
+  @override
+  Widget build(BuildContext context) {
+    List<PieChartSectionData> sections = [];
+
+    for (int i = 0; i < queryResult.length; i++) {
+      final item = queryResult[i];
+      final count = (item['Count'] ?? 0).toDouble();
+      final color = Colors.primaries[i % Colors.primaries.length];
+
+      sections.add(
+        PieChartSectionData(
+          value: count,
+          title: item['Name'] ?? '',
+          color: color,
+          radius: 60,
+          titleStyle: const TextStyle(fontSize: 12, color: Colors.white),
+        ),
+      );
+    }
+
+    return PieChart(
+      PieChartData(
+        sections: sections,
+        centerSpaceRadius: 30,
+        sectionsSpace: 4,
+      ),
+    );
+  }
+}
+
+
