@@ -64,7 +64,7 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                     label: 'Justification No',
                     controller: controller.textJustificationNo,
                     maxLine: 1,
-                    inputType: TextInputType.number
+                    inputType: TextInputType.number,
                   ),
                   Obx(() {
                     return buildDropdownFieldUpdate<PartnerType>(
@@ -101,7 +101,16 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                       },
                     );
                   }),
-                  buildReadOnlyField("Violation Date", "05/02/2025"),
+                  buildEditableField(
+                    label: 'Violation Date',
+                    controller: controller.textViolationDate,
+                    maxLine: 1,
+                    onTap: () {
+                      printf('clicked-violation-date');
+                      controller.selectDate(context);
+                    },
+                    enable: false,
+                  ),
                   buildEditableField(
                     label: 'Time in',
                     controller: controller.textTimeIn,
@@ -179,7 +188,7 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                           icon: "",
                           text: 'Save'.toUpperCase(),
                           onPressed: () {
-                            controller.buttonCreateJustification();
+                            controller.buttonCreateJustification('save');
                           },
                         ),
                       ),
@@ -188,8 +197,10 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                         child: CustomButton(
                           horizontalMargin: 0,
                           icon: "",
-                          text: 'Cancel'.toUpperCase(),
-                          onPressed: () {},
+                          text: 'submit'.toUpperCase(),
+                          onPressed: () {
+                            controller.buttonCreateJustification('submit');
+                          },
                         ),
                       ),
                     ],

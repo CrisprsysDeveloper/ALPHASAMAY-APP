@@ -41,6 +41,8 @@ class JustificationAddController extends GetxController {
   TextEditingController textTimeIn = TextEditingController();
   TextEditingController textTimeOut = TextEditingController();
 
+  TextEditingController textViolationDate = TextEditingController();
+
   final Map<int, String> requestTypeMap = {0: 'Personal', 1: 'Official'};
 
   RxBool isShowTimeOut = false.obs;
@@ -65,8 +67,8 @@ class JustificationAddController extends GetxController {
     printf('<------init--JustificationAddController----->');
     loadSavedCredentials();
 
-    defaultDate.value = dateFormat.format(selectedDate.value);
-    selectedInDate.value = selectedDate.value.toUtc().toIso8601String();
+    // defaultDate.value = dateFormat.format(selectedDate.value);
+    // selectedInDate.value = selectedDate.value.toUtc().toIso8601String();
 
     // Combine selectedDate and selectedTime to build fullDateTime
     final DateTime fullDateTime = DateTime(
@@ -82,6 +84,8 @@ class JustificationAddController extends GetxController {
 
     textTimeIn.text = defaultTime.value;
     textTimeOut.text = defaultTime.value;
+
+    textViolationDate.text = dateFormat.format(selectedDate.value);
 
     textJustificationNo.text = '0';
   }
@@ -118,6 +122,26 @@ class JustificationAddController extends GetxController {
       isShowTimeOut.value = false;
     } else {
       isShowTimeOut.value = true;
+    }
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime today = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate.value,
+      firstDate: DateTime(2020),
+      lastDate: today, //DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate.value) {
+      selectedInDate.value =
+          picked.toUtc().toIso8601String(); // "2025-02-06T05:00:00.000Z"
+      printf('Selected UTC Date: $selectedInDate');
+
+      // selectedDate.value = picked;
+      // defaultDate.value = dateFormat.format(picked);
+
+      textViolationDate.text = dateFormat.format(picked);
     }
   }
 
@@ -235,7 +259,7 @@ class JustificationAddController extends GetxController {
     }
   }
 
-  Future<void> buttonCreateJustification() async {
+  Future<void> buttonCreateJustification(String from) async {
     if (textJustificationNo.text.isEmpty) {
       dropDownBannerError('Please enter justification no');
     } else if (textStatus.text.isEmpty) {
@@ -249,11 +273,11 @@ class JustificationAddController extends GetxController {
 
       var validationVariable = {
         "BusObjCode": "ATTEND_BUS_New_Justification",
-        "ControlID": '5',
+        "ControlID": from == 'save' ? '5' : '6',
         "ObjectNo": '',
         "IsApprovalPreCondition": 'ActionBased',
         "MemberID": userId,
-        "ActionText": 'SAVE',
+        "ActionText": from == 'save' ? 'SAVE' : 'SUBMIT',
         "ScreenMode": 'Create',
         "UserID": userId,
         "RoleID": clientId,
