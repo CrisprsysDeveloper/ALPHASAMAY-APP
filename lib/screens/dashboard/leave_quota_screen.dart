@@ -52,7 +52,8 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
               Row(
                 children: [
                   2.sbw,
-                  Expanded(
+                  SizedBox(
+                    width: 76.w,
                     child: Text(
                       'Year',
                       style: interTextStyle(size: 12, color: Colors.grey),
@@ -70,7 +71,8 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
               5.sbh,
               Row(
                 children: [
-                  Expanded(
+                  SizedBox(
+                    width: 86.w,
                     child: Obx(
                       () => Container(
                         height: 40.h,

@@ -16,7 +16,7 @@ dropDownBannerError(String message) {
   Get.snackbar(
     'Failed',
     message,
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.redAccent,
     borderWidth: 1,
     colorText: Colors.white,
     borderColor: Colors.white,

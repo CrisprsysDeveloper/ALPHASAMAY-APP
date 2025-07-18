@@ -102,6 +102,18 @@ class LeaveQuotaController extends GetxController {
     if (await InternetConnection().hasInternetAccess) {
       try {
         showProgress();
+
+        final fullUrl = Uri.parse('$baseUrl$endpoint').replace(
+          queryParameters: {
+            'ClientID': clientId,
+            'UserName': userName,
+            'EmployeeNo': empNo,
+            'Year': '2025',
+          },
+        ).toString();
+
+        printf('Full URL: $fullUrl');
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {

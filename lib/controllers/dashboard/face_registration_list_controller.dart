@@ -87,7 +87,7 @@ class FaceRegistrationListController extends GetxController {
         showProgress();
 
         final url =
-            '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&BusObjCode=CRIS_BUS_GS_FaceRegistration_OV'; //; //&FilePath=$encodedPath';
+            '$baseUrl$endpoint?CPMClientID=1&CPMUserName=$userName&BusObjCode=CRIS_BUS_GS_FaceRegistration_OV'; //; //&FilePath=$encodedPath';
 
         printf('<---url-->$url');
 
@@ -148,7 +148,7 @@ class FaceRegistrationListController extends GetxController {
         showProgress();
 
         final url =
-            '$baseUrl$endpoint?CPMClientID=1&CPMUserName=Call&KeyName=$faceId'; //; //&FilePath=$encodedPath';
+            '$baseUrl$endpoint?CPMClientID=1&CPMUserName=$userName&KeyName=$faceId'; //; //&FilePath=$encodedPath';
 
         printf('<---url-->$url');
 

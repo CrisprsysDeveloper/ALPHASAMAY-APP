@@ -33,30 +33,23 @@ class CheckInOutApproveList extends StatelessWidget {
           },
           child: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        // actions: [
-        //   Icon(Icons.notifications, color: Colors.white),
-        //   SizedBox(width: 8),
-        //   Icon(Icons.search),
-        //   SizedBox(width: 10),
-        // ],
       ),
       body: Obx(() {
         return ListView.builder(
           itemCount: controller.approvalList.length,
           itemBuilder: (context, index) {
             final item = controller.approvalList[index];
-            return widgetApprovalItem(item);
+            return GestureDetector(
+              onTap: () {
+                printf("<---user-pic-->${item.checkinUserProfilePath}");
+                printf("<---register-in-pic-->${item.regUserProfilePath}");
+                Get.toNamed(Routes.timeEventApprovalScreen);
+              },
+              child: widgetApprovalItem(item),
+            );
           },
         );
       }),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Get.toNamed(Routes.checkInOutScreen);
-      //   }, // Change icon if needed
-      //   backgroundColor: ColorConstants.appColor,
-      //   shape: const CircleBorder(),
-      //   child: Icon(Icons.add, color: Colors.white), // Optional
-      // ),
     );
   }
 

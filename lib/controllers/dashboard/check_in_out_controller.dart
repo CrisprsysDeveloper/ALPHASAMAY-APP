@@ -67,6 +67,7 @@ class CheckInOutController extends GetxController {
 
   var from = AppConstants.add;
   var checkInId = '';
+  var editEmpId = '';
 
   RxString selectedInDate = ''.obs;
   RxString convertedCheckInDate = ''.obs;
@@ -118,17 +119,30 @@ class CheckInOutController extends GetxController {
         );
 
         selectedPartnerType.value = employee.partnerType;
-        selectedEmpType.value = '${employee.employeeID} ${employee.employeeName}';
+        selectedEmpType.value =
+            '${employee.employeeID} ${employee.employeeName}';
 
         defaultDate.value = employee.checkInDate.toString();
         defaultTime.value = employee.checktime.toString();
       } else if (from == AppConstants.edit) {
         checkInId = Get.arguments['checkInId'];
         printf('<---from---->$from--check-in-id-->$checkInId');
+        AttendanceModel employee = Get.arguments['emp'];
+        printf(
+          'user-profile->${employee.regUserProfilePath} -- ${employee.regUserProfile} --checkin-->${employee.checkinUserProfilePath}',
+        );
+        printf('check-in-->${employee.checkinUserProfile}');
+        editEmpId = employee.pernr.toString();
         getCurrentLocation();
         getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(
           () {
-            getDropDownListApi(clientId: clientId, userName: userName);
+            getDropDownListApi(
+              clientId: clientId,
+              userName: userName,
+            ).whenComplete(() {
+              defaultDate.value = employee.checkInDate.toString();
+              defaultTime.value = employee.checktime.toString();
+            });
           },
         );
       } else {
@@ -328,7 +342,7 @@ class CheckInOutController extends GetxController {
   void filterListBySelectedEmployee() {
     final selectedId = selectedPartnerType.value;
 
-    printf('<--filter--partner-list---->$selectedId');
+    printf('<--filter--selectedId---->$selectedId');
 
     filteredPartnerTypeList.value =
         fullPartnerTypeList.where((user) => user.pType == selectedId).toList();
@@ -338,7 +352,20 @@ class CheckInOutController extends GetxController {
     }
 
     if (filteredPartnerTypeList.isNotEmpty) {
-      selectedEmpType.value = filteredPartnerTypeList.first.id;
+      if (from == AppConstants.edit) {
+        final selectedUser = filteredPartnerTypeList.firstWhere(
+          (user) => user.id.toLowerCase().contains(editEmpId.toLowerCase()),
+        );
+
+        if (selectedUser != null) {
+          selectedEmpType.value = selectedUser.id;
+          printf('Edit mode: Matched user -> ${selectedUser.description}');
+        } else {
+          printf('No matching user found for editing.');
+        }
+      } else {
+        selectedEmpType.value = filteredPartnerTypeList.first.id;
+      }
     }
   }
 

@@ -34,12 +34,6 @@ class FaceRegistrationListScreen extends StatelessWidget {
           },
           child: Icon(Icons.arrow_back, color: Colors.white),
         ),
-        // actions: [
-        //   Icon(Icons.notifications, color: Colors.white),
-        //   SizedBox(width: 8),
-        //   Icon(Icons.search),
-        //   SizedBox(width: 10),
-        // ],
       ),
       body: SizedBox(
         height: Get.height,
@@ -134,12 +128,15 @@ class FaceRegistrationListScreen extends StatelessWidget {
                               borderColor: ColorConstants.appColor,
                               iconColor: Colors.white,
                               onTap: () async {
+                                printf('<---edit-face--->');
                                 final result = await Get.toNamed(
                                   Routes.faceRegistrationScreen,
                                   arguments: {
                                     'from': AppConstants.edit,
                                     'id': emp.faceRegID,
                                     'faceId': emp.faceId,
+                                    'image': emp.attendanceUserUImage,
+                                    'objectNo': emp.objectNo,
                                   },
                                 );
 

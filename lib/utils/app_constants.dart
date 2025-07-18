@@ -66,6 +66,12 @@ class AppConstants {
   static const String deleteJustificationApi =
       'api//Justification/DELETE_Justifications';
 
+  static const String getMyAccountDetailApi =
+      'api/UserProfile/UserProfileDetails';
+
+  static const String getJustificationDropDownListApi =
+      'api/Justification/GettingJustifyDropdown';
+
   //
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
@@ -95,6 +101,13 @@ class AppConstants {
   static String prefUsername = 'prefUsername';
   static String prefPassword = 'prefPassword';
   static String prefIsRemember = 'prefIsRemember';
+
+  static String prefEmpName = 'prefEmpName';
+  static String prefRole = 'prefRole';
+  static String prefRoleCode = 'prefRoleCode';
+  static String prefUserId = 'prefUserId';
+  static String prefPENRId = 'prefPENRId';
+
 
   //login screen
   static const String clientAuthentication = 'Client Authentication';

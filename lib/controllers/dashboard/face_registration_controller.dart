@@ -58,6 +58,8 @@ class FaceRegistrationController extends GetxController {
   var from = AppConstants.add;
   var editId = '';
   var faceId = '';
+  var imageUrl = '';
+  var objectNo = '';
 
   @override
   void onInit() {
@@ -76,18 +78,25 @@ class FaceRegistrationController extends GetxController {
     defaultTime.value = timeFormat.format(fullDateTime);
 
     loadSavedCredentials();
-    getDropDownListApi(clientId: clientId, userName: userName);
 
     try {
       from = Get.arguments['from'] ?? AppConstants.add;
       if (from == AppConstants.edit) {
         editId = Get.arguments['id'];
         faceId = Get.arguments['faceId'];
-        printf('----edit---id--->$editId--faceId--->$faceId');
+        imageUrl = Get.arguments['image'];
+        objectNo = Get.arguments['objectNo'];
+        printf(
+          '----edit---id--->$editId--faceId--->$faceId--img-->$imageUrl--object-->$objectNo',
+        );
       }
     } catch (e) {
       printf('exe-from-->$e');
     }
+
+    getDropDownListApi(clientId: clientId, userName: userName).whenComplete(() {
+
+    });
   }
 
   void loadSavedCredentials() {
@@ -183,7 +192,6 @@ class FaceRegistrationController extends GetxController {
         printf('MessageDescription: ${serviceStatus.messageDescription}');
 
         if (serviceStatus.messageCode == "200") {
-          // Now use attendanceUsers and businessObjects as needed
           for (var user in attendanceUsers) {
             printf('AttendanceUser: ${user.id}, ${user.description}');
           }
@@ -198,6 +206,7 @@ class FaceRegistrationController extends GetxController {
                   .toList();
 
           if (businessObjectDropdownItems.isNotEmpty) {
+            printf('objectId-->${businessObjectDropdownItems.first['id']!}');
             selectedObject.value = businessObjectDropdownItems.first['id']!;
             filterAttendanceListBySelectedObject();
           }
@@ -218,7 +227,7 @@ class FaceRegistrationController extends GetxController {
   void filterAttendanceListBySelectedObject() {
     final selectedId = selectedObject.value;
 
-    printf('<--filter--object-list---->$selectedId');
+    printf('<--filter--selectedId----->$selectedId');
 
     filteredAttendanceUserList.value =
         fullAttendanceUserList
@@ -230,7 +239,22 @@ class FaceRegistrationController extends GetxController {
     }
 
     if (filteredAttendanceUserList.isNotEmpty) {
-      selectedObjectNumber.value = filteredAttendanceUserList.first.id;
+      if (from == AppConstants.edit)
+      {
+        final selectedUser = filteredAttendanceUserList.firstWhere(
+          (user) =>
+              user.description.toLowerCase().contains(objectNo.toLowerCase()),
+        );
+
+        if (selectedUser != null) {
+          selectedObjectNumber.value = selectedUser.id;
+          printf('Edit mode: Matched user -> ${selectedUser.description}');
+        } else {
+          printf('No matching user found for editing.');
+        }
+      } else {
+        selectedObjectNumber.value = filteredAttendanceUserList.first.id;
+      }
     }
   }
 

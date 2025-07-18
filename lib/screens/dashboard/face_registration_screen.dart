@@ -38,16 +38,55 @@ class FaceRegistrationScreen extends StatelessWidget {
         child: Column(
           children: [
             20.sbh,
+            // Obx(
+            //   () => Container(
+            //     height: 120,
+            //     width: 120,
+            //     decoration: BoxDecoration(
+            //       shape: BoxShape.circle,
+            //       border: Border.all(
+            //         color: ColorConstants.appColor,
+            //         width: 1, // border width
+            //       ),
+            //     ),
+            //     child: Stack(
+            //       children: [
+            //         ClipOval(
+            //           child:
+            //               controller.image.value != null
+            //                   ? Image.file(
+            //                     controller.image.value!,
+            //                     width: 120,
+            //                     height: 120,
+            //                     fit: BoxFit.cover,
+            //                   )
+            //                   : Image.asset(
+            //                     'assets/icons/ic_user_profile.png',
+            //                     width: 120,
+            //                     height: 120,
+            //                     fit: BoxFit.cover,
+            //                   ),
+            //         ),
+            //         Align(
+            //           alignment: Alignment.center,
+            //           child: IconButton(
+            //             icon: Icon(Icons.camera_alt_outlined),
+            //             onPressed: () {
+            //               controller.showImageSourceDialog();
+            //             },
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             Obx(
               () => Container(
                 height: 120,
                 width: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: ColorConstants.appColor,
-                    width: 1, // border width
-                  ),
+                  border: Border.all(color: ColorConstants.appColor, width: 1),
                 ),
                 child: Stack(
                   children: [
@@ -60,12 +99,30 @@ class FaceRegistrationScreen extends StatelessWidget {
                                 height: 120,
                                 fit: BoxFit.cover,
                               )
-                              : Image.asset(
-                                'assets/icons/ic_user_profile.png',
-                                width: 120,
-                                height: 120,
-                                fit: BoxFit.cover,
-                              ),
+                              : (controller.imageUrl.isNotEmpty
+                                  ? Image.network(
+                                    controller.imageUrl,
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) => Image.asset(
+                                          'assets/icons/ic_user_profile.png',
+                                          width: 120,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                        ),
+                                  )
+                                  : Image.asset(
+                                    'assets/icons/ic_user_profile.png',
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                  )),
                     ),
                     Align(
                       alignment: Alignment.center,
@@ -80,6 +137,7 @@ class FaceRegistrationScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             20.sbh,
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

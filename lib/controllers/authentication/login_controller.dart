@@ -135,9 +135,11 @@ class LoginController extends GetxController {
           printf('Parsed BusinessObjects: ${businessObjects.length}');
 
           printf('<---set-pin--->$setPin');
+          await GetStorage().write(AppConstants.isLoggedIn, true);
           if (setPin == 'null' || setPin.isEmpty) {
             Get.offAll(() => SetPinScreen());
           } else {
+            Get.offAll(() => SetPinScreen());
             printf('<---navigate-to-dashboard--->');
             // Get.toNamed(Routes.dashboardScreen);
           }

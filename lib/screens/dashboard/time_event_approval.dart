@@ -12,7 +12,8 @@ import '../../controllers/dashboard/check_in_out_controller.dart';
 class TimeEventApproval extends StatelessWidget {
   TimeEventApproval({super.key});
 
-  final TimeEventApprovalController controller = Get.find<TimeEventApprovalController>();
+  final TimeEventApprovalController controller =
+      Get.find<TimeEventApprovalController>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class TimeEventApproval extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: ColorConstants.appColor,
         title: Text(
-          "Time Event Approval",
+          "Time Event Approvals",
           style: interTextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -37,46 +38,79 @@ class TimeEventApproval extends StatelessWidget {
       body: Padding(
         padding: EdgeInsets.all(16.w),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            20.sbh,
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 150.w,
-                  height: 180.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: ColorConstants.appColor,
-                      width: 1,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.asset(
-                      'assets/icons/ic_user_profile.png', // Replace with your actual asset path
-                      fit: BoxFit.cover,
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'User Profile',
+                      style: interTextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                        size: 14.sp,
+                      ),
                     ),
                   ),
                 ),
                 10.sbw,
-                Container(
-                  width: 150.w,
-                  height: 180.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: ColorConstants.appColor,
-                      width: 1,
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Checkin Profile',
+                      style: interTextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                        size: 14.sp,
+                      ),
                     ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.asset(
-                      'assets/icons/ic_user_profile.png', // Replace with your actual asset path
-                      fit: BoxFit.cover,
+                ),
+              ],
+            ),
+            10.sbh,
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 180.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset(
+                        'assets/icons/ic_user_profile.png',
+                        // Replace with your actual asset path
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                10.sbw,
+                Expanded(
+                  child: Container(
+                    height: 180.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset(
+                        'assets/icons/ic_user_profile.png',
+                        // Replace with your actual asset path
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -89,7 +123,7 @@ class TimeEventApproval extends StatelessWidget {
                   child: CustomButton(
                     horizontalMargin: 0,
                     icon: "",
-                    text: 'Accept'.toUpperCase(),
+                    text: 'Reject',
                     onPressed: () {
                       // Accept logic here
                     },
@@ -100,7 +134,7 @@ class TimeEventApproval extends StatelessWidget {
                   child: CustomButton(
                     horizontalMargin: 0,
                     icon: "",
-                    text: 'Reject'.toUpperCase(),
+                    text: 'Approve',
                     onPressed: () {
                       // Reject logic here
                     },
@@ -113,6 +147,4 @@ class TimeEventApproval extends StatelessWidget {
       ),
     );
   }
-
-
 }

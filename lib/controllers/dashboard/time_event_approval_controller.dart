@@ -11,7 +11,7 @@ class TimeEventApprovalController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    printf('<------init--CreateTimeEventsController----->');
+    printf('<------init--TimeEventApprovalController----->');
   }
 
 }

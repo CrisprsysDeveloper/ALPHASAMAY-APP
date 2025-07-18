@@ -65,7 +65,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     child: Obx(
                       () => Container(
                         height: 40,
-                        color: Colors.grey.shade300,
+                        color: Colors.grey.shade200,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
@@ -105,7 +105,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     child: Obx(
                       () => Container(
                         height: 40,
-                        color: Colors.grey.shade300,
+                        color: Colors.grey.shade200,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
@@ -248,6 +248,7 @@ class TimeEventOverScreen extends StatelessWidget {
                     arguments: {
                       'from': AppConstants.edit,
                       'checkInId': employee.checkInId.toString(),
+                      'emp': employee,
                     },
                   );
                   if (result) {

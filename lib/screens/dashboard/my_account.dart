@@ -1,86 +1,349 @@
+import 'dart:convert';
+
+import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/helper/snackbar_toast.dart';
+import 'package:crysprsys/utils/app_constants.dart';
+import 'package:crysprsys/utils/color_constants.dart';
+import 'package:crysprsys/utils/utility.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
-import '../../utils/color_constants.dart';
+class MyAccount extends StatefulWidget {
+  const MyAccount({super.key});
 
-class MyAccount extends StatelessWidget {
+  @override
+  State<MyAccount> createState() => _MyAccountState();
+}
+
+class _MyAccountState extends State<MyAccount> {
+  final box = GetStorage();
+
+  var clientId = '1';
+  var userName = 'Call';
+
+  RootModel? rootModel;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    printf('<----init-----MyAccount---->');
+    loadSavedCredentials();
+    getMyAccountDetails();
+  }
+
+  Future<void> getMyAccountDetails() async {
+    await getUerAccountDetails(clientId: clientId, userName: userName);
+  }
+
+  void loadSavedCredentials() {
+    final savedUsername = box.read(AppConstants.prefUsername);
+    final companyId = box.read(AppConstants.prefClientID);
+
+    if (savedUsername != null) {
+      userName = savedUsername;
+    }
+
+    if (companyId != null) {
+      clientId = companyId;
+    }
+
+    printf('<---userName-->$userName---clientId--->$clientId');
+  }
+
+  Future<void> getUerAccountDetails({
+    required String clientId,
+    required String userName,
+  }) async {
+    final dio = Dio();
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.getMyAccountDetailApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final fullUrl =
+            Uri.parse('$baseUrl$endpoint')
+                .replace(
+                  queryParameters: {
+                    'CPMClientID': clientId,
+                    'CPMUserName': userName,
+                    'flag': '',
+                  },
+                )
+                .toString();
+
+        printf('Full URL: $fullUrl');
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'flag': '',
+          },
+        );
+
+        printf('<----response---->${response.data}');
+
+        final Map<String, dynamic> jsonMap =
+            response.data is String
+                ? json.decode(response.data)
+                : response.data;
+
+        // Decode the stringified ServiceStatus
+        final serviceStatus = json.decode(jsonMap['ServiceStatus'] ?? '{}');
+
+        if (serviceStatus['MessageCode'] == "200") {
+          rootModel = RootModel.fromJson(jsonMap); // ✅ Assigned here
+
+          printf('User Name: ${rootModel?.userProfileList.first.userName}');
+          printf('Email: ${rootModel?.userProfileList.first.email}');
+        } else {
+          dropDownBannerError(
+            serviceStatus['MessageDescription'] ?? "Unknown error",
+          );
+        }
+
+        isLoading = false;
+        hideProgress();
+        setState(() {});
+      } catch (e, stackTrace) {
+        printf("Exception: $e");
+        printf("StackTrace: $stackTrace");
+        dropDownBannerError("Something went wrong. Please try again.");
+        isLoading = false;
+        hideProgress();
+        setState(() {});
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+      isLoading = false;
+      hideProgress();
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: true,
       top: false,
       child: Scaffold(
-        appBar: AppBar(title: Text('My Account')),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildSectionCard(
-                title: 'General Information',
-                content: Column(
-                  children: [
-                    _buildInfoRow('Client ID', '1'),
-                    _buildInfoRow('Client Name', 'Crisprays Eportal'),
-                    _buildInfoRow('User Name', 'Suresh'),
-                    _buildInfoRow('Full Name', 'Suresh'),
-                    _buildInfoRow('Position', 'NA'),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16),
-              _buildSectionCard(
-                title: 'Role Assignments',
-                content: Column(children: [_buildRoleAssignmentTable()]),
-              ),
-              SizedBox(height: 16),
-              _buildSectionCard(
-                title: 'Contact Information',
-                content: Column(
-                  children: [
-                    _buildInfoRow('Email', 'Suresh@crisprsys.net'),
-                    _buildInfoRow('Phone', '9963023494'),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 16),
-              _buildSectionCard(
-                title: 'Other Information',
-                content: Column(
-                  children: [
-                    _buildInfoRow('Time Zone', 'India Standard Time'),
-                    _buildInfoRow('Date Format', 'dd/MM/yyyy HH:mm:ss'),
-                    _buildInfoRow('Number Format', 'ZZZ,ZZZ,ZZZ.DDDD'),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                alignment: Alignment.centerRight,
-                margin: EdgeInsets.only(top: 16),
-                child: GestureDetector(
-                  onTap: () {
-                    // Handle reset pin action
-                    print('Reset PIN tapped');
-                  },
-                  child: Text(
-                    'RESET PIN',
-                    style: TextStyle(
-                      color: ColorConstants.primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-
-              _buildProfileCard(),
-              SizedBox(height: 20),
-              _buildCheckInCard(),
-            ],
-          ),
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: Text('My Account'),
+          backgroundColor: Colors.white,
         ),
+        body:
+            !isLoading
+                ? SingleChildScrollView(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildSectionCard(
+                        title: 'General Information',
+                        content: SizedBox(
+                          width: Get.width,
+                          child: Column(
+                            children: [
+                              _buildInfoRow(
+                                'Client ID',
+                                rootModel?.userProfileList.first.clientID ?? '',
+                              ),
+                              _buildInfoRow(
+                                'Client Name',
+                                rootModel?.userProfileList.first.clientName ??
+                                    '',
+                              ),
+                              _buildInfoRow(
+                                'User Name',
+                                rootModel?.userProfileList.first.userName ?? '',
+                              ),
+                              _buildInfoRow(
+                                'Full Name',
+                                rootModel?.userProfileList.first.clientName ??
+                                    '',
+                              ),
+                              _buildInfoRow('Position', 'NA'),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildSectionCard(
+                        title: 'Role Assignments',
+                        content: SizedBox(
+                          width: Get.width,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 150.w,
+                                    child: Text(
+                                      'Role',
+                                      style: interTextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        size: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'ValidFrom',
+                                      style: interTextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        size: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'ValidTo',
+                                      style: interTextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        size: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.h),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 140.w,
+                                    child: Text(
+                                      rootModel
+                                              ?.userRoleAssignments
+                                              .first
+                                              .role ??
+                                          '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: interTextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                        size: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      rootModel
+                                              ?.userRoleAssignments
+                                              .first
+                                              .validFrom ??
+                                          '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.start,
+                                      style: interTextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                        size: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      rootModel
+                                              ?.userRoleAssignments
+                                              .first
+                                              .validTo ??
+                                          '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.start,
+                                      style: interTextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                        size: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildSectionCard(
+                        title: 'Contact Information',
+                        content: SizedBox(
+                          width: Get.width,
+                          child: Column(
+                            children: [
+                              _buildInfoRow(
+                                'Email',
+                                rootModel?.userProfileList.first.email ?? '',
+                              ),
+                              _buildInfoRow(
+                                'Phone',
+                                rootModel?.userProfileList.first.phone ?? '',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      _buildSectionCard(
+                        title: 'Other Information',
+                        content: SizedBox(
+                          width: Get.width,
+                          child: Column(
+                            children: [
+                              _buildInfoRow(
+                                'Time Zone',
+                                rootModel
+                                        ?.userProfileList
+                                        .first
+                                        .crisprsysTimeZone ??
+                                    '',
+                              ),
+                              _buildInfoRow('Date Format', 'Crisprays Eportal'),
+                              _buildInfoRow(
+                                'Number Format',
+                                'Crisprays Eportal',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        alignment: Alignment.centerRight,
+                        margin: EdgeInsets.only(top: 16.h, right: 6.w),
+                        child: GestureDetector(
+                          onTap: () {
+                            printf('Reset PIN tapped');
+                          },
+                          child: Text(
+                            'RESET PIN',
+                            style: TextStyle(
+                              color: ColorConstants.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.sp,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // _buildProfileCard(),
+                    ],
+                  ),
+                )
+                : SizedBox(),
       ),
     );
   }
@@ -103,15 +366,15 @@ class MyAccount extends StatelessWidget {
           left: 16,
           top: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
             decoration: BoxDecoration(
-              color: ColorConstants.primaryColor,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: ColorConstants.appColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -123,160 +386,176 @@ class MyAccount extends StatelessWidget {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 4.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 120.w,
             child: Text(
-              '$label :',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              label,
+              style: interTextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+                size: 14.sp,
+              ),
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRoleAssignmentTable() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Table(
-        border: TableBorder.symmetric(inside: BorderSide(color: Colors.grey)),
-        columnWidths: {
-          0: FlexColumnWidth(2),
-          1: FlexColumnWidth(1),
-          2: FlexColumnWidth(1),
-        },
-        children: [
-          TableRow(
-            decoration: BoxDecoration(color: Colors.grey[200]),
-            children: [
-              _buildTableCell('Role', isHeader: true),
-              _buildTableCell('ValidFrom', isHeader: true),
-              _buildTableCell('ValidTo', isHeader: true),
-            ],
-          ),
-          TableRow(
-            children: [
-              _buildTableCell('CALL - Crisprsys ALL'),
-              _buildTableCell('31/12/2019'),
-              _buildTableCell('30/12/2099'),
-            ],
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Text(
+              ':  $value',
+              style: interTextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+                size: 14.sp,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildTableCell(String text, {bool isHeader = false}) {
-    return Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-        ),
+class RootModel {
+  final ServiceStatus serviceStatus;
+  final List<UserProfile> userProfileList;
+  final List<UserRoleAssignment> userRoleAssignments;
+
+  RootModel({
+    required this.serviceStatus,
+    required this.userProfileList,
+    required this.userRoleAssignments,
+  });
+
+  factory RootModel.fromJson(Map<String, dynamic> json) {
+    return RootModel(
+      serviceStatus: ServiceStatus.fromJson(
+        jsonDecode(json['ServiceStatus'] ?? '{}'),
       ),
+      userProfileList:
+          (jsonDecode(json['UserProfileList'] ?? '[]') as List)
+              .map((e) => UserProfile.fromJson(e))
+              .toList(),
+      userRoleAssignments:
+          (json['userRoleAssignements'] as List)
+              .map((e) => UserRoleAssignment.fromJson(e))
+              .toList(),
     );
   }
+}
 
-  Widget _buildProfileCard() {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'User Profile',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'CheckIn Profile',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-              ],
-            ),
-            Divider(thickness: 1, height: 24),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User Avatar
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.grey[300],
-                  child: Icon(Icons.person, size: 40, color: Colors.grey[600]),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInfoRow('Partner Object', '1007'),
-                      _buildInfoRow('Partner Type', 'Employee'),
-                      _buildInfoRow('Partner Name', 'Norah\nNarakuduru'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+class ServiceStatus {
+  final String messageCode;
+  final String messageDescription;
+
+  ServiceStatus({required this.messageCode, required this.messageDescription});
+
+  factory ServiceStatus.fromJson(Map<String, dynamic> json) {
+    return ServiceStatus(
+      messageCode: json['MessageCode'] ?? '',
+      messageDescription: json['MessageDescription'] ?? '',
     );
   }
+}
 
-  Widget _buildCheckInCard() {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'CheckIn Details',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Divider(thickness: 1, height: 24),
-            _buildInfoRow1('Check Type', 'Check In'),
-            _buildInfoRow1('CheckIn Date', '06/02/2025'),
-            _buildInfoRow1('CheckIn Time', '10:41:00'),
-          ],
-        ),
-      ),
+class UserProfile {
+  final String clientID;
+  final String clientName;
+  final int userID;
+  final String userName;
+  final String pernr;
+  final String fullName;
+  final String uImage;
+  final String lastLogin;
+  final String email;
+  final String phone;
+  final String pswrd;
+  final bool advanceUser;
+  final String mblNotificationToken;
+  final String companyName;
+  final String costcenterNo;
+  final String deptID;
+  final String position;
+  final String crisprsysTimeZone;
+  final String clientTimeZone;
+  final String userTimeZone;
+
+  UserProfile({
+    required this.clientID,
+    required this.clientName,
+    required this.userID,
+    required this.userName,
+    required this.pernr,
+    required this.fullName,
+    required this.uImage,
+    required this.lastLogin,
+    required this.email,
+    required this.phone,
+    required this.pswrd,
+    required this.advanceUser,
+    required this.mblNotificationToken,
+    required this.companyName,
+    required this.costcenterNo,
+    required this.deptID,
+    required this.position,
+    required this.crisprsysTimeZone,
+    required this.clientTimeZone,
+    required this.userTimeZone,
+  });
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      clientID: json['ClientID'] ?? '',
+      clientName: json['ClientName'] ?? '',
+      userID: json['UserID'] ?? 0,
+      userName: json['UserName'] ?? '',
+      pernr: json['PERNR'] ?? '',
+      fullName: json['FullName'] ?? '',
+      uImage: json['UImage'] ?? '',
+      lastLogin: json['LASTLogin'] ?? '',
+      email: json['Email'] ?? '',
+      phone: json['Phone'] ?? '',
+      pswrd: json['PSWRD'] ?? '',
+      advanceUser: json['AdvanceUser'] ?? false,
+      mblNotificationToken: json['MblNotificationToken'] ?? '',
+      companyName: json['CompanyName'] ?? '',
+      costcenterNo: json['CostcenterNo'] ?? '',
+      deptID: json['DeptID'] ?? '',
+      position: json['Position'] ?? '',
+      crisprsysTimeZone: json['CrisprsysTimeZone'] ?? '',
+      clientTimeZone: json['ClientTimeZone'] ?? '',
+      userTimeZone: json['UserTimeZone'] ?? '',
     );
   }
+}
 
-  Widget _buildInfoRow1(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          SizedBox(width: 16),
-          Expanded(child: Text(value, style: TextStyle(height: 1.4))),
-        ],
-      ),
+class UserRoleAssignment {
+  final String userName;
+  final String roleID;
+  final String roleCode;
+  final String role;
+  final String validFrom;
+  final String validTo;
+
+  UserRoleAssignment({
+    required this.userName,
+    required this.roleID,
+    required this.roleCode,
+    required this.role,
+    required this.validFrom,
+    required this.validTo,
+  });
+
+  factory UserRoleAssignment.fromJson(Map<String, dynamic> json) {
+    return UserRoleAssignment(
+      userName: json['UserName'] ?? '',
+      roleID: json['RoleID'] ?? '',
+      roleCode: json['RoleCode'] ?? '',
+      role: json['Role'] ?? '',
+      validFrom: json['ValidFrom'] ?? '',
+      validTo: json['ValidTo'] ?? '',
     );
   }
 }

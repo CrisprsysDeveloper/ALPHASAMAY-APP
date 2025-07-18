@@ -23,7 +23,8 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
 
   final tabs = ["Online Data", "Offline Data"];
   final icons = [Icons.cloud, Icons.cloud_off];
-  final LeaveOverviewController controller = Get.find<LeaveOverviewController>();
+  final LeaveOverviewController controller =
+      Get.find<LeaveOverviewController>();
 
   @override
   Widget build(BuildContext context) {
@@ -50,60 +51,60 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: ColorConstants.appColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: List.generate(tabs.length, (index) {
-                    final isSelected = index == selectedIndex;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => selectedIndex = index),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color:
-                                isSelected
-                                    ? ColorConstants.appColor
-                                    : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                icons[index],
-                                color:
-                                    isSelected
-                                        ? Colors.white
-                                        : ColorConstants.appColor,
-                                //Color(0xFF5E3E9B),
-                                size: 18,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                tabs[index],
-                                style: TextStyle(
-                                  color:
-                                      isSelected
-                                          ? Colors.white
-                                          : ColorConstants.appColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-              16.sbh,
+              // Container(
+              //   width: double.infinity,
+              //   padding: EdgeInsets.all(4),
+              //   decoration: BoxDecoration(
+              //     color: ColorConstants.appColor.withOpacity(0.1),
+              //     borderRadius: BorderRadius.circular(8),
+              //   ),
+              //   child: Row(
+              //     children: List.generate(tabs.length, (index) {
+              //       final isSelected = index == selectedIndex;
+              //       return Expanded(
+              //         child: GestureDetector(
+              //           onTap: () => setState(() => selectedIndex = index),
+              //           child: Container(
+              //             padding: EdgeInsets.symmetric(vertical: 10),
+              //             decoration: BoxDecoration(
+              //               color:
+              //                   isSelected
+              //                       ? ColorConstants.appColor
+              //                       : Colors.transparent,
+              //               borderRadius: BorderRadius.circular(6),
+              //             ),
+              //             child: Row(
+              //               mainAxisAlignment: MainAxisAlignment.center,
+              //               children: [
+              //                 Icon(
+              //                   icons[index],
+              //                   color:
+              //                       isSelected
+              //                           ? Colors.white
+              //                           : ColorConstants.appColor,
+              //                   //Color(0xFF5E3E9B),
+              //                   size: 18,
+              //                 ),
+              //                 SizedBox(width: 6),
+              //                 Text(
+              //                   tabs[index],
+              //                   style: TextStyle(
+              //                     color:
+              //                         isSelected
+              //                             ? Colors.white
+              //                             : ColorConstants.appColor,
+              //                     fontWeight: FontWeight.w500,
+              //                   ),
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //       );
+              //     }),
+              //   ),
+              // ),
+              // 16.sbh,
               Row(
                 children: [
                   2.sbw,
@@ -129,7 +130,7 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
                     child: Obx(
                       () => Container(
                         height: 40,
-                        color: Colors.grey.shade300,
+                        color: Colors.grey.shade200,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
@@ -169,7 +170,7 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
                     child: Obx(
                       () => Container(
                         height: 40,
-                        color: Colors.grey.shade300,
+                        color: Colors.grey.shade200,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(

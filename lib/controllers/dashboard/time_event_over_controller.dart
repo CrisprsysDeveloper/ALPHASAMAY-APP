@@ -146,6 +146,21 @@ class TimeEventOverController extends GetxController {
       try {
         showProgress();
 
+        final uri = Uri.parse('$baseUrl$endpoint').replace(
+          queryParameters: {
+            'flag': 'get',
+            'ClientId': clientId,
+            'UserName': userName,
+            'EmployeeNumber': empNo,
+            'StartDate': startDay,
+            'EndDate': endDay,
+            'BusObject': 'ATTEND_BUS_Attendance_Events_Overview',
+            'RequestComingFrom': 'Mobile',
+          },
+        );
+
+        printf('time-event-list-url--->${uri.toString()}');
+
         final url = '$baseUrl$endpoint';
 
         printf('<---url-->$url');

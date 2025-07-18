@@ -14,7 +14,7 @@ class SplashController extends GetxController {
 
   SplashController(this.context);
 
-  bool isUserLogin = false;
+  RxBool isUserLogin = false.obs;
 
   var version = '';
 
@@ -34,11 +34,12 @@ class SplashController extends GetxController {
 
   void loadSavedCredentials() {
     final pin = box.read(AppConstants.prefPIN);
+    isUserLogin.value = box.read(AppConstants.isLoggedIn) ?? false;
 
     if (pin != null) {
       setPin = pin;
     }
-    printf('<--splash-set-pin--->$pin');
+    printf('<--splash-set-pin--->$pin--isLogin-->$isUserLogin');
   }
 
   Future<void> loadBuildNumber() async {
@@ -52,8 +53,12 @@ class SplashController extends GetxController {
 
     //Get.offAndToNamed(Routes.dashboardScreen);
 
-    if (setPin.isNotEmpty) {
-      Get.offAll(() => SetPinScreen());
+    if (isUserLogin.value) {
+      if (setPin.isNotEmpty) {
+        Get.offAll(() => SetPinScreen());
+      } else {
+        redirect();
+      }
     } else {
       redirect();
     }
