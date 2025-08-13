@@ -21,21 +21,26 @@ class LeaveResponseModel {
 
   factory LeaveResponseModel.fromJson(Map<String, dynamic> json) {
     return LeaveResponseModel(
-      employeesLeavesList: (json['EmployeesLeavesList'] as List)
-          .map((e) => LeaveItem.fromJson(e))
-          .toList(),
-      employeesList: (json['EmployeesList'] as List)
-          .map((e) => DropdownItem.fromJson(e))
-          .toList(),
-      leaveScreenCntrlsList: (json['LeaveScreenCntrlsList'] as List)
-          .map((e) => LeaveScreenControl.fromJson(e))
-          .toList(),
-      yearsList: (json['YearsList'] as List)
-          .map((e) => DropdownItem.fromJson(e))
-          .toList(),
-      monthsList: (json['MonthsList'] as List)
-          .map((e) => DropdownItem.fromJson(e))
-          .toList(),
+      employeesLeavesList:
+          (json['EmployeesLeavesList'] as List)
+              .map((e) => LeaveItem.fromJson(e))
+              .toList(),
+      employeesList:
+          (json['EmployeesList'] as List)
+              .map((e) => DropdownItem.fromJson(e))
+              .toList(),
+      leaveScreenCntrlsList:
+          (json['LeaveScreenCntrlsList'] as List)
+              .map((e) => LeaveScreenControl.fromJson(e))
+              .toList(),
+      yearsList:
+          (json['YearsList'] as List)
+              .map((e) => DropdownItem.fromJson(e))
+              .toList(),
+      monthsList:
+          (json['MonthsList'] as List)
+              .map((e) => DropdownItem.fromJson(e))
+              .toList(),
       authType: json['AuthType'] ?? '',
       employeeNo: json['EmployeeNo'] ?? '',
     );
@@ -46,6 +51,7 @@ class LeaveItem {
   final String leaveID;
   final String empName;
   final String position;
+  final String pernr;
   final String department;
   final String costCenter;
   final String project;
@@ -61,6 +67,7 @@ class LeaveItem {
   LeaveItem({
     required this.leaveID,
     required this.empName,
+    required this.pernr,
     required this.position,
     required this.department,
     required this.costCenter,
@@ -79,6 +86,7 @@ class LeaveItem {
     return LeaveItem(
       leaveID: json['LeaveID'] ?? '',
       empName: json['EmpName'] ?? '',
+      pernr: json['PERNR'] ?? '',
       position: json['Position'] ?? '',
       department: json['Department'] ?? '',
       costCenter: json['CostCenter'] ?? '',
@@ -140,4 +148,3 @@ class LeaveScreenControl {
     );
   }
 }
-

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crysprsys/controllers/dashboard/dashboard_controller.dart';
 import 'package:crysprsys/helper/common.dart';
+import 'package:crysprsys/model/authentication/login_model.dart';
 import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
@@ -24,27 +25,69 @@ class DashboardScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: ColorConstants.appColor,
-          iconTheme: IconThemeData(color: Colors.white),
-          title: Text(
-            AppConstants.workForceManagement,
-            style: interTextStyle(
-              color: Colors.white,
-              size: 14.sp,
-              fontWeight: FontWeight.w600,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: GestureDetector(
+            onTap: () async {
+              final selectedComponent = await showMenu<AuthorizedComponent>(
+                context: context,
+                position: RelativeRect.fromLTRB(100, kToolbarHeight, 50, 0),
+                // adjust position
+                items:
+                    controller.authorizedComponentList.map((component) {
+                      return PopupMenuItem<AuthorizedComponent>(
+                        value: component,
+                        child: Text(component.componentName),
+                      );
+                    }).toList(),
+              );
+
+              if (selectedComponent != null) {
+                printf('Selected: ${selectedComponent.componentName}');
+              }
+            },
+            child: Text(
+              controller.title.value,
+              style: interTextStyle(
+                color: Colors.white,
+                size: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           actions: [
-            IconButton(
-              icon: Icon(Icons.pie_chart_outline),
-              onPressed: () {
-                Get.toNamed(Routes.timeEventOverScreen);
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.notifications_none),
-              onPressed: () {
-                Get.toNamed(Routes.notificationListScreen);
-              },
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed(Routes.timeEventOverScreen);
+                  },
+                  child: const Icon(
+                    Icons.pie_chart_outline,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 10.w,),
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed(Routes.notificationListScreen);
+                  },
+                  child: SizedBox(
+                    height: 32,
+                    width: 32,
+                    child: Stack(
+                      children: const [
+                        Center(
+                          child: Icon(
+                            Icons.notifications_none,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -267,6 +310,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   title: Text("My Account"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(Routes.myAccount);
                   },
                 ),
@@ -274,6 +318,7 @@ class DashboardScreen extends StatelessWidget {
                   leading: Icon(Icons.login, color: ColorConstants.appColor),
                   title: Text("Check-in/Out"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(
                       Routes.checkInOutScreen,
                       arguments: {'from': AppConstants.add, 'checkInId': ''},
@@ -284,6 +329,7 @@ class DashboardScreen extends StatelessWidget {
                   leading: Icon(Icons.approval, color: ColorConstants.appColor),
                   title: Text("Check-in/Out Approvals"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(Routes.checkInOutApproveScreen);
                   },
                 ),
@@ -291,6 +337,7 @@ class DashboardScreen extends StatelessWidget {
                   leading: Icon(Icons.schedule, color: ColorConstants.appColor),
                   title: Text("Time Justification"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(Routes.timeJustificationScreen);
                   },
                 ),
@@ -298,6 +345,7 @@ class DashboardScreen extends StatelessWidget {
                   leading: Icon(Icons.face, color: ColorConstants.appColor),
                   title: Text("Face Registration"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(Routes.faceRegistrationListScreen);
                   },
                 ),
@@ -308,6 +356,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   title: Text("Leave Overview"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(Routes.leaveOverviewScreen);
                   },
                 ),
@@ -318,14 +367,19 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   title: Text("Leave Quota"),
                   onTap: () {
+                    Get.back();
                     Get.toNamed(Routes.leaveQuotaScreen);
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.send, color: ColorConstants.appColor),
                   title: Text("Leave Request"),
-                  onTap: () {
-                    Get.toNamed(Routes.leaveRequestScreen);
+                  onTap: () async {
+                    Get.back();
+                    final result = await Get.toNamed(
+                      Routes.leaveRequestScreen,
+                      arguments: {'from': AppConstants.add},
+                    );
                   },
                 ),
               ],
@@ -436,13 +490,18 @@ class BarChartWidget extends StatelessWidget {
       child: BarChart(
         BarChartData(
           barGroups: barGroups,
-          gridData: FlGridData(show: true),
-          borderData: FlBorderData(
+          gridData: FlGridData(
+            drawHorizontalLine: true,
+            drawVerticalLine: false,
             show: true,
+          ),
+          borderData: FlBorderData(
+            show: false,
             border: const Border(left: BorderSide(), bottom: BorderSide()),
           ),
           titlesData: FlTitlesData(
             bottomTitles: AxisTitles(
+              drawBelowEverything: true,
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 42,

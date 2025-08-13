@@ -206,7 +206,7 @@ class TimeEventOverScreen extends StatelessWidget {
                       style: interTextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.grey,
-                        size: 14,
+                        size: 12.sp,
                       ),
                     ),
                     3.sbh,
@@ -215,7 +215,7 @@ class TimeEventOverScreen extends StatelessWidget {
                       style: interTextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
-                        size: 16,
+                        size: 14.sp,
                       ),
                     ),
                   ],
@@ -273,29 +273,27 @@ class TimeEventOverScreen extends StatelessWidget {
           15.sbh,
           Row(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Employee No./User",
-                      style: interTextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                        size: 14,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Employee No./User",
+                    style: interTextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                      size: 12.sp,
                     ),
-                    3.sbh,
-                    Text(
-                      employee.employeeID.toString(),
-                      style: interTextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        size: 14,
-                      ),
+                  ),
+                  3.sbh,
+                  Text(
+                    employee.employeeID.toString(),
+                    style: interTextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      size: 12.sp,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Expanded(
                 child: Column(
@@ -319,7 +317,7 @@ class TimeEventOverScreen extends StatelessWidget {
                           style: interTextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
-                            size: 14,
+                            size: 12.sp,
                           ),
                         ),
                       ],
@@ -333,7 +331,7 @@ class TimeEventOverScreen extends StatelessWidget {
                           style: interTextStyle(
                             fontWeight: FontWeight.w500,
                             color: Colors.grey,
-                            size: 14,
+                            size: 12.sp,
                           ),
                         ),
                         5.sbw,
@@ -342,7 +340,7 @@ class TimeEventOverScreen extends StatelessWidget {
                           style: interTextStyle(
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
-                            size: 14,
+                            size: 12.sp,
                           ),
                         ),
                       ],

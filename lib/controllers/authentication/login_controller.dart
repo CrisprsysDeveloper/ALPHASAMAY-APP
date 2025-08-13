@@ -88,10 +88,8 @@ class LoginController extends GetxController {
         printf('<----login-api-url----> ${response.realUri}');
         printf('<----login-api-response----> ${response.data}');
 
-        // Decode outer JSON
         final Map<String, dynamic> outerJson = jsonDecode(response.data);
 
-        // Parse ServiceStatus
         final String serviceStatusRaw = outerJson['ServiceStatus'];
         final Map<String, dynamic> serviceStatus = jsonDecode(serviceStatusRaw);
 
@@ -101,51 +99,56 @@ class LoginController extends GetxController {
         printf('MessageCode: $messageCode');
         printf('MessageDescription: $messageDescription');
 
-        if (messageCode == "200") {
-          final List<dynamic> tokenList = outerJson['token'] ?? [];
-          final String? token = tokenList.isNotEmpty ? tokenList[0] : null;
-          printf('Token: $token');
-          final Map<String, dynamic> listOfApplications =
-              outerJson['ListOfApplications'];
-
-          final List<dynamic> appJsonList =
-              listOfApplications['listOfAuthorizedApplications'] ?? [];
-          final List<AuthorizedApplication> apps =
-              appJsonList
-                  .map((e) => AuthorizedApplication.fromJson(e))
-                  .toList();
-          printf('Parsed Applications: ${apps.length}');
-
-          // Authorized Components
-          final List<dynamic> componentJsonList =
-              listOfApplications['listOfAuthorizedComponents'] ?? [];
-          final List<AuthorizedComponent> components =
-              componentJsonList
-                  .map((e) => AuthorizedComponent.fromJson(e))
-                  .toList();
-          printf('Parsed Components: ${components.length}');
-
-          // Authorized Business Objects
-          final List<dynamic> businessObjectJsonList =
-              listOfApplications['listOfAuthorizedBusinessObjects'] ?? [];
-          final List<AuthorizedBusinessObject> businessObjects =
-              businessObjectJsonList
-                  .map((e) => AuthorizedBusinessObject.fromJson(e))
-                  .toList();
-          printf('Parsed BusinessObjects: ${businessObjects.length}');
-
-          printf('<---set-pin--->$setPin');
-          await GetStorage().write(AppConstants.isLoggedIn, true);
-          if (setPin == 'null' || setPin.isEmpty) {
-            Get.offAll(() => SetPinScreen());
-          } else {
-            Get.offAll(() => SetPinScreen());
-            printf('<---navigate-to-dashboard--->');
-            // Get.toNamed(Routes.dashboardScreen);
-          }
-        } else {
-          dropDownBannerError(messageDescription);
-        }
+        // if (messageCode == "200")
+        // {
+        //   final List<dynamic> tokenList = outerJson['token'] ?? [];
+        //   final String? token = tokenList.isNotEmpty ? tokenList[0] : null;
+        //   printf('Token: $token');
+        //
+        //   final Map<String, dynamic> listOfApplications =
+        //       outerJson['ListOfApplications'];
+        //
+        //   final List<dynamic> appJsonList =
+        //       listOfApplications['listOfAuthorizedApplications'] ?? [];
+        //
+        //   printf('listOfAuthorizedApplications: ${appJsonList.length}');
+        //
+        //   // Parse components
+        //   final List<dynamic> componentJsonList =
+        //       listOfApplications['listOfAuthorizedComponents'] ?? [];
+        //
+        //   final List<AuthorizedComponent> authorizedComponents =
+        //       componentJsonList
+        //           .map((compJson) => AuthorizedComponent.fromJson(compJson))
+        //           .toList();
+        //
+        //   final List<Map<String, dynamic>> componentJsonListForStorage =
+        //       authorizedComponents.map((comp) => comp.toJson()).toList();
+        //
+        //   await GetStorage().write(
+        //     'authorizedComponents',
+        //     componentJsonListForStorage,
+        //   );
+        //
+        //   for (var comp in authorizedComponents) {
+        //     printf(
+        //       'Component: ${comp.componentCode}, ${comp.componentName}, ${comp.url}',
+        //     );
+        //   }
+        //
+        //   printf('<---set-pin--->$setPin');
+        //   await GetStorage().write(AppConstants.isLoggedIn, true);
+        //   if (setPin == 'null' || setPin.isEmpty) {
+        //     Get.to(() => SetPinScreen(from: 'login'));
+        //     // Get.offAll(() => SetPinScreen(from: 'login'));
+        //   } else {
+        //     Get.to(() => SetPinScreen(from: 'login'));
+        //     // Get.offAll(() => SetPinScreen(from: 'login'));
+        //     printf('<---navigate-to-dashboard--->');
+        //   }
+        // } else {
+        //   dropDownBannerError(messageDescription);
+        // }
 
         hideProgress();
       } catch (e, stackTrace) {

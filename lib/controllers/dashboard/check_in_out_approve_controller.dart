@@ -108,7 +108,8 @@ class CheckInOutApproveController extends GetxController {
           },
         );
 
-        printf('<----response---->$response');
+        printf('<----response--url-->${response.realUri}');
+        printf('<----response---->${response}');
 
         final Map<String, dynamic> outerJson = jsonDecode(response.data);
 

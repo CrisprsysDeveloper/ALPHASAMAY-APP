@@ -130,7 +130,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                     child: Obx(
                       () => Container(
                         height: 40,
-                        color:  Colors.grey.shade200,
+                        color: Colors.grey.shade200,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
@@ -170,7 +170,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                     child: Obx(
                       () => Container(
                         height: 40,
-                        color:  Colors.grey.shade200,
+                        color: Colors.grey.shade200,
                         child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.w),
                           child: DropdownButtonFormField<String>(
@@ -231,8 +231,14 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Get.toNamed(Routes.justificationAddScreen);
+          onPressed: () async {
+            final result = await Get.toNamed(
+              Routes.justificationAddScreen,
+              arguments: {'from': AppConstants.add},
+            );
+            if (result) {
+              controller.getList();
+            }
           },
           backgroundColor: ColorConstants.appColor,
           shape: const CircleBorder(),
@@ -283,7 +289,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           Row(
             children: [
               Expanded(child: buildTextColumn("Date", employee.date)),
-              Expanded(child: buildTextColumn("Time-In", employee.date)),
+              Expanded(child: buildTextColumn("Time-In", employee.timeIn)),
             ],
           ),
           15.sbh,
@@ -295,8 +301,14 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-view--->');
+                onTap: () async {
+                  final result = await Get.toNamed(
+                    Routes.justificationAddScreen,
+                    arguments: {'from': AppConstants.view, 'emp': employee},
+                  );
+                  if (result) {
+                    controller.getList();
+                  }
                 },
               ),
               10.sbw,
@@ -305,8 +317,14 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-
+                onTap: () async {
+                  final result = await Get.toNamed(
+                    Routes.justificationAddScreen,
+                    arguments: {'from': AppConstants.edit, 'emp': employee},
+                  );
+                  if (result) {
+                    controller.getList();
+                  }
                 },
               ),
               10.sbw,
@@ -316,12 +334,9 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
                 onTap: () {
-                  controller.showDeleteJustificationDialog(employee.justid.toString());
-                  // controller.deleteJustificationApi(
-                  //   clientId: controller.clientId,
-                  //   userName: controller.userName,
-                  //   deleteId: employee.justid.toString(),
-                  // );
+                  controller.showDeleteJustificationDialog(
+                    employee.justid.toString(),
+                  );
                 },
               ),
             ],

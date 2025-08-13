@@ -43,7 +43,12 @@ class CheckInOutApproveList extends StatelessWidget {
               onTap: () {
                 printf("<---user-pic-->${item.checkinUserProfilePath}");
                 printf("<---register-in-pic-->${item.regUserProfilePath}");
-                Get.toNamed(Routes.timeEventApprovalScreen);
+                Get.toNamed(
+                  Routes.timeEventApprovalScreen,
+                  arguments: {
+                    'emp': item,
+                  },
+                );
               },
               child: widgetApprovalItem(item),
             );

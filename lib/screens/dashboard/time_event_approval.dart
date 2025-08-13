@@ -78,18 +78,26 @@ class TimeEventApproval extends StatelessWidget {
                     height: 180.h,
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 0.5,
-                      ),
+                      border: Border.all(color: Colors.grey, width: 0.5),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: Image.asset(
-                        'assets/icons/ic_user_profile.png',
-                        // Replace with your actual asset path
-                        fit: BoxFit.cover,
-                      ),
+                      child:
+                          controller.userProfile.value.isNotEmpty
+                              ? Image.network(
+                                controller.userProfile.value,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/icons/ic_user_profile.png',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                              : Image.asset(
+                                'assets/icons/ic_user_profile.png',
+                                fit: BoxFit.cover,
+                              ),
                     ),
                   ),
                 ),
@@ -99,16 +107,24 @@ class TimeEventApproval extends StatelessWidget {
                     height: 180.h,
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 0.5,
-                      ),
+                      border: Border.all(color: Colors.grey, width: 0.5),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: Image.asset(
+                      child:
+                      controller.checkInProfile.value.isNotEmpty
+                          ? Image.network(
+                        controller.checkInProfile.value,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/icons/ic_user_profile.png',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      )
+                          : Image.asset(
                         'assets/icons/ic_user_profile.png',
-                        // Replace with your actual asset path
                         fit: BoxFit.cover,
                       ),
                     ),

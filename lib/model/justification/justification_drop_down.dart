@@ -23,31 +23,50 @@ class JustificationCreateData {
 
   factory JustificationCreateData.fromJson(Map<String, dynamic> json) {
     return JustificationCreateData(
-      serviceStatus: ServiceStatus.fromJson(jsonDecode(json['ServiceStatus'] ?? '{}')),
-      authEmployeesList: _parseJsonList<AuthEmployee>(json['AuthEmployeesList'], AuthEmployee.fromJson),
-      partnerTypeList: _parseJsonList<PartnerType>(json['PartnerTypeList'], PartnerType.fromJson),
-      violationTypeDataList: _parseJsonList<ViolationTypeData>(json['ViolationTypeDataList'], ViolationTypeData.fromJson),
-      justifyScreenCntrlsList: _parseJsonList<JustifyScreenControl>(json['JustifyScreenCntrlsList'], JustifyScreenControl.fromJson),
-      workingDayList: _parseJsonList<WorkingDay>(json['WorkingDayList'], WorkingDay.fromJson),
+      serviceStatus: ServiceStatus.fromJson(
+        jsonDecode(json['ServiceStatus'] ?? '{}'),
+      ),
+      authEmployeesList: _parseJsonList<AuthEmployee>(
+        json['AuthEmployeesList'],
+        AuthEmployee.fromJson,
+      ),
+      partnerTypeList: _parseJsonList<PartnerType>(
+        json['PartnerTypeList'],
+        PartnerType.fromJson,
+      ),
+      violationTypeDataList: _parseJsonList<ViolationTypeData>(
+        json['ViolationTypeDataList'],
+        ViolationTypeData.fromJson,
+      ),
+      justifyScreenCntrlsList: _parseJsonList<JustifyScreenControl>(
+        json['JustifyScreenCntrlsList'],
+        JustifyScreenControl.fromJson,
+      ),
+      workingDayList: _parseJsonList<WorkingDay>(
+        json['WorkingDayList'],
+        WorkingDay.fromJson,
+      ),
       authJustificationType: json['AuthJustificationType'] ?? '',
-      fieldNameDescriptions: (json['FieldNameDescriptions'] as List<dynamic>)
-          .map((e) => FieldNameDescription.fromJson(e))
-          .toList(),
+      fieldNameDescriptions:
+          (json['FieldNameDescriptions'] as List<dynamic>)
+              .map((e) => FieldNameDescription.fromJson(e))
+              .toList(),
     );
   }
-
 }
 
 Map<String, dynamic> _parseJsonString(String? jsonStr) {
   return jsonStr != null ? Map<String, dynamic>.from(jsonDecode(jsonStr)) : {};
 }
 
-List<T> _parseJsonList<T>(String? jsonStr, T Function(Map<String, dynamic>) fromJson) {
+List<T> _parseJsonList<T>(
+  String? jsonStr,
+  T Function(Map<String, dynamic>) fromJson,
+) {
   if (jsonStr == null || jsonStr.isEmpty) return [];
   final List<dynamic> list = jsonDecode(jsonStr);
   return list.map((item) => fromJson(item)).toList();
 }
-
 
 class ServiceStatus {
   final String messageCode;
@@ -99,9 +118,13 @@ class PartnerType {
   PartnerType({required this.id, required this.value});
 
   factory PartnerType.fromJson(Map<String, dynamic> json) {
-    return PartnerType(id: json['Id'] ?? '', value: json['Value'] ?? '');
+    return PartnerType(
+      id: json['Id'] ?? '',
+      value: json['Value'] ?? '',
+    );
   }
 }
+
 
 class ViolationTypeData {
   final String id;

@@ -198,7 +198,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -208,12 +208,12 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
                     SizedBox(
-                      width: 40.w,
+                      width: 46.w,
                       child: Align(
                         alignment: Alignment.topRight,
                         child: Text(
@@ -221,14 +221,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                           style: interTextStyle(
                             fontWeight: FontWeight.w500,
                             color: Colors.grey,
-                            size: 14.sp,
+                            size: 12.sp,
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: 3.h),
                 Row(
                   children: [
                     SizedBox(
@@ -238,7 +238,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
-                          size: 16.sp,
+                          size: 14.sp,
                         ),
                       ),
                     ),
@@ -248,7 +248,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
-                          size: 16.sp,
+                          size: 14.sp,
                         ),
                       ),
                     ),
@@ -261,7 +261,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                           style: interTextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
-                            size: 16.sp,
+                            size: 14.sp,
                           ),
                         ),
                       ),
@@ -284,7 +284,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -294,7 +294,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -307,14 +307,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                           style: interTextStyle(
                             fontWeight: FontWeight.w500,
                             color: Colors.grey,
-                            size: 14.sp,
+                            size: 12.sp,
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: 3.h),
                 Row(
                   children: [
                     SizedBox(
@@ -324,7 +324,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
-                          size: 16.sp,
+                          size: 14.sp,
                         ),
                       ),
                     ),
@@ -334,7 +334,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
-                          size: 16.sp,
+                          size: 14.sp,
                         ),
                       ),
                     ),
@@ -347,7 +347,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                           style: interTextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
-                            size: 16.sp,
+                            size: 14.sp,
                           ),
                         ),
                       ),
@@ -370,7 +370,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -380,7 +380,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
-                          size: 14.sp,
+                          size: 12.sp,
                         ),
                       ),
                     ),
@@ -393,14 +393,14 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                           style: interTextStyle(
                             fontWeight: FontWeight.w500,
                             color: Colors.grey,
-                            size: 14.sp,
+                            size: 12.sp,
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: 3.h),
                 Row(
                   children: [
                     SizedBox(
@@ -410,7 +410,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
-                          size: 16.sp,
+                          size: 14.sp,
                         ),
                       ),
                     ),
@@ -420,7 +420,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
-                          size: 16.sp,
+                          size: 14.sp,
                         ),
                       ),
                     ),
@@ -433,7 +433,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                           style: interTextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
-                            size: 16.sp,
+                            size: 14.sp,
                           ),
                         ),
                       ),

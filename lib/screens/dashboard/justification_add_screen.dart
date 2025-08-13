@@ -3,6 +3,7 @@ import 'package:crysprsys/controllers/dashboard/time_event_over_controller.dart'
 import 'package:crysprsys/controllers/dashboard/time_justification_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/justification/justification_drop_down.dart';
+import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
@@ -60,12 +61,15 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
             child: Form(
               child: Column(
                 children: [
-                  buildEditableField(
-                    label: 'Justification No',
-                    controller: controller.textJustificationNo,
-                    maxLine: 1,
-                    inputType: TextInputType.number,
-                  ),
+                  controller.from == AppConstants.add
+                      ? SizedBox()
+                      : buildEditableField(
+                        label: 'Justification No',
+                        controller: controller.textJustificationNo,
+                        enable: false,
+                        maxLine: 1,
+                        inputType: TextInputType.number,
+                      ),
                   Obx(() {
                     return buildDropdownFieldUpdate<PartnerType>(
                       label: 'Select Partner Type',
@@ -164,47 +168,70 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                     );
                   }),
                   const SizedBox(height: 16),
-                  buildEditableField(
-                    label: 'Status',
-                    controller: controller.textStatus,
-                    maxLine: 1,
-                  ),
-                  buildEditableField(
-                    label: 'Pending with',
-                    controller: controller.textPendingWith,
-                    maxLine: 1,
-                  ),
+                  controller.from == AppConstants.edit
+                      ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          buildEditableField(
+                            label: 'Status',
+                            controller: controller.textStatus,
+                            maxLine: 1,
+                            enable: false
+                          ),
+                          buildEditableField(
+                            label: 'Pending with',
+                            controller: controller.textPendingWith,
+                            maxLine: 1,
+                            enable: false
+                          ),
+                        ],
+                      )
+                      : SizedBox(),
                   buildEditableField(
                     label: 'Justification Reason',
                     controller: controller.textJustificationReason,
                     maxLine: 3,
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          horizontalMargin: 0,
-                          icon: "",
-                          text: 'Save'.toUpperCase(),
-                          onPressed: () {
-                            controller.buttonCreateJustification('save');
-                          },
-                        ),
+                  controller.from == AppConstants.view
+                      ? SizedBox()
+                      : Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              horizontalMargin: 0,
+                              icon: "",
+                              text: 'Save'.toUpperCase(),
+                              onPressed: () {
+                                if (controller.from == AppConstants.edit) {
+                                  controller.buttonUpdateJustification('save');
+                                } else {
+                                  controller.buttonCreateJustification('save');
+                                }
+                              },
+                            ),
+                          ),
+                          10.sbw,
+                          Expanded(
+                            child: CustomButton(
+                              horizontalMargin: 0,
+                              icon: "",
+                              text: 'submit'.toUpperCase(),
+                              onPressed: () {
+                                if (controller.from == AppConstants.edit) {
+                                  controller.buttonUpdateJustification(
+                                    'submit',
+                                  );
+                                } else {
+                                  controller.buttonCreateJustification(
+                                    'submit',
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      10.sbw,
-                      Expanded(
-                        child: CustomButton(
-                          horizontalMargin: 0,
-                          icon: "",
-                          text: 'submit'.toUpperCase(),
-                          onPressed: () {
-                            controller.buttonCreateJustification('submit');
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

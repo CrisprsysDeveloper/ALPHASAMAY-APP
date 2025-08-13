@@ -1,5 +1,6 @@
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
+import 'package:crysprsys/model/authentication/login_model.dart';
 import 'package:crysprsys/repositories/token_repository.dart';
 import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/screens/dashboard/my_account.dart';
@@ -25,12 +26,41 @@ class DashboardController extends GetxController {
   Map<String, dynamic>? dashboardData;
   RxBool isLoadingDashboard = false.obs;
 
+  RxString title = 'Dashboard'.obs; //AppConstants.workForceManagement.obs;
+  RxList<AuthorizedComponent> authorizedComponentList = <AuthorizedComponent>[].obs;
+
   @override
   void onInit() {
     super.onInit();
     printf('<------init--DashboardController----->');
     // Load dashboard data when controller initializes
     _initializeDashboard();
+
+    // final List<dynamic> storedList =
+    //     GetStorage().read('authorizedComponents') ?? [];
+    //
+    // final List<AuthorizedComponent> authorizedComponents =
+    //     storedList.map((item) => AuthorizedComponent.fromJson(item)).toList();
+    //
+    // for (var comp in authorizedComponents) {
+    //   printf(
+    //     'Dashboard Component: ${comp.componentCode}, ${comp.componentName}, ${comp.url}',
+    //   );
+    //   title.value = comp.componentName.toString();
+    // }
+
+    final List<dynamic> storedList =
+        GetStorage().read('authorizedComponents') ?? [];
+
+    final List<AuthorizedComponent> components =
+    storedList.map((item) => AuthorizedComponent.fromJson(item)).toList();
+
+    authorizedComponentList.assignAll(components);
+
+    if (authorizedComponentList.isNotEmpty) {
+      title.value = authorizedComponentList.first.componentName;
+    }
+
   }
 
   Future<void> _initializeDashboard() async {

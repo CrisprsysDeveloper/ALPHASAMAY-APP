@@ -1,4 +1,3 @@
-
 class AuthorizedApplication {
   final String applicationCode;
   final String applicationName;
@@ -43,6 +42,16 @@ class AuthorizedComponent {
       url: json['URL'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ComponentCode': componentCode,
+      'ApplicationCode': applicationCode,
+      'ComponentName': componentName,
+      'MainMenu': mainMenu,
+      'URL': url,
+    };
+  }
 }
 
 class AuthorizedBusinessObject {
@@ -64,4 +73,3 @@ class AuthorizedBusinessObject {
     );
   }
 }
-

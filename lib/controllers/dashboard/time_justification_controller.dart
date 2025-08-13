@@ -148,6 +148,29 @@ class TimeJustificationController extends GetxController {
 
         printf('<---url-->$url');
 
+        final queryParams = {
+          'flag': 'get',
+          'CPMClientID': clientId,
+          'CPMUserName': userName,
+          'AccessToken': '',
+          'SessionID': '',
+          'BusObjCode': 'ATTEND_BUS_Justification',
+          'RequestComingFrom': 'Mobile',
+          'AttendenceParamters': jsonEncode({
+            "StartDate": startDay,
+            "EndDate": endDay,
+            "UserID": "1",
+            "RoleID": "1",
+            "ScreenType": "ATTEND_BUS_Justification",
+            "DefaultName": "ATTEND_Justification",
+          }),
+        };
+
+        final uri = Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
+
+        print('<-- Full URL --> ${uri.toString()}');
+
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {

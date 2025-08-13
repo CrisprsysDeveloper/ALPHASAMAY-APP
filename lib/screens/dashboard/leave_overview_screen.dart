@@ -207,7 +207,6 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
                   ),
                 ],
               ),
-
               20.sbh,
               Expanded(
                 child: Obx(() {
@@ -251,8 +250,14 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Get.toNamed(Routes.leaveRequestScreen);
+          onPressed: () async {
+            final result = await Get.toNamed(
+              Routes.leaveRequestScreen,
+              arguments: {'from': AppConstants.add},
+            );
+            if (result) {
+              controller.getList();
+            }
           },
           backgroundColor: ColorConstants.appColor,
           shape: const CircleBorder(),
@@ -314,8 +319,14 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-view--->');
+                onTap: () async {
+                  final result = await Get.toNamed(
+                    Routes.leaveRequestScreen,
+                    arguments: {'from': AppConstants.view, 'emp': leaveData},
+                  );
+                  if (result) {
+                    controller.getList();
+                  }
                 },
               ),
               10.sbw,
@@ -324,8 +335,15 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
                 bgColors: Colors.white,
                 borderColor: ColorConstants.appColor,
                 iconColor: ColorConstants.appColor,
-                onTap: () {
-                  print('<---on-tap-edit--->');
+                onTap: () async {
+                  final result = await Get.toNamed(
+                    Routes.leaveRequestScreen,
+                    arguments: {'from': AppConstants.edit, 'emp': leaveData},
+                  );
+                  if (result) {
+                    controller.getList();
+                  }
+
                 },
               ),
               10.sbw,
@@ -338,11 +356,7 @@ class _LeaveOverviewScreenState extends State<LeaveOverviewScreen> {
                   controller.showDeleteEventDialog(
                     leaveData.leaveID.toString(),
                   );
-                  // controller.deleteJustificationApi(
-                  //   clientId: controller.clientId,
-                  //   userName: controller.userName,
-                  //   deleteId: employee.justid.toString(),
-                  // );
+
                 },
               ),
             ],

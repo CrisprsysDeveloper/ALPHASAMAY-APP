@@ -62,7 +62,6 @@ class AppConstants {
   static const String deleteFaceRegistrationApi =
       'api//FaceRekognition/DeleteAttendanceUserProfilePic';
 
-
   static const String deleteJustificationApi =
       'api//Justification/DELETE_Justifications';
 
@@ -78,12 +77,28 @@ class AppConstants {
   static const String getNotificationListApi =
       'api/Notifications/GetNotifications';
 
+  static const String validationForJustification =
+      'api/Justification/CommonJustifyWebMobileValidations';
 
-  //
+  static const String createJustificationApi =
+      'api//Justification/INSERT_Justifications';
+
+  static const String updateJustificationApi =
+      'api/Justification/UPDATE_Justifications';
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
 
-  //
+  static const String getLeaveRequestDropDownListApi =
+      '/api/LeaveRequest/LeaveRequestData';
+
+  static const String validationForCreateLeaveRequestApi =
+      '/api/LeaveRequest/CommonLeaveWebMobileValidations';
+
+  static const String createLeaveRequestApi =
+      'api/LeaveRequest/SaveLeaveRequest';
+
+  static const String updateLeaveRequestApi =
+      'api//LeaveRequest/EditLeaveRequest';
 
   static const busObject = 'ATTEND_BUS_Attendance_Events_Overview';
 
@@ -92,7 +107,6 @@ class AppConstants {
   static const add = 'Add';
   static const edit = 'Edit';
   static const view = 'View';
-
 
   static const somethingWentWrong =
       'Something went wrong...please try again later';
@@ -114,7 +128,6 @@ class AppConstants {
   static String prefRoleCode = 'prefRoleCode';
   static String prefUserId = 'prefUserId';
   static String prefPENRId = 'prefPENRId';
-
 
   //login screen
   static const String clientAuthentication = 'Client Authentication';

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
+import 'package:crysprsys/screens/authentication/set_pin_screen.dart';
 import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:crysprsys/utils/utility.dart';
@@ -28,6 +29,10 @@ class _MyAccountState extends State<MyAccount> {
   RootModel? rootModel;
   bool isLoading = true;
 
+  var timeZone = '';
+  var dateFormat = '';
+  var numberFormat = '';
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +42,12 @@ class _MyAccountState extends State<MyAccount> {
   }
 
   Future<void> getMyAccountDetails() async {
-    await getUerAccountDetails(clientId: clientId, userName: userName);
+    await getUerAccountDetails(
+      clientId: clientId,
+      userName: userName,
+    ).whenComplete(() {
+      getUserTimeZone(clientId: clientId, userName: userName);
+    });
   }
 
   void loadSavedCredentials() {
@@ -108,6 +118,72 @@ class _MyAccountState extends State<MyAccount> {
           dropDownBannerError(
             serviceStatus['MessageDescription'] ?? "Unknown error",
           );
+        }
+
+        isLoading = false;
+        hideProgress();
+        setState(() {});
+      } catch (e, stackTrace) {
+        printf("Exception: $e");
+        printf("StackTrace: $stackTrace");
+        dropDownBannerError("Something went wrong. Please try again.");
+        isLoading = false;
+        hideProgress();
+        setState(() {});
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+      isLoading = false;
+      hideProgress();
+      setState(() {});
+    }
+  }
+
+  Future<void> getUserTimeZone({
+    required String clientId,
+    required String userName,
+  }) async {
+    final dio = Dio();
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.getUserTimeZoneApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final fullUrl =
+            Uri.parse('$baseUrl$endpoint')
+                .replace(
+                  queryParameters: {
+                    'CPMClientID': clientId,
+                    'CPMUserName': userName,
+                  },
+                )
+                .toString();
+
+        printf('Full URL: $fullUrl');
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'flag': '',
+          },
+        );
+
+        printf('<----response---->${response.data}');
+        final data = response.data;
+        if (data != null && data is String && data.isNotEmpty) {
+          List<dynamic> jsonList = json.decode(data);
+          if (jsonList.isNotEmpty) {
+            final userSettings = UserSettings.fromJson(jsonList[0]);
+
+            timeZone = userSettings.userTimeZone;
+            dateFormat = userSettings.userDateFormat;
+            numberFormat = userSettings.numberFormat;
+            printf('User Time Zone: ${userSettings.userTimeZone}');
+          }
         }
 
         isLoading = false;
@@ -303,19 +379,9 @@ class _MyAccountState extends State<MyAccount> {
                           width: Get.width,
                           child: Column(
                             children: [
-                              _buildInfoRow(
-                                'Time Zone',
-                                rootModel
-                                        ?.userProfileList
-                                        .first
-                                        .crisprsysTimeZone ??
-                                    '',
-                              ),
-                              _buildInfoRow('Date Format', 'Crisprays Eportal'),
-                              _buildInfoRow(
-                                'Number Format',
-                                'Crisprays Eportal',
-                              ),
+                              _buildInfoRow('Time Zone', timeZone),
+                              _buildInfoRow('Date Format', dateFormat),
+                              _buildInfoRow('Number Format', numberFormat),
                             ],
                           ),
                         ),
@@ -326,7 +392,7 @@ class _MyAccountState extends State<MyAccount> {
                         margin: EdgeInsets.only(top: 16.h, right: 6.w),
                         child: GestureDetector(
                           onTap: () {
-                            printf('Reset PIN tapped');
+                            Get.to(() => SetPinScreen(from: 'reset'));
                           },
                           child: Text(
                             'RESET PIN',
@@ -391,7 +457,7 @@ class _MyAccountState extends State<MyAccount> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120.w,
+            width: 100.w,
             child: Text(
               label,
               style: interTextStyle(
@@ -405,6 +471,8 @@ class _MyAccountState extends State<MyAccount> {
           Expanded(
             child: Text(
               ':  $value',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: interTextStyle(
                 fontWeight: FontWeight.w500,
                 color: Colors.grey.shade700,
@@ -556,6 +624,59 @@ class UserRoleAssignment {
       role: json['Role'] ?? '',
       validFrom: json['ValidFrom'] ?? '',
       validTo: json['ValidTo'] ?? '',
+    );
+  }
+}
+
+class UserSettings {
+  final String id;
+  final String userId;
+  final String landingPage;
+  final String defaultPrinter;
+  final String crisprsysTimeZone;
+  final String clientTimeZone;
+  final String userTimeZone;
+  final String crisprsysDateFormat;
+  final String userDateFormat;
+  final String numberFormat;
+  final String createdDate;
+  final String updatedDate;
+  final String ipTimeZone;
+  final bool userDefaultAdvanceSettings;
+
+  UserSettings({
+    this.id = '',
+    this.userId = '',
+    this.landingPage = '',
+    this.defaultPrinter = '',
+    this.crisprsysTimeZone = '',
+    this.clientTimeZone = '',
+    this.userTimeZone = '',
+    this.crisprsysDateFormat = '',
+    this.userDateFormat = '',
+    this.numberFormat = '',
+    this.createdDate = '',
+    this.updatedDate = '',
+    this.ipTimeZone = '',
+    this.userDefaultAdvanceSettings = false,
+  });
+
+  factory UserSettings.fromJson(Map<String, dynamic> json) {
+    return UserSettings(
+      id: json['ID'] ?? '',
+      userId: json['UserID'] ?? '',
+      landingPage: json['LandingPage'] ?? '',
+      defaultPrinter: json['DefaultPrinter'] ?? '',
+      crisprsysTimeZone: json['CrisprsysTimeZone'] ?? '',
+      clientTimeZone: json['ClientTimeZone'] ?? '',
+      userTimeZone: json['UserTimeZone'] ?? '',
+      crisprsysDateFormat: json['CrisprsysDateFormat'] ?? '',
+      userDateFormat: json['UserDateFormat'] ?? '',
+      numberFormat: json['NumberFormat'] ?? '',
+      createdDate: json['Created_date'] ?? '',
+      updatedDate: json['Updated_date'] ?? '',
+      ipTimeZone: json['IpTimeZone'] ?? '',
+      userDefaultAdvanceSettings: json['UserDefaultAdvanceSettings'] ?? false,
     );
   }
 }

@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 class JustificationModel {
@@ -24,9 +23,15 @@ class JustificationModel {
     return JustificationModel(
       serviceStatus: ServiceStatus.fromJson(jsonDecode(json['ServiceStatus'])),
       justifyResults: JustifyResults.fromJson(json['justifyResults']),
-      employeeList: List<Employee>.from(jsonDecode(json['EmployeeList']).map((e) => Employee.fromJson(e))),
-      objYearsList: List<YearMonth>.from(json['ObjYearsList'].map((e) => YearMonth.fromJson(e))),
-      objMonthsList: List<Month>.from(json['ObjMonthsList'].map((e) => Month.fromJson(e))),
+      employeeList: List<Employee>.from(
+        jsonDecode(json['EmployeeList']).map((e) => Employee.fromJson(e)),
+      ),
+      objYearsList: List<YearMonth>.from(
+        json['ObjYearsList'].map((e) => YearMonth.fromJson(e)),
+      ),
+      objMonthsList: List<Month>.from(
+        json['ObjMonthsList'].map((e) => Month.fromJson(e)),
+      ),
       employeeNumber: json['EmployeeNumber'],
       authEventType: json['AuthEventType'],
     );
@@ -54,7 +59,9 @@ class JustifyResults {
 
   factory JustifyResults.fromJson(Map<String, dynamic> json) {
     return JustifyResults(
-      justificationList: List<JustificationItem>.from(json['JustificationList'].map((e) => JustificationItem.fromJson(e))),
+      justificationList: List<JustificationItem>.from(
+        json['JustificationList'].map((e) => JustificationItem.fromJson(e)),
+      ),
     );
   }
 }
@@ -68,6 +75,8 @@ class JustificationItem {
   final String date;
   final String justifyComments;
   final String status;
+  final String timeIn;
+  final String timeOut;
 
   JustificationItem({
     required this.jid,
@@ -78,6 +87,8 @@ class JustificationItem {
     required this.date,
     required this.justifyComments,
     required this.status,
+    required this.timeIn,
+    required this.timeOut,
   });
 
   factory JustificationItem.fromJson(Map<String, dynamic> json) {
@@ -90,6 +101,8 @@ class JustificationItem {
       date: json['Date'],
       justifyComments: json['JustifyComments'] ?? '',
       status: json['Status'] ?? '',
+      timeIn: json['InTime'] ?? '',
+      timeOut: json['OutTime'] ?? '',
     );
   }
 }
@@ -101,10 +114,7 @@ class Employee {
   Employee({required this.id, required this.value});
 
   factory Employee.fromJson(Map<String, dynamic> json) {
-    return Employee(
-      id: json['Id'],
-      value: json['Value'],
-    );
+    return Employee(id: json['Id'], value: json['Value']);
   }
 }
 

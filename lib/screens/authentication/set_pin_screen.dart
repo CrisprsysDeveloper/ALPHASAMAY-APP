@@ -9,7 +9,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class SetPinScreen extends StatefulWidget {
-  const SetPinScreen({Key? key}) : super(key: key);
+  String from;
+
+  SetPinScreen({super.key, required this.from});
 
   @override
   State<SetPinScreen> createState() => _SetPinScreenState();
@@ -33,8 +35,12 @@ class _SetPinScreenState extends State<SetPinScreen> {
   void loadSavedCredentials() {
     final pin = box.read(AppConstants.prefPIN);
 
-    if (pin != null) {
-      setPin = pin;
+    if (widget.from == 'reset') {
+      setPin = '';
+    } else {
+      if (pin != null) {
+        setPin = pin;
+      }
     }
     printf('<---set-pin--->$pin');
   }
@@ -120,7 +126,6 @@ class _SetPinScreenState extends State<SetPinScreen> {
       }
     }
   }
-
 
   void onBackspace() {
     setState(() {

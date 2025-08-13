@@ -51,11 +51,11 @@ class SplashController extends GetxController {
   void _route() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    //Get.offAndToNamed(Routes.dashboardScreen);
+    //Get.offAndToNamed(Routes.leaveOverviewScreen);
 
     if (isUserLogin.value) {
       if (setPin.isNotEmpty) {
-        Get.offAll(() => SetPinScreen());
+        Get.offAll(() => SetPinScreen(from: 'splash'));
       } else {
         redirect();
       }

@@ -143,6 +143,22 @@ class LeaveOverviewController extends GetxController {
       try {
         showProgress();
 
+        final queryParams = {
+          'flag': 'get',
+          'ClientID': clientId,
+          'UserName': userName,
+          'EmployeeNo': empNo,
+          'StartDate': startDay,
+          'EndDate': endDay,
+          'BusObjCode': 'LM_LR_BUS_OV',
+          'RequestComingFrom': 'Mobile',
+        };
+
+        final uri = Uri.parse('$baseUrl$endpoint').replace(queryParameters: queryParams);
+
+        printf('Final URL: $uri');
+
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: {

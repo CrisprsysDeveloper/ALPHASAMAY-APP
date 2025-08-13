@@ -1,4 +1,5 @@
 import 'package:crysprsys/controllers/authentication/login_controller.dart';
+import 'package:crysprsys/model/authentication/login_model.dart';
 import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
@@ -39,11 +40,21 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             actions: [
-              IconButton(
-                icon: Icon(Icons.help_outline, color: Colors.white),
-                onPressed: () {
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.help_outline, color: Colors.white),
+                onSelected: (String value) {
+                  printf('Selected: $value');
                   Get.toNamed(Routes.authenticationScreen);
                 },
+                itemBuilder: (BuildContext context) {
+                  return ["1"].map((item) {
+                    return PopupMenuItem<String>(
+                      value: item,
+                      child: Text('Change $item ClientID?'),
+                    );
+                  }).toList();
+                },
+                padding: EdgeInsets.zero,
               ),
             ],
           ),
@@ -93,7 +104,8 @@ class LoginScreen extends StatelessWidget {
                         Obx(
                           () => Checkbox(
                             visualDensity: VisualDensity.compact,
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                             value: controller.isRememberMe.value,
                             onChanged: (bool? value) {
                               controller.isRememberMe.value = value ?? false;
