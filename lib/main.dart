@@ -137,8 +137,6 @@ Pwd:Suresh@123
 
 /*
 
-Query
-1.leave quota --> inside grade what value will be show
 
 
 

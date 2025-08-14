@@ -99,56 +99,55 @@ class LoginController extends GetxController {
         printf('MessageCode: $messageCode');
         printf('MessageDescription: $messageDescription');
 
-        // if (messageCode == "200")
-        // {
-        //   final List<dynamic> tokenList = outerJson['token'] ?? [];
-        //   final String? token = tokenList.isNotEmpty ? tokenList[0] : null;
-        //   printf('Token: $token');
-        //
-        //   final Map<String, dynamic> listOfApplications =
-        //       outerJson['ListOfApplications'];
-        //
-        //   final List<dynamic> appJsonList =
-        //       listOfApplications['listOfAuthorizedApplications'] ?? [];
-        //
-        //   printf('listOfAuthorizedApplications: ${appJsonList.length}');
-        //
-        //   // Parse components
-        //   final List<dynamic> componentJsonList =
-        //       listOfApplications['listOfAuthorizedComponents'] ?? [];
-        //
-        //   final List<AuthorizedComponent> authorizedComponents =
-        //       componentJsonList
-        //           .map((compJson) => AuthorizedComponent.fromJson(compJson))
-        //           .toList();
-        //
-        //   final List<Map<String, dynamic>> componentJsonListForStorage =
-        //       authorizedComponents.map((comp) => comp.toJson()).toList();
-        //
-        //   await GetStorage().write(
-        //     'authorizedComponents',
-        //     componentJsonListForStorage,
-        //   );
-        //
-        //   for (var comp in authorizedComponents) {
-        //     printf(
-        //       'Component: ${comp.componentCode}, ${comp.componentName}, ${comp.url}',
-        //     );
-        //   }
-        //
-        //   printf('<---set-pin--->$setPin');
-        //   await GetStorage().write(AppConstants.isLoggedIn, true);
-        //   if (setPin == 'null' || setPin.isEmpty) {
-        //     Get.to(() => SetPinScreen(from: 'login'));
-        //     // Get.offAll(() => SetPinScreen(from: 'login'));
-        //   } else {
-        //     Get.to(() => SetPinScreen(from: 'login'));
-        //     // Get.offAll(() => SetPinScreen(from: 'login'));
-        //     printf('<---navigate-to-dashboard--->');
-        //   }
-        // } else {
-        //   dropDownBannerError(messageDescription);
-        // }
+        if (messageCode == "200") {
+          final List<dynamic> tokenList = outerJson['token'] ?? [];
+          final String? token = tokenList.isNotEmpty ? tokenList[0] : null;
+          printf('Token: $token');
+
+          final Map<String, dynamic> listOfApplications =
+              outerJson['ListOfApplications'];
+
+          final List<dynamic> appJsonList =
+              listOfApplications['listOfAuthorizedApplications'] ?? [];
+
+          printf('listOfAuthorizedApplications: ${appJsonList.length}');
+
+          // Parse components
+          final List<dynamic> componentJsonList =
+              listOfApplications['listOfAuthorizedComponents'] ?? [];
+
+          final List<AuthorizedComponent> authorizedComponents =
+              componentJsonList
+                  .map((compJson) => AuthorizedComponent.fromJson(compJson))
+                  .toList();
+
+          final List<Map<String, dynamic>> componentJsonListForStorage =
+              authorizedComponents.map((comp) => comp.toJson()).toList();
+
+          await GetStorage().write(
+            'authorizedComponents',
+            componentJsonListForStorage,
+          );
+
+          for (var comp in authorizedComponents) {
+            printf(
+              'Component: ${comp.componentCode}, ${comp.componentName}, ${comp.url}',
+            );
+          }
+
+          printf('<---set-pin--->$setPin');
+          await GetStorage().write(AppConstants.isLoggedIn, true);
+          if (setPin == 'null' || setPin.isEmpty) {
+            Get.to(() => SetPinScreen(from: 'login'));
+            // Get.offAll(() => SetPinScreen(from: 'login'));
+          } else {
+            Get.to(() => SetPinScreen(from: 'login'));
+            // Get.offAll(() => SetPinScreen(from: 'login'));
+            printf('<---navigate-to-dashboard--->');
+          }
+        } else {
+          dropDownBannerError(messageDescription);
+        }
 
         hideProgress();
       } catch (e, stackTrace) {
