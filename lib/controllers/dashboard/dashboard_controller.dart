@@ -27,40 +27,27 @@ class DashboardController extends GetxController {
   RxBool isLoadingDashboard = false.obs;
 
   RxString title = 'Dashboard'.obs; //AppConstants.workForceManagement.obs;
-  RxList<AuthorizedComponent> authorizedComponentList = <AuthorizedComponent>[].obs;
+  RxList<AuthorizedComponent> authorizedComponentList =
+      <AuthorizedComponent>[].obs;
+
+  RxString roleCode = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     printf('<------init--DashboardController----->');
-    // Load dashboard data when controller initializes
     _initializeDashboard();
-
-    // final List<dynamic> storedList =
-    //     GetStorage().read('authorizedComponents') ?? [];
-    //
-    // final List<AuthorizedComponent> authorizedComponents =
-    //     storedList.map((item) => AuthorizedComponent.fromJson(item)).toList();
-    //
-    // for (var comp in authorizedComponents) {
-    //   printf(
-    //     'Dashboard Component: ${comp.componentCode}, ${comp.componentName}, ${comp.url}',
-    //   );
-    //   title.value = comp.componentName.toString();
-    // }
-
     final List<dynamic> storedList =
         GetStorage().read('authorizedComponents') ?? [];
 
     final List<AuthorizedComponent> components =
-    storedList.map((item) => AuthorizedComponent.fromJson(item)).toList();
+        storedList.map((item) => AuthorizedComponent.fromJson(item)).toList();
 
     authorizedComponentList.assignAll(components);
 
     if (authorizedComponentList.isNotEmpty) {
       title.value = authorizedComponentList.first.componentName;
     }
-
   }
 
   Future<void> _initializeDashboard() async {
@@ -144,6 +131,8 @@ class DashboardController extends GetxController {
             AppConstants.prefRoleCode,
             rootModel?.userRoleAssignments.first.roleCode,
           );
+          roleCode.value = rootModel?.userRoleAssignments.first.roleCode ?? '';
+          printf('userRoleCode----->$roleCode');
           await GetStorage().write(
             AppConstants.prefUserId,
             rootModel?.userProfileList.first.userID.toString(),

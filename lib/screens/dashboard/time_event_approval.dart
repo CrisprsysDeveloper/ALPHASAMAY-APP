@@ -152,7 +152,7 @@ class TimeEventApproval extends StatelessWidget {
                     icon: "",
                     text: 'Approve',
                     onPressed: () {
-                      // Reject logic here
+                      controller.buttonApprove();
                     },
                   ),
                 ),

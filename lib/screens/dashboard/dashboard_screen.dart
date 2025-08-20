@@ -67,7 +67,7 @@ class DashboardScreen extends StatelessWidget {
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(width: 10.w,),
+                SizedBox(width: 10.w),
                 GestureDetector(
                   onTap: () {
                     Get.toNamed(Routes.notificationListScreen);
@@ -325,13 +325,21 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.approval, color: ColorConstants.appColor),
-                  title: Text("Check-in/Out Approvals"),
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(Routes.checkInOutApproveScreen);
-                  },
+                Obx(
+                  () =>
+                      controller.roleCode.value == 'SELF'
+                          ? SizedBox()
+                          : ListTile(
+                            leading: Icon(
+                              Icons.approval,
+                              color: ColorConstants.appColor,
+                            ),
+                            title: Text("Check-in/Out Approvals"),
+                            onTap: () {
+                              Get.back();
+                              Get.toNamed(Routes.checkInOutApproveScreen);
+                            },
+                          ),
                 ),
                 ListTile(
                   leading: Icon(Icons.schedule, color: ColorConstants.appColor),
@@ -341,13 +349,21 @@ class DashboardScreen extends StatelessWidget {
                     Get.toNamed(Routes.timeJustificationScreen);
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.face, color: ColorConstants.appColor),
-                  title: Text("Face Registration"),
-                  onTap: () {
-                    Get.back();
-                    Get.toNamed(Routes.faceRegistrationListScreen);
-                  },
+                Obx(
+                  () =>
+                      controller.roleCode.value == 'SELF'
+                          ? SizedBox()
+                          : ListTile(
+                            leading: Icon(
+                              Icons.face,
+                              color: ColorConstants.appColor,
+                            ),
+                            title: Text("Face Registration"),
+                            onTap: () {
+                              Get.back();
+                              Get.toNamed(Routes.faceRegistrationListScreen);
+                            },
+                          ),
                 ),
                 ListTile(
                   leading: Icon(

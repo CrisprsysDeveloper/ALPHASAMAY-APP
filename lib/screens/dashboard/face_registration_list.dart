@@ -60,23 +60,23 @@ class FaceRegistrationListScreen extends StatelessWidget {
                       SizedBox(
                         height: 96,
                         width: 90,
-                        child: CachedNetworkImage(
-                          imageUrl: emp.attendanceUserUImage,
-                          placeholder:
-                              (context, url) => Center(
-                                child: SizedBox(
-                                  height: 24, // Adjust size as needed
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ), // Thinner circle
+                        child: Image.network(
+                          "${emp.attendanceUserUImage}?nocache=${DateTime.now().millisecondsSinceEpoch}",
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                 ),
                               ),
-                          errorWidget:
-                              (context, url, error) => Icon(Icons.error),
-                          fit:
-                              BoxFit
-                                  .cover, // Optional: scale image to fill container
+                            );
+                          },
+                          errorBuilder:
+                              (context, error, stackTrace) => Icon(Icons.error),
                         ),
                       ),
                       5.sbw,

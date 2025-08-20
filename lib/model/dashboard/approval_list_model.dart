@@ -44,6 +44,7 @@ class Attendance {
   final String? regUserProfilePath;
   final String? checkinUserProfilePath;
   final double? profileMatchingPercentage;
+  int? checkInId;
 
   Attendance({
     required this.employeeID,
@@ -55,6 +56,7 @@ class Attendance {
     this.regUserProfilePath,
     this.checkinUserProfilePath,
     this.profileMatchingPercentage,
+    this.checkInId,
   });
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
@@ -67,6 +69,7 @@ class Attendance {
       checkinapprovalstatus: json['checkinapprovalstatus'] ?? '',
       regUserProfilePath: json['RegUserProfilePath'],
       checkinUserProfilePath: json['CheckinUserProfilePath'],
+      checkInId: json['CheckInId'] ?? 0,
       profileMatchingPercentage:
           (json['ProfileMatchingPercentage'] ?? 0.0).toDouble(),
     );
