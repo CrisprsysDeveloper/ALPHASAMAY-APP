@@ -58,18 +58,29 @@ class TimeEventApprovalController extends GetxController {
   buttonApprove() async {
     if (await InternetConnection().hasInternetAccess) {
       showProgress();
-      final url =
-          'https://api.crisprsys.net/api/TimeEventApprovals/RejectTimeEventProfile?'
-          'ClientId=$clientId&UserName=$userName&EventID=$eventId&EventStatus=Approved';
 
-      printf('<---url-->$url');
+      try {
+        final url =
+            'https://api.crisprsys.net/api/TimeEventApprovals/RejectTimeEventProfile?'
+            'ClientId=$clientId&UserName=$userName&EventID=$eventId&EventStatus=Approved';
 
-      final dio = dio_.Dio();
-      final response = await dio.get(url);
-      printf('<---response-for-validation-->$response');
+        printf('<---url-->$url');
 
-      printf('Response runtimeType: ${response.data.runtimeType}');
-      printf('Raw response: ${response.data}');
+        final dio = dio_.Dio();
+        final response = await dio.get(url);
+
+        printf('<---response-for-validation-->$response');
+        printf('Response runtimeType: ${response.data.runtimeType}');
+        printf('Raw response: ${response.data}');
+      } catch (e, stackTrace) {
+        // Catch any error (including DioError)
+        printf('Error occurred: $e');
+        printf('StackTrace: $stackTrace');
+        dropDownBannerError(AppConstants.somethingWentWrong);
+      } finally {
+        hideProgress(); // Always executed, whether success or error
+      }
     }
+
   }
 }
