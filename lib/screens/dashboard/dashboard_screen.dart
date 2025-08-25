@@ -60,7 +60,10 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    Get.toNamed(Routes.timeEventOverScreen);
+                    Get.toNamed(
+                      Routes.checkInOutScreen,
+                      arguments: {'from': AppConstants.add, 'checkInId': ''},
+                    );
                   },
                   child: const Icon(
                     Icons.pie_chart_outline,
@@ -98,7 +101,6 @@ class DashboardScreen extends StatelessWidget {
             child: Column(
               children: [
                 10.sbh,
-                // Dynamic dashboard items based on API response
                 GetBuilder<DashboardController>(
                   builder: (controller) {
                     if (controller.isLoadingDashboard.value) {
@@ -157,7 +159,6 @@ class DashboardScreen extends StatelessWidget {
               title: _extractValueFromQueryResult(tile.queryResult),
               desc: tile.tileName,
               onTap: () {
-                // Handle tap action based on navigationTargetBusObject
                 _handleTileNavigation(tile);
               },
               bgColor: _parseColor(tile.tileBgColor),
@@ -165,13 +166,10 @@ class DashboardScreen extends StatelessWidget {
           ),
         );
       } else if (tile.typeOfReport.toLowerCase() == 'chart') {
-        // If we have items in current row, add them first
         if (currentRow.isNotEmpty) {
           widgets.add(Row(children: List.from(currentRow)));
           currentRow.clear();
         }
-
-        // Add chart widget
         widgets.add(
           widgetChart(
             graphId: tile.graphId,
@@ -182,7 +180,6 @@ class DashboardScreen extends StatelessWidget {
         );
       }
 
-      // Add row when we have 3 items or reached the end
       if (currentRow.length == 3 ||
           i == dashboardResponse.listOfDashboardQueries.length - 1) {
         if (currentRow.isNotEmpty) {
@@ -227,12 +224,11 @@ class DashboardScreen extends StatelessWidget {
   }
 
   void _handleTileNavigation(DashboardTile tile) {
-    // Handle navigation based on navigationTargetBusObject
-    if (tile.navigationTargetBusObject.isNotEmpty) {
-      // Add your navigation logic here
-      print('Navigate to: ${tile.navigationTargetBusObject}');
-      // Example: Get.toNamed(tile.navigationTargetBusObject);
-    }
+    printf('clicked-tile-${tile.userDbId}');
+    Get.toNamed(
+      Routes.dashboardReportScreen,
+      arguments: {'tileId': tile.userDbId},
+    );
   }
 
   Widget widgetChart({
@@ -319,10 +315,7 @@ class DashboardScreen extends StatelessWidget {
                   title: Text("Check-in/Out"),
                   onTap: () {
                     Get.back();
-                    Get.toNamed(
-                      Routes.checkInOutScreen,
-                      arguments: {'from': AppConstants.add, 'checkInId': ''},
-                    );
+                    Get.toNamed(Routes.timeEventOverScreen);
                   },
                 ),
                 Obx(
@@ -567,6 +560,92 @@ class PieChartWidget extends StatelessWidget {
   final List<dynamic> queryResult;
 
   const PieChartWidget({super.key, required this.queryResult});
+
+  @override
+  Widget build(BuildContext context) {
+    // total for percentage calculation
+    final double total = queryResult.fold<double>(
+      0,
+      (sum, item) => sum + (item['Count'] ?? 0).toDouble(),
+    );
+
+    List<PieChartSectionData> sections = [];
+
+    for (int i = 0; i < queryResult.length; i++) {
+      final item = queryResult[i];
+      final count = (item['Count'] ?? 0).toDouble();
+      final color = Colors.primaries[i % Colors.primaries.length];
+      final percent =
+          total > 0 ? (count / total * 100).toStringAsFixed(1) : "0";
+
+      sections.add(
+        PieChartSectionData(
+          value: count,
+          title: "$percent%",
+          // show % inside slice
+          color: color,
+          radius: 60,
+          titleStyle: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 150,
+          child: PieChart(
+            PieChartData(
+              sections: sections,
+              centerSpaceRadius: 30,
+              sectionsSpace: 4,
+            ),
+          ),
+        ),
+        const SizedBox(height: 40),
+        Wrap(
+          spacing: 12,
+          runSpacing: 6,
+          alignment: WrapAlignment.center,
+          children:
+              queryResult.asMap().entries.map((entry) {
+                final i = entry.key;
+                final item = entry.value;
+                final color = Colors.primaries[i % Colors.primaries.length];
+                final count = (item['Count'] ?? 0).toDouble();
+                final percent =
+                    total > 0 ? (count / total * 100).toStringAsFixed(1) : "0";
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text("${item['Name']} ($percent%)"),
+                  ],
+                );
+              }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class PieChartWidgets extends StatelessWidget {
+  final List<dynamic> queryResult;
+
+  const PieChartWidgets({super.key, required this.queryResult});
 
   @override
   Widget build(BuildContext context) {

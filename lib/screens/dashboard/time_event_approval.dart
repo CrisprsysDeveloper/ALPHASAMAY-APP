@@ -112,21 +112,21 @@ class TimeEventApproval extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child:
-                      controller.checkInProfile.value.isNotEmpty
-                          ? Image.network(
-                        controller.checkInProfile.value,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/icons/ic_user_profile.png',
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      )
-                          : Image.asset(
-                        'assets/icons/ic_user_profile.png',
-                        fit: BoxFit.cover,
-                      ),
+                          controller.checkInProfile.value.isNotEmpty
+                              ? Image.network(
+                                controller.checkInProfile.value,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/icons/ic_user_profile.png',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                              : Image.asset(
+                                'assets/icons/ic_user_profile.png',
+                                fit: BoxFit.cover,
+                              ),
                     ),
                   ),
                 ),
@@ -141,7 +141,7 @@ class TimeEventApproval extends StatelessWidget {
                     icon: "",
                     text: 'Reject',
                     onPressed: () {
-                      // Accept logic here
+                      controller.buttonReject();
                     },
                   ),
                 ),

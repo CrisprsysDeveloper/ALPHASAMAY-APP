@@ -100,6 +100,9 @@ class AppConstants {
   static const String updateLeaveRequestApi =
       'api//LeaveRequest/EditLeaveRequest';
 
+  static const String dashboardReportApi =
+      'api//DynamicDashboards/DisplayTilesReportData';
+
   static const busObject = 'ATTEND_BUS_Attendance_Events_Overview';
 
   //
