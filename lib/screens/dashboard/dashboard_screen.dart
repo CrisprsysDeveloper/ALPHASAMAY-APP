@@ -79,17 +79,68 @@ class DashboardScreen extends StatelessWidget {
                     height: 32,
                     width: 32,
                     child: Stack(
-                      children: const [
-                        Center(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Center(
                           child: Icon(
                             Icons.notifications_none,
                             color: Colors.white,
                           ),
                         ),
+                        Obx(
+                          () =>
+                              controller.count.value.isNotEmpty
+                                  ? Positioned(
+                                    right: 0,
+                                    top: -6,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 18,
+                                        minHeight: 18,
+                                      ),
+                                      child: Text(
+                                        controller.count.value,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  )
+                                  : const SizedBox(),
+                        ),
                       ],
                     ),
                   ),
                 ),
+                SizedBox(width: 4.w),
+
+                // GestureDetector(
+                //   onTap: () {
+                //     Get.toNamed(Routes.notificationListScreen);
+                //   },
+                //   child: SizedBox(
+                //     height: 32,
+                //     width: 32,
+                //     child: Stack(
+                //       children: const [
+                //         Center(
+                //           child: Icon(
+                //             Icons.notifications_none,
+                //             color: Colors.white,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ],

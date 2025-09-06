@@ -93,7 +93,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     onTap: () {
                       controller.selectStartDate(context);
                     },
-                    enable: false,
+                    enable: true,
                   ),
                   buildEditableField(
                     label: 'Leave End Date',
@@ -102,7 +102,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     onTap: () {
                       controller.selectEndDate(context);
                     },
-                    enable: false,
+                    enable: true,
                   ),
                   Obx(() {
                     return buildDropdownFieldUpdate<LeaveType>(
@@ -301,7 +301,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     required TextEditingController controller,
     int? maxLine,
     VoidCallback? onTap,
-    bool enable = true,
+    bool enable = false,
     TextInputType inputType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
   }) {
@@ -316,25 +316,23 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        GestureDetector(
+        TextFormField(
+          controller: controller,
+          readOnly: enable,
+          maxLines: maxLine,
+          keyboardType: inputType,
+          inputFormatters: inputFormatters,
           onTap: onTap,
-          child: TextFormField(
-            controller: controller,
-            enabled: enable,
-            maxLines: maxLine,
-            keyboardType: inputType,
-            inputFormatters: inputFormatters,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 14,
-                horizontal: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-              filled: true,
-              fillColor: Colors.grey.shade100,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 14,
+              horizontal: 10,
             ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
+            filled: true,
+            fillColor: Colors.grey.shade100,
           ),
         ),
         const SizedBox(height: 16),

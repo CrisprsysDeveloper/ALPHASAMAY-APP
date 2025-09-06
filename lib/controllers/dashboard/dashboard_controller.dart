@@ -1,6 +1,7 @@
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
 import 'package:crysprsys/model/authentication/login_model.dart';
+import 'package:crysprsys/model/dashboard/notification_count_model.dart';
 import 'package:crysprsys/repositories/token_repository.dart';
 import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/screens/dashboard/my_account.dart';
@@ -31,6 +32,7 @@ class DashboardController extends GetxController {
       <AuthorizedComponent>[].obs;
 
   RxString roleCode = ''.obs;
+  RxString count = ''.obs;
 
   @override
   void onInit() {
@@ -63,9 +65,66 @@ class DashboardController extends GetxController {
           clientId: clientId,
           userName: userName,
         ).whenComplete(() {
-          getDashboardData();
+          getDashboardData().whenComplete(() {
+            getNotificationCount(clientId: clientId, userName: userName);
+          });
         });
       }
+    }
+  }
+
+  Future<void> getNotificationCount({
+    required String clientId,
+    required String userName,
+  }) async {
+    final dio = Dio();
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.getNotificationCount;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final queryParameters = {
+          'CPMClientID': clientId,
+          'CPMUserName': userName,
+          'TaskID': '',
+          'NotificationID': '',
+          'Notification_Status': 'Submitted',
+        };
+
+        final uri = Uri.parse(
+          '$baseUrl$endpoint',
+        ).replace(queryParameters: queryParameters);
+
+        printf("Request URL: $uri");
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: queryParameters,
+        );
+
+        hideProgress();
+
+        printf('<----response--notification-count-->${response.data}');
+
+        final notificationCountResponse = NotificationCountResponse.fromJson(
+          response.data,
+        );
+
+        if (notificationCountResponse.data.isNotEmpty) {
+          count.value = notificationCountResponse.data.first.count;
+          printf('<----Notification Count--> $count');
+
+        } else {
+          printf("No count found in response.");
+        }
+      } catch (e) {
+        printf("Error: $e");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
     }
   }
 

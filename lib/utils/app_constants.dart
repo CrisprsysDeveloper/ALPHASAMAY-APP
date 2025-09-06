@@ -105,6 +105,8 @@ class AppConstants {
 
   static const busObject = 'ATTEND_BUS_Attendance_Events_Overview';
 
+  static const String getNotificationCount = 'api/Notifications/GetNotificationCount';
+  //
   //
 
   static const add = 'Add';

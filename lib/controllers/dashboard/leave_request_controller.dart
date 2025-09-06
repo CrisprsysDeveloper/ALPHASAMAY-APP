@@ -269,12 +269,12 @@ class LeaveRequestController extends GetxController {
 
       var justifyList = {
         "LeaveID": textLeaveId.text,
-        "PERNR": selectedEmployee.value?.id,
+        "PERNR": roleCode == 'SELF' ? userId : selectedEmployee.value?.id,
         "UserName": selectedEmployee.value?.id,
         "LeaveStartDate": textLeaveStartDate.text, //"2025-08-07T18:30:00.000Z",
         "LeaveEndDate": textLeaveEndDate.text, //"2025-08-07T18:30:00.000Z",
         "LeaveType": selectedLeaveType.value?.id,
-        "LeaveStatus": "Saved",
+        "LeaveStatus": from == 'save' ? 'SAVE' : 'SUBMIT', //"Saved",
         "LeaveReason": textLeaveReason.text,
         "IsAdvanceLeave": true,
       };
@@ -282,15 +282,15 @@ class LeaveRequestController extends GetxController {
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
 
       var approvalData = {
-        "Status": "Saved",
+        "Status": from == 'save' ? 'SAVE' : 'SUBMIT', //"Saved",
         "AppCode": "LM",
         "BusObjectDesc": "Leave Request Overview",
         "MemberStatus": "",
-        "SaveOrSubmit": "SAVE",
+        "SaveOrSubmit": from == 'save' ? 'SAVE' : 'SUBMIT', //"SAVE",
         "apiUrl": "https://apis.crisprsys.net/api/",
         "EmployeeID": userId,
         "baseUrl": "https://eportal.crisprsys.net",
-        "UserAction": "SAVE",
+        "UserAction": from == 'save' ? 'SAVE' : 'SUBMIT', //"SAVE",
       };
 
       printf('approvalData  payload:\n${jsonEncode(approvalData)}');
@@ -380,7 +380,10 @@ class LeaveRequestController extends GetxController {
             hideProgress();
           }
         } else {
-          dropDownBannerError(AppConstants.somethingWentWrong);
+          final String message =
+              data['ValidationResponse']['MessageText'] ??
+              AppConstants.somethingWentWrong; //'No message provided';
+          dropDownBannerError(message);
         }
 
         hideProgress();
@@ -422,12 +425,12 @@ class LeaveRequestController extends GetxController {
 
       var justifyList = {
         "LeaveID": textLeaveId.text,
-        "PERNR": selectedEmployee.value?.id,
+        "PERNR": roleCode == 'SELF' ? userId : selectedEmployee.value?.id,
         "UserName": selectedEmployee.value?.id,
         "LeaveStartDate": textLeaveStartDate.text, //"2025-08-07T18:30:00.000Z",
         "LeaveEndDate": textLeaveEndDate.text, //"2025-08-07T18:30:00.000Z",
         "LeaveType": selectedLeaveType.value?.id,
-        "LeaveStatus": "Saved",
+        "LeaveStatus": from == 'save' ? 'SAVE' : 'SUBMIT', //"Saved",
         "LeaveReason": textLeaveReason.text,
         "IsAdvanceLeave": true,
       };
@@ -435,15 +438,15 @@ class LeaveRequestController extends GetxController {
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
 
       var approvalData = {
-        "Status": "Saved",
+        "Status": from == 'save' ? 'SAVE' : 'SUBMIT', //"Saved",
         "AppCode": "LM",
         "BusObjectDesc": "Leave Request Overview",
         "MemberStatus": "",
-        "SaveOrSubmit": "SAVE",
+        "SaveOrSubmit": from == 'save' ? 'SAVE' : 'SUBMIT', //"SAVE",
         "apiUrl": "https://apis.crisprsys.net/api/",
         "EmployeeID": userId,
         "baseUrl": "https://eportal.crisprsys.net",
-        "UserAction": "SAVE",
+        "UserAction": from == 'save' ? 'SAVE' : 'SUBMIT', //"SAVE",
       };
 
       printf('approvalData  payload:\n${jsonEncode(approvalData)}');
@@ -528,9 +531,13 @@ class LeaveRequestController extends GetxController {
           } catch (e) {
             printf('exe-->$e');
             hideProgress();
+            dropDownBannerError('Server error. please try again later');
           }
         } else {
-          dropDownBannerError(AppConstants.somethingWentWrong);
+          final String message =
+              data['ValidationResponse']['MessageText'] ??
+              AppConstants.somethingWentWrong; //'No message provided';
+          dropDownBannerError(message);
         }
 
         hideProgress();
@@ -573,12 +580,12 @@ class LeaveRequestController extends GetxController {
 
       var justifyList = {
         "LeaveID": textLeaveId.text,
-        "PERNR": selectedEmployee.value?.id,
+        "PERNR": roleCode == 'SELF' ? userId : selectedEmployee.value?.id,
         "UserName": selectedEmployee.value?.id,
         "LeaveStartDate": textLeaveStartDate.text, //"2025-08-07T18:30:00.000Z",
         "LeaveEndDate": textLeaveEndDate.text, //"2025-08-07T18:30:00.000Z",
         "LeaveType": selectedLeaveType.value?.id,
-        "LeaveStatus": "Saved",
+        "LeaveStatus": from == 'save' ? 'SAVE' : 'SUBMIT', //"Saved",
         "LeaveReason": textLeaveReason.text,
         "IsAdvanceLeave": true,
       };
@@ -586,7 +593,7 @@ class LeaveRequestController extends GetxController {
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
 
       var approvalData = {
-        "Status": "Saved",
+        "Status": from == 'save' ? 'SAVE' : 'SUBMIT', //"Saved",
         "AppCode": "LM",
         "BusObjectDesc": "Leave Request Overview",
         "MemberStatus": "",

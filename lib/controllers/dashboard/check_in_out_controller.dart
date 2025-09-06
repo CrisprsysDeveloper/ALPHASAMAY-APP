@@ -473,9 +473,9 @@ class CheckInOutController extends GetxController {
     if (pickedImagePath.value.isEmpty) {
       dropDownBannerError('Upload image');
     } else if (selectedEmpType.value.isEmpty) {
-      dropDownBannerError('select patner type');
+      dropDownBannerError('select partner type');
     } else if (selectedPartnerType.value.isEmpty) {
-      dropDownBannerError('select employe type');
+      dropDownBannerError('select employee type');
     } else {
       printf(
         'emp->${selectedEmpType.value} date->${defaultDate.value} time->${defaultTime.value}',
@@ -580,9 +580,9 @@ class CheckInOutController extends GetxController {
     if (pickedImagePath.value.isEmpty) {
       dropDownBannerError('Upload image');
     } else if (selectedEmpType.value.isEmpty) {
-      dropDownBannerError('select patner type');
+      dropDownBannerError('select partner type');
     } else if (selectedPartnerType.value.isEmpty) {
-      dropDownBannerError('select employe type');
+      dropDownBannerError('select employee type');
     } else {
       printf(
         'emp->${selectedEmpType.value} date->${defaultDate.value} time->${defaultTime.value}',
@@ -634,7 +634,7 @@ class CheckInOutController extends GetxController {
       });
 
       final dio = dio_.Dio();
-      final response = await dio.post(url);
+      final response = await dio.post(url, data: formData);
       printf('<---response--->$response');
       final Map<String, dynamic> json =
           response.data is String ? jsonDecode(response.data) : response.data;

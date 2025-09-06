@@ -116,6 +116,12 @@ class DashboardReportController extends GetxController {
           'Type': 'DisplayReport',
         };
 
+        final uri = Uri.parse(
+          '$baseUrl$endpoint',
+        ).replace(queryParameters: queryParameters);
+
+        printf("Request URL: $uri");
+
         final response = await dio.get(
           '$baseUrl$endpoint',
           queryParameters: queryParameters,
@@ -142,6 +148,8 @@ class DashboardReportController extends GetxController {
     }
     return null;
   }
+
+
 }
 
 class DashboardReport {
