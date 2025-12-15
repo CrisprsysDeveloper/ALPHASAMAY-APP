@@ -39,19 +39,18 @@ class CheckInOutApproveList extends StatelessWidget {
           itemCount: controller.approvalList.length,
           itemBuilder: (context, index) {
             final item = controller.approvalList[index];
-            return GestureDetector(
-              onTap: () {
-                printf("<---user-pic-->${item.checkinUserProfilePath}");
-                printf("<---register-in-pic-->${item.regUserProfilePath}");
-                Get.toNamed(
-                  Routes.timeEventApprovalScreen,
-                  arguments: {
-                    'emp': item,
-                  },
-                );
-              },
-              child: widgetApprovalItem(item),
-            );
+            return PartnerCard(data: item);
+            //   GestureDetector(
+            //   onTap: () {
+            //     printf("<---user-pic-->${item.checkinUserProfilePath}");
+            //     printf("<---register-in-pic-->${item.regUserProfilePath}");
+            //     Get.toNamed(
+            //       Routes.timeEventApprovalScreen,
+            //       arguments: {'emp': item},
+            //     );
+            //   },
+            //   child: widgetApprovalItem(item),
+            // );
           },
         );
       }),
@@ -141,11 +140,20 @@ class CheckInOutApproveList extends StatelessWidget {
                       child: Stack(
                         children: [
                           Center(
-                            child: const CircleAvatar(
+                            child: CircleAvatar(
                               radius: 50,
-                              backgroundImage: AssetImage(
-                                'assets/icons/ic_user_profile.png',
-                              ), // Replace with your image
+                              backgroundImage:
+                                  data.checkinUserProfilePath != null &&
+                                          data
+                                              .checkinUserProfilePath!
+                                              .isNotEmpty
+                                      ? NetworkImage(
+                                        data.checkinUserProfilePath.toString(),
+                                      )
+                                      : AssetImage(
+                                            'assets/icons/ic_user_profile.png',
+                                          )
+                                          as ImageProvider,
                             ),
                           ),
                         ],
@@ -319,6 +327,214 @@ class CheckInOutApproveList extends StatelessWidget {
             ),
             5.sbh,
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class PartnerCard extends StatelessWidget {
+  final Attendance data;
+
+  const PartnerCard({Key? key, required this.data}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundImage:
+                        data.regUserProfilePath != null &&
+                                data.regUserProfilePath!.isNotEmpty
+                            ? NetworkImage(data.regUserProfilePath.toString())
+                            : AssetImage('assets/icons/ic_user_profile.png')
+                                as ImageProvider,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'User Profile',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    data.employeeName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Container(
+                width: 1,
+                color: Colors.grey[300],
+                margin: EdgeInsets.symmetric(horizontal: 10),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    CircleAvatar(
+                      radius: 32,
+                      backgroundImage:
+                          data.checkinUserProfilePath != null &&
+                                  data.checkinUserProfilePath!.isNotEmpty
+                              ? NetworkImage(
+                                data.checkinUserProfilePath.toString(),
+                              )
+                              : AssetImage('assets/icons/ic_user_profile.png')
+                                  as ImageProvider,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Check In/Out Profile',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Badge(
+                          label: data.checkType,
+                          color: Colors.green[100]!,
+                          textColor: Colors.green[900]!,
+                        ),
+                        SizedBox(width: 8), // Spacing between badges
+                        Badge(
+                          label: '${data.checkInDate} • ${data.checktime}',
+                          //'17/09/2025  •  21:49:00',
+                          color: Colors.blue[100]!,
+                          textColor: Colors.blue[900]!,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16), // Spacing between badges and buttons
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.start,
+                    //   children: <Widget>[
+                    //     ElevatedButton(
+                    //       onPressed: () {
+                    //         // Action for View button
+                    //       },
+                    //       child: Text('View'),
+                    //     ),
+                    //     SizedBox(width: 8), // Spacing between buttons
+                    //     ElevatedButton(
+                    //       onPressed: () {},
+                    //       child: Text('Approve'),
+                    //     ),
+                    //   ],
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                              Routes.timeEventApprovalScreen,
+                              arguments: {'emp': data},
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple,
+                              borderRadius: BorderRadius.circular(
+                                25,
+                              ), // rounded corners
+                            ),
+                            child: Text(
+                              'View',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8), // Spacing between buttons
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                              Routes.timeEventApprovalScreen,
+                              arguments: {'emp': data},
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Text(
+                              'Approve',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Badge extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color textColor;
+
+  Badge({required this.label, required this.color, required this.textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
         ),
       ),
     );

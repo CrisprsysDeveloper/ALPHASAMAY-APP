@@ -24,6 +24,7 @@ class NotificationListController extends GetxController {
 
   RxList<ObjUNotification> notifications = <ObjUNotification>[].obs;
 
+
   @override
   void onInit() {
     super.onInit();
@@ -125,6 +126,54 @@ class NotificationListController extends GetxController {
             );
           }
         }
+
+        hideProgress();
+      } catch (e) {
+        printf("Error: $e");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  Future<void> notificationView({
+    required String clientId,
+    required String userName,
+    required String notificationNo,
+  }) async {
+    final dio = Dio();
+
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.viewNotificationApi;
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final queryParameters = {
+          'CPMClientID': clientId,
+          'CPMUserName': userName,
+          'NotificationNo': notificationNo,
+          'Date': '',
+        };
+
+        final uri = Uri.parse(
+          '$baseUrl$endpoint',
+        ).replace(queryParameters: queryParameters);
+
+        printf('Request URL: $uri'); // 👈 prints full
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'NotificationNo': notificationNo,
+            'Date': '',
+          },
+        );
+
+        printf('<----response--notification-view-->$response');
 
         hideProgress();
       } catch (e) {

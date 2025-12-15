@@ -42,6 +42,7 @@ class Attendance {
   final String checkType;
   final String checkinapprovalstatus;
   final String? regUserProfilePath;
+  final String? checkinPhotoKey;
   final String? checkinUserProfilePath;
   final double? profileMatchingPercentage;
   int? checkInId;
@@ -55,6 +56,7 @@ class Attendance {
     required this.checkinapprovalstatus,
     this.regUserProfilePath,
     this.checkinUserProfilePath,
+    required this.checkinPhotoKey,
     this.profileMatchingPercentage,
     this.checkInId,
   });
@@ -70,6 +72,7 @@ class Attendance {
       regUserProfilePath: json['RegUserProfilePath'],
       checkinUserProfilePath: json['CheckinUserProfilePath'],
       checkInId: json['CheckInId'] ?? 0,
+      checkinPhotoKey: json['CheckinPhotoKey'] ?? '',
       profileMatchingPercentage:
           (json['ProfileMatchingPercentage'] ?? 0.0).toDouble(),
     );

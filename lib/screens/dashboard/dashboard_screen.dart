@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crysprsys/app_assistant.dart';
 import 'package:crysprsys/controllers/dashboard/dashboard_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/authentication/login_model.dart';
@@ -89,7 +90,11 @@ class DashboardScreen extends StatelessWidget {
                         ),
                         Obx(
                           () =>
-                              controller.count.value.isNotEmpty
+                              AppAssistant
+                                      .access
+                                      .notificationCount
+                                      .value
+                                      .isNotEmpty //controller.count.value.isNotEmpty
                                   ? Positioned(
                                     right: 0,
                                     top: -6,
@@ -104,7 +109,11 @@ class DashboardScreen extends StatelessWidget {
                                         minHeight: 18,
                                       ),
                                       child: Text(
-                                        controller.count.value,
+                                        AppAssistant
+                                            .access
+                                            .notificationCount
+                                            .value,
+                                        //controller.count.value,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -290,11 +299,10 @@ class DashboardScreen extends StatelessWidget {
   }) {
     return Card(
       elevation: 0,
-
       margin: const EdgeInsets.symmetric(vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       child: Container(
-        height: 300,
+        height: 325,
         decoration: BoxDecoration(
           color: bgColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
@@ -302,12 +310,13 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               tileName,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Expanded(
               child:
                   graphId == 'Bar-chart'
@@ -431,17 +440,17 @@ class DashboardScreen extends StatelessWidget {
                     Get.toNamed(Routes.leaveQuotaScreen);
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.send, color: ColorConstants.appColor),
-                  title: Text("Leave Request"),
-                  onTap: () async {
-                    Get.back();
-                    final result = await Get.toNamed(
-                      Routes.leaveRequestScreen,
-                      arguments: {'from': AppConstants.add},
-                    );
-                  },
-                ),
+                // ListTile(
+                //   leading: Icon(Icons.send, color: ColorConstants.appColor),
+                //   title: Text("Leave Request"),
+                //   onTap: () async {
+                //     Get.back();
+                //     final result = await Get.toNamed(
+                //       Routes.leaveRequestScreen,
+                //       arguments: {'from': AppConstants.add},
+                //     );
+                //   },
+                // ),
               ],
             ),
           ),
@@ -503,7 +512,7 @@ class DashboardScreen extends StatelessWidget {
                     style: interTextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
-                      size: 12,
+                      size: 10.sp,
                     ),
                   ),
                   5.sbh,
@@ -658,7 +667,7 @@ class PieChartWidget extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 40),
+        SizedBox(height: 40),
         Wrap(
           spacing: 12,
           runSpacing: 6,

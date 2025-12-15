@@ -1,3 +1,4 @@
+import 'package:crysprsys/app_assistant.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/helper/snackbar_toast.dart';
 import 'package:crysprsys/model/authentication/login_model.dart';
@@ -16,9 +17,12 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'dart:convert';
 
 class DashboardController extends GetxController {
-  final TokenRepository authRepository;
+  static DashboardController get access =>
+      GetInstance().putOrFind(() => DashboardController());
 
-  DashboardController({required this.authRepository});
+  //  final TokenRepository authRepository;
+
+  DashboardController();
 
   RootModel? rootModel;
   final box = GetStorage();
@@ -32,7 +36,8 @@ class DashboardController extends GetxController {
       <AuthorizedComponent>[].obs;
 
   RxString roleCode = ''.obs;
-  RxString count = ''.obs;
+
+  //RxString count = ''.obs;
 
   @override
   void onInit() {
@@ -113,9 +118,12 @@ class DashboardController extends GetxController {
         );
 
         if (notificationCountResponse.data.isNotEmpty) {
-          count.value = notificationCountResponse.data.first.count;
-          printf('<----Notification Count--> $count');
-
+          // count.value = notificationCountResponse.data.first.count;
+          AppAssistant.access.notificationCount.value =
+              notificationCountResponse.data.first.count;
+          printf(
+            '<----Notification Count--> $AppAssistant.access.notificationCount.value',
+          );
         } else {
           printf("No count found in response.");
         }

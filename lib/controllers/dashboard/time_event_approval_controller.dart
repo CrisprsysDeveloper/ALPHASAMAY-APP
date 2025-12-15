@@ -20,6 +20,7 @@ class TimeEventApprovalController extends GetxController {
   var clientId = '1';
   var userName = 'Call';
   int eventId = 0;
+  var checkInKey = '';
 
   @override
   void onInit() {
@@ -32,6 +33,7 @@ class TimeEventApprovalController extends GetxController {
       userProfile.value = emp.regUserProfilePath.toString();
       checkInProfile.value = emp.checkinUserProfilePath.toString();
       eventId = emp.checkInId ?? 0;
+      checkInKey = emp.checkinPhotoKey.toString();
       printf('userProfile :${userProfile.value}');
       printf('checkInProfile :${checkInProfile.value}');
       printf('eventId :${emp.checkInId.toString()}');
@@ -61,7 +63,7 @@ class TimeEventApprovalController extends GetxController {
 
       try {
         final url =
-            'https://apis.crisprsys.net/api/TimeEventApprovals/RejectTimeEventProfile?'
+            'https://apis.crisprsys.net/api//TimeEventApprovals/RejectTimeEventProfile?'
             'ClientId=$clientId&UserName=$userName&EventID=$eventId&EventStatus=Rejected';
 
         printf('<---url-->$url');
@@ -77,7 +79,7 @@ class TimeEventApprovalController extends GetxController {
           printf('msg-text--->$messageText');
           if (messageText.isNotEmpty) {
             Get.back();
-            dropDownBannerSuccess(messageText);
+            dropDownBannerError(messageText);
           }
         }
       } catch (e, stackTrace) {
@@ -96,8 +98,8 @@ class TimeEventApprovalController extends GetxController {
 
       try {
         final url =
-            'https://apis.crisprsys.net/api/TimeEventApprovals/RejectTimeEventProfile?'
-            'ClientId=$clientId&UserName=$userName&EventID=$eventId&EventStatus=Approved';
+            'https://apis.crisprsys.net/api//TimeEventApprovals/ApproveTimeEventProfile?'
+            'ClientId=$clientId&UserName=$userName&EventID=$eventId&EventStatus=Approved&CheckInPhotoKey=$checkInKey';
 
         printf('<---url-->$url');
 
@@ -112,7 +114,7 @@ class TimeEventApprovalController extends GetxController {
           printf('msg-text--->$messageText');
           if (messageText.isNotEmpty) {
             Get.back();
-            dropDownBannerSuccess(messageText);
+            dropDownBannerSuccess(messageText,duration: 800);
           }
         }
       } catch (e, stackTrace) {

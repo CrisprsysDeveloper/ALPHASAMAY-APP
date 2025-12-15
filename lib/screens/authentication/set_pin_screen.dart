@@ -25,6 +25,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
   final box = GetStorage();
   var setPin = '';
 
+  RxBool isUserLogin = false.obs;
+
   @override
   void initState() {
     super.initState();
@@ -34,7 +36,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
 
   void loadSavedCredentials() {
     final pin = box.read(AppConstants.prefPIN);
-
+    isUserLogin.value = box.read(AppConstants.isLoggedIn) ?? false;
     if (widget.from == 'reset') {
       setPin = '';
     } else {
@@ -43,6 +45,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
       }
     }
     printf('<---set-pin--->$pin');
+    printf('<----isLogin-->$isUserLogin');
   }
 
   void onKeyboardTap(String value) async {
@@ -57,7 +60,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
           await Future.delayed(const Duration(milliseconds: 200));
           if (setPin == pin.join()) {
             printf('<---navigate-to-dashboard--->');
-            Get.offAndToNamed(Routes.dashboardScreen);
+            //Get.offAndToNamed(Routes.dashboardScreen);
+            Get.offAllNamed(Routes.dashboardScreen);
           } else {
             Fluttertoast.showToast(
               msg: "Incorrect PIN",
@@ -106,7 +110,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
               );
 
               await GetStorage().write(AppConstants.prefPIN, finalPin);
-              Get.toNamed(Routes.dashboardScreen);
+              //Get.toNamed(Routes.dashboardScreen);
+              Get.offAllNamed(Routes.dashboardScreen);
             } else {
               Fluttertoast.showToast(
                 msg: "PINs do not match. Try again.",
@@ -191,49 +196,90 @@ class _SetPinScreenState extends State<SetPinScreen> {
 
     return Scaffold(
       backgroundColor: ColorConstants.appColor,
-      appBar: AppBar(
-        backgroundColor: ColorConstants.appColor,
-        elevation: 0,
-        title: const Text('PIN', style: TextStyle(color: Colors.white)),
-        leading: const BackButton(color: Colors.white),
-      ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          setPin.isNotEmpty
-              ? Text(
-                'Please Enter PIN',
-                style: const TextStyle(color: Colors.white, fontSize: 18),
-              )
-              : Text(
-                isConfirming ? 'Re-enter Your PIN' : 'Please Set Your PIN',
-                style: const TextStyle(color: Colors.white, fontSize: 18),
-              ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              4,
-              (index) => pinIndicator(index < currentPin.length),
+          SizedBox(
+            height: 75,
+            width: Get.width,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(width: 16),
+                InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () async {
+                    if (isUserLogin.value) {
+                      await GetStorage().write(AppConstants.isLoggedIn, false);
+                      Get.back();
+                      Get.offAllNamed(Routes.loginScreen);
+                    } else {
+                      Get.back();
+                    }
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 30),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text(
+                    'PIN',
+                    style: const TextStyle(color: Colors.white, fontSize: 22),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 40),
-          GridView.builder(
-            shrinkWrap: true,
-            itemCount: 12,
-            padding: const EdgeInsets.symmetric(horizontal: 60),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 25,
-              crossAxisSpacing: 25,
-            ),
-            itemBuilder: (context, index) {
-              if (index == 9) return backspaceButton();
-              if (index == 11) return const SizedBox.shrink();
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                setPin.isNotEmpty
+                    ? Text(
+                      'Please Enter PIN',
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                    )
+                    : Text(
+                      isConfirming
+                          ? 'Re-enter Your PIN'
+                          : 'Please Set Your PIN',
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    4,
+                    (index) => pinIndicator(index < currentPin.length),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                GridView.builder(
+                  shrinkWrap: true,
+                  itemCount: 12,
+                  padding: const EdgeInsets.symmetric(horizontal: 60),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 25,
+                    crossAxisSpacing: 25,
+                  ),
+                  itemBuilder: (context, index) {
+                    if (index == 9) return backspaceButton();
+                    if (index == 11) return const SizedBox.shrink();
 
-              String number = index == 10 ? '0' : '${index + 1}';
-              return numberButton(number);
-            },
+                    String number = index == 10 ? '0' : '${index + 1}';
+                    return numberButton(number);
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),

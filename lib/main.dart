@@ -1,3 +1,4 @@
+import 'package:crysprsys/app_assistant.dart';
 import 'package:crysprsys/app_binding.dart';
 import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/app_constants.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -15,14 +17,14 @@ import 'package:permission_handler/permission_handler.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init(); // Initialize GetStorage
-
+  Get.put(AppAssistant(), permanent: true);
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp, // Normal Portrait
     DeviceOrientation.portraitDown, // Upside-Down Portrait
   ]);
 
   await _requestPermissions();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 // Future<void> _requestPermissions() async {
@@ -101,6 +103,25 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// class MyAppDemo extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Partner Card App', // Changed title
+//       theme: ThemeData(
+//         useMaterial3: true,
+//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+//       ),
+//       home: Scaffold(
+//         appBar: AppBar(
+//           title: Text('Partner Card Preview'), // Changed title
+//         ),
+//         body: Center(child: PartnerCard()),
+//       ),
+//     );
+//   }
+//}
 
 /*
 

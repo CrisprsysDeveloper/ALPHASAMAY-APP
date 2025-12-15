@@ -5,6 +5,6 @@ import 'package:get/get.dart';
 class DashboardBinding implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<DashboardController>(() => DashboardController(authRepository: Get.find()));
+    Get.lazyPut<DashboardController>(() => DashboardController());
   }
 }

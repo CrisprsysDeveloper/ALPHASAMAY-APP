@@ -51,60 +51,6 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              // Container(
-              //   width: double.infinity,
-              //   padding: EdgeInsets.all(4),
-              //   decoration: BoxDecoration(
-              //     color: ColorConstants.appColor.withOpacity(0.1),
-              //     borderRadius: BorderRadius.circular(8),
-              //   ),
-              //   child: Row(
-              //     children: List.generate(tabs.length, (index) {
-              //       final isSelected = index == selectedIndex;
-              //
-              //       return Expanded(
-              //         child: GestureDetector(
-              //           onTap: () => setState(() => selectedIndex = index),
-              //           child: Container(
-              //             padding: EdgeInsets.symmetric(vertical: 10),
-              //             decoration: BoxDecoration(
-              //               color:
-              //                   isSelected
-              //                       ? ColorConstants.appColor
-              //                       : Colors.transparent,
-              //               borderRadius: BorderRadius.circular(6),
-              //             ),
-              //             child: Row(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 Icon(
-              //                   icons[index],
-              //                   color:
-              //                       isSelected
-              //                           ? Colors.white
-              //                           : ColorConstants.appColor,
-              //                   size: 18,
-              //                 ),
-              //                 SizedBox(width: 6),
-              //                 Text(
-              //                   tabs[index],
-              //                   style: TextStyle(
-              //                     color:
-              //                         isSelected
-              //                             ? Colors.white
-              //                             : ColorConstants.appColor,
-              //                     fontWeight: FontWeight.w500,
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //       );
-              //     }),
-              //   ),
-              // ),
-              // 16.sbh,
               Row(
                 children: [
                   2.sbw,
@@ -278,7 +224,7 @@ class _TimeJustificationScreenState extends State<TimeJustificationScreen> {
           Row(
             children: [
               Expanded(
-                child: buildTextColumn("Violation Type", employee.partnerType),
+                child: buildTextColumn("Violation Type", employee.violationType),
               ),
               Expanded(
                 child: buildTextColumn("Comment", employee.justifyComments),

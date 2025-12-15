@@ -51,7 +51,8 @@ class AppConstants {
   static const String getUserTimeZoneApi = '/api/UserProfile/GetUserTimezone';
 
   static const String checkInApi =
-      'api//TimeEvents/INSERT_TimeEvent'; //'/api/TimeEvents/SaveMobileAttendanceUserTimeEvents';
+      "api/TimeEvents/SaveMobileAttendanceUserTimeEvents";
+  // 'api//TimeEvents/INSERT_TimeEvent'; //'/api/TimeEvents/SaveMobileAttendanceUserTimeEvents';
 
   static const String checkOutApi = 'api//TimeEvents/EditAttendanceEvents';
 
@@ -76,6 +77,11 @@ class AppConstants {
 
   static const String getNotificationListApi =
       'api/Notifications/GetNotifications';
+
+  static const String viewNotificationApi =
+      'api/Notifications/ViewNotification';
+
+  //
 
   static const String validationForJustification =
       'api/Justification/CommonJustifyWebMobileValidations';
@@ -105,7 +111,11 @@ class AppConstants {
 
   static const busObject = 'ATTEND_BUS_Attendance_Events_Overview';
 
-  static const String getNotificationCount = 'api/Notifications/GetNotificationCount';
+  static const String getNotificationCount =
+      'api/Notifications/GetNotificationCount';
+  static const String approveNotification =
+      'api//Notifications/WebMobileNotificationsNavigationValidations';
+
   //
   //
 

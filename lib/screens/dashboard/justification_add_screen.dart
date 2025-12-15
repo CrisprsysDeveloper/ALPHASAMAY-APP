@@ -42,13 +42,15 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: ColorConstants.appColor,
-            title: Text(
-              "Create Justification",
-              style: interTextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            title: Obx(() {
+              return Text(
+                controller.title.value,
+                style: interTextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            }),
             leading: InkWell(
               onTap: () {
                 Get.back();
@@ -66,109 +68,136 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                       : buildEditableField(
                         label: 'Justification No',
                         controller: controller.textJustificationNo,
-                        enable: false,
+                        enable: true,
                         maxLine: 1,
                         inputType: TextInputType.number,
                       ),
                   Obx(() {
-                    return buildDropdownFieldUpdate<PartnerType>(
-                      label: 'Select Partner Type',
-                      selectedItem: controller.selectedPartnerType.value,
-                      items: controller.partnerTypeList,
-                      itemLabelBuilder: (item) => item.value,
-                      onChanged: (newValue) {
-                        controller.selectedPartnerType.value = newValue!;
-                      },
+                    return IgnorePointer(
+                      ignoring: controller.isFromNotification.value,
+                      child: buildDropdownFieldUpdate<PartnerType>(
+                        label: 'Select Partner Type',
+                        selectedItem: controller.selectedPartnerType.value,
+                        items: controller.partnerTypeList,
+                        itemLabelBuilder: (item) => item.value,
+                        onChanged: (newValue) {
+                          controller.selectedPartnerType.value = newValue!;
+                        },
+                      ),
                     );
                   }),
                   Obx(() {
-                    return buildDropdownFieldUpdate<AuthEmployee>(
-                      label: 'Select Employee',
-                      selectedItem: controller.selectedPersonalNumber.value,
-                      items: controller.personalNumberList,
-                      itemLabelBuilder: (item) => item.description,
-                      onChanged: (newValue) {
-                        controller.selectedPersonalNumber.value = newValue!;
-                      },
+                    return IgnorePointer(
+                      ignoring: controller.isFromNotification.value,
+                      child: buildDropdownFieldUpdate<AuthEmployee>(
+                        label: 'Select Employee',
+                        selectedItem: controller.selectedPersonalNumber.value,
+                        items: controller.personalNumberList,
+                        itemLabelBuilder: (item) => item.description,
+                        onChanged: (newValue) {
+                          controller.selectedPersonalNumber.value = newValue!;
+                        },
+                      ),
                     );
                   }),
                   Obx(() {
-                    return buildDropdownFieldUpdate<ViolationTypeData>(
-                      label: 'Select Violation Type',
-                      selectedItem: controller.selectedViolationType.value,
-                      items: controller.violationTypeDataList,
-                      itemLabelBuilder: (item) => item.value,
-                      onChanged: (newValue) {
-                        ViolationTypeData? data = newValue;
-                        controller.selectedViolationType.value = data;
-                        controller.changeType(newValue!);
-                      },
+                    return IgnorePointer(
+                      ignoring: controller.isFromNotification.value,
+                      child: buildDropdownFieldUpdate<ViolationTypeData>(
+                        label: 'Select Violation Type',
+                        selectedItem: controller.selectedViolationType.value,
+                        items: controller.violationTypeDataList,
+                        itemLabelBuilder: (item) => item.value,
+                        onChanged: (newValue) {
+                          ViolationTypeData? data = newValue;
+                          controller.selectedViolationType.value = data;
+                          controller.changeType(newValue!);
+                        },
+                      ),
                     );
                   }),
-                  buildEditableField(
-                    label: 'Violation Date',
-                    controller: controller.textViolationDate,
-                    maxLine: 1,
-                    onTap: () {
-                      printf('clicked-violation-date');
-                      controller.selectDate(context);
-                    },
-                    enable: false,
+                  IgnorePointer(
+                    ignoring: controller.isFromNotification.value,
+                    child: buildEditableField(
+                      label: 'Violation Date',
+                      controller: controller.textViolationDate,
+                      maxLine: 1,
+                      onTap: () {
+                        printf('clicked-violation-date');
+                        controller.selectDate(context);
+                      },
+                      enable: true,
+                    ),
                   ),
-                  buildEditableField(
-                    label: 'Time in',
-                    controller: controller.textTimeIn,
-                    maxLine: 1,
-                    onTap: () {
-                      printf('clicked-time-in');
-                      controller.selectTime(context, 'in');
-                    },
-                    enable: false,
-                  ),
+                  Obx(() {
+                    return controller.isShowTimeIn.value
+                        ? IgnorePointer(
+                          ignoring: controller.isFromNotification.value,
+                          child: buildEditableField(
+                            label: 'Time in',
+                            controller: controller.textTimeIn,
+                            maxLine: 1,
+                            onTap: () {
+                              printf('clicked-time-in');
+                              controller.selectTime(context, 'in');
+                            },
+                            enable: true,
+                          ),
+                        )
+                        : SizedBox();
+                  }),
+
                   Obx(() {
                     return controller.isShowTimeOut.value
-                        ? buildEditableField(
-                          label: 'Time out',
-                          controller: controller.textTimeOut,
-                          maxLine: 1,
-                          onTap: () {
-                            printf('clicked-time-in');
-                            controller.selectTime(context, 'out');
-                          },
-                          enable: false,
+                        ? IgnorePointer(
+                          ignoring: controller.isFromNotification.value,
+                          child: buildEditableField(
+                            label: 'Time out',
+                            controller: controller.textTimeOut,
+                            maxLine: 1,
+                            onTap: () {
+                              printf('clicked-time-in');
+                              controller.selectTime(context, 'out');
+                            },
+                            enable: true,
+                          ),
                         )
                         : SizedBox();
                   }),
                   Obx(() {
-                    return DropdownButtonFormField<int>(
-                      value: controller.selectedRequestType.value,
-                      items:
-                          controller.requestTypeMap.entries.map((entry) {
-                            return DropdownMenuItem<int>(
-                              value: entry.key,
-                              child: Text(entry.value),
-                            );
-                          }).toList(),
-                      onChanged: (int? newValue) {
-                        if (newValue != null) {
-                          controller.selectedRequestType.value = newValue;
-                        }
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 10,
+                    return IgnorePointer(
+                      ignoring: controller.isFromNotification.value,
+                      child: DropdownButtonFormField<int>(
+                        value: controller.selectedRequestType.value,
+                        items:
+                            controller.requestTypeMap.entries.map((entry) {
+                              return DropdownMenuItem<int>(
+                                value: entry.key,
+                                child: Text(entry.value),
+                              );
+                            }).toList(),
+                        onChanged: (int? newValue) {
+                          if (newValue != null) {
+                            controller.selectedRequestType.value = newValue;
+                          }
+                        },
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 10,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
                       ),
                     );
                   }),
                   const SizedBox(height: 16),
-                  controller.from == AppConstants.edit
+                  controller.from == AppConstants.edit ||
+                          controller.from == 'Notification'
                       ? Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -176,25 +205,61 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
                             label: 'Status',
                             controller: controller.textStatus,
                             maxLine: 1,
-                            enable: false
+                            enable: true,
                           ),
                           buildEditableField(
                             label: 'Pending with',
                             controller: controller.textPendingWith,
                             maxLine: 1,
-                            enable: false
+                            enable: true,
                           ),
                         ],
                       )
                       : SizedBox(),
-                  buildEditableField(
-                    label: 'Justification Reason',
-                    controller: controller.textJustificationReason,
-                    maxLine: 3,
+                  IgnorePointer(
+                    ignoring: controller.isFromNotification.value,
+                    child: buildEditableField(
+                      label: 'Justification Reason',
+                      controller: controller.textJustificationReason,
+                      maxLine: 3,
+                      enable: false,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   controller.from == AppConstants.view
                       ? SizedBox()
+                      : controller.from == 'Notification'
+                      ? Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              horizontalMargin: 0,
+                              icon: "",
+                              text: 'Approve'.toUpperCase(),
+                              onPressed: () {
+                                // controller.buttonApproveRejectNotification(
+                                //   'Approval',
+                                // );
+                                controller.buttonApproveReject('Approval');
+                              },
+                            ),
+                          ),
+                          10.sbw,
+                          Expanded(
+                            child: CustomButton(
+                              horizontalMargin: 0,
+                              icon: "",
+                              text: 'Reject'.toUpperCase(),
+                              onPressed: () {
+                                // controller.buttonApproveRejectNotification(
+                                //   'Rejected',
+                                // );
+                                controller.buttonApproveReject('Rejected');
+                              },
+                            ),
+                          ),
+                        ],
+                      )
                       : Row(
                         children: [
                           Expanded(
@@ -372,24 +437,20 @@ class _JustificationAddScreenState extends State<JustificationAddScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        GestureDetector(
+        TextFormField(
+          controller: controller,
+          readOnly: enable,
+          maxLines: maxLine,
+          keyboardType: inputType,
           onTap: onTap,
-          child: TextFormField(
-            controller: controller,
-            enabled: enable,
-            maxLines: maxLine,
-            keyboardType: inputType,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 14,
-                horizontal: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-              filled: true,
-              fillColor: Colors.grey.shade100,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 14,
+              horizontal: 10,
             ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+            filled: true,
+            fillColor: Colors.grey.shade100,
           ),
         ),
         const SizedBox(height: 16),

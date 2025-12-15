@@ -77,6 +77,7 @@ class JustificationItem {
   final String status;
   final String timeIn;
   final String timeOut;
+  final String violationType;
 
   JustificationItem({
     required this.jid,
@@ -89,6 +90,7 @@ class JustificationItem {
     required this.status,
     required this.timeIn,
     required this.timeOut,
+    required this.violationType,
   });
 
   factory JustificationItem.fromJson(Map<String, dynamic> json) {
@@ -103,6 +105,7 @@ class JustificationItem {
       status: json['Status'] ?? '',
       timeIn: json['InTime'] ?? '',
       timeOut: json['OutTime'] ?? '',
+      violationType: json['ViolationType'] ?? '',
     );
   }
 }

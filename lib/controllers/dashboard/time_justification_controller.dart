@@ -38,6 +38,8 @@ class TimeJustificationController extends GetxController {
   var clientId = '1';
   var userName = 'Call';
 
+  var title ='Create Notification';
+
   @override
   void onInit() {
     super.onInit();

@@ -12,10 +12,11 @@ dropDownBannerWarning(String message) {
   );
 }
 
-dropDownBannerError(String message) {
+dropDownBannerError(String message, {duration = 1000}) {
   Get.snackbar(
     'Failed',
     message,
+    duration: Duration(milliseconds: duration),
     backgroundColor: Colors.redAccent,
     borderWidth: 1,
     colorText: Colors.white,
@@ -23,7 +24,7 @@ dropDownBannerError(String message) {
   );
 }
 
-dropDownBannerSuccess(String message, {duration = 5000}) {
+dropDownBannerSuccess(String message, {duration = 1000}) {
   Get.snackbar(
     'Success',
     message,

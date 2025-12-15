@@ -64,11 +64,14 @@ class CheckInOutApproveController extends GetxController {
     printf("First day: $firstDay");
     printf("Last day: $lastDay");
 
+    // https://apis.crisprsys.net/api/TimeEventApprovals/GetTimeEventApprovalsData?ClientId=1&userName=Suresh+&EmployeeNumber=&
+    // StartDate=2025-10-01&EndDate=2025-10-31
     getApprovalListApi(
       clientId: clientId,
       userName: userName,
       empNo: '',
-      startDay: firstDay,
+      startDay: '2024-01-01',
+      //firstDay,
       endDay: lastDay,
     );
   }
@@ -103,8 +106,8 @@ class CheckInOutApproveController extends GetxController {
             'ClientId': clientId,
             'userName': userName,
             'EmployeeNumber': empNo,
-            'StartDate': firstDay,
-            'EndDate': endDay,
+            'StartDate': '2024-01-01', // firstDay,
+            'EndDate':  endDay,
           },
         );
 

@@ -174,6 +174,15 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
   }
 
   Widget widgetLeaveQuota(LeaveQuotaItem data) {
+    final actualQuota = int.tryParse(data.actualQuota ?? '') ?? 0;
+    final blockedQuota = int.tryParse(data.blockedQuota ?? '') ?? 0;
+
+    int bl = actualQuota - blockedQuota;
+
+    if (bl < 0) {
+      bl = 0;
+    }
+
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -416,7 +425,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        data.usedQuota,
+                        data.blockedQuota,
                         style: interTextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
@@ -429,7 +438,7 @@ class _LeaveQuotaScreenState extends State<LeaveQuotaScreen> {
                       child: Align(
                         alignment: Alignment.topRight,
                         child: Text(
-                          data.balanceQuota,
+                          bl.toString(),
                           style: interTextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.black,

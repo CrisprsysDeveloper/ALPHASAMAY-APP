@@ -1,6 +1,8 @@
+import 'package:crysprsys/controllers/dashboard/dashboard_controller.dart';
 import 'package:crysprsys/controllers/dashboard/notification_list_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/notification/notification_list_model.dart';
+import 'package:crysprsys/route/app_pages.dart';
 import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/color_constants.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ class NotificationListScreen extends StatefulWidget {
 class _NotificationListScreenState extends State<NotificationListScreen> {
   final NotificationListController controller =
       Get.find<NotificationListController>();
+  final dashboardController = Get.find<DashboardController>();
 
   @override
   Widget build(BuildContext context) {
@@ -337,14 +340,47 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                         bgColors: Colors.white,
                         borderColor: ColorConstants.appColor,
                         iconColor: ColorConstants.appColor,
-                        onTap: () async {},
+                        onTap: () async {
+                          controller
+                              .notificationView(
+                                clientId: controller.clientId,
+                                userName: controller.userName,
+                                notificationNo: data.notificationNo,
+                              )
+                              .whenComplete(() {
+                                controller.getNotificationList(
+                                  clientId: controller.clientId,
+                                  userName: controller.userName,
+                                  roleCode: controller.roleCode,
+                                );
+                              })
+                              .whenComplete(() {
+                                dashboardController.getNotificationCount(
+                                  clientId: controller.clientId,
+                                  userName: controller.userName,
+                                );
+                              });
+                        },
                       )
                       : widgetContainer(
                         icon: Icons.check_circle,
                         bgColors: Colors.white,
                         borderColor: ColorConstants.appColor,
                         iconColor: ColorConstants.appColor,
-                        onTap: () async {},
+                        onTap: () async {
+                          printf('clicked notification view api');
+                          final result = await Get.toNamed(
+                            Routes.justificationAddScreen,
+                            arguments: {
+                              'from': 'Notification',
+                              'objectNo': data.objectNo,
+                              'status': data.notification_Status,
+                              'notificationNo': data.notificationNo,
+                              'businessObject': data.busObjCode,
+                              'date': data.createdDate,
+                            },
+                          );
+                        },
                       ),
                 ],
               ),

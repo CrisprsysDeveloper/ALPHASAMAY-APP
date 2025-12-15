@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:crysprsys/app_assistant.dart';
+import 'package:crysprsys/controllers/dashboard/dashboard_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/dashboard/justification_model.dart';
 import 'package:crysprsys/model/justification/justification_drop_down.dart';
@@ -48,6 +50,7 @@ class JustificationAddController extends GetxController {
   final Map<int, String> requestTypeMap = {0: 'Personal', 1: 'Official'};
 
   RxBool isShowTimeOut = false.obs;
+  RxBool isShowTimeIn = true.obs;
   RxString defaultTime = ''.obs;
 
   RxString defaultDate = ''.obs;
@@ -64,6 +67,17 @@ class JustificationAddController extends GetxController {
   var userId = '';
 
   var from = AppConstants.add;
+  RxString title = 'Justification'.obs;
+
+  var notificationStatus = '';
+  var notificationBusObject = '';
+  var notificationObjectNo = '';
+  var notificationId = '';
+
+  RxBool isFromNotification = false.obs;
+
+  var textSaved = 'Saved';
+  var textSubmitted =  'Submitted';
 
   @override
   void onInit() {
@@ -71,10 +85,6 @@ class JustificationAddController extends GetxController {
     printf('<------init--JustificationAddController----->');
     loadSavedCredentials();
 
-    // defaultDate.value = dateFormat.format(selectedDate.value);
-    // selectedInDate.value = selectedDate.value.toUtc().toIso8601String();
-
-    // Combine selectedDate and selectedTime to build fullDateTime
     final DateTime fullDateTime = DateTime(
       selectedDate.value.year,
       selectedDate.value.month,
@@ -83,7 +93,6 @@ class JustificationAddController extends GetxController {
       selectedTime.value.minute,
     );
 
-    // Format display time (e.g., 10:30 AM)
     defaultTime.value = timeFormat.format(fullDateTime);
 
     textTimeIn.text = ''; //defaultTime.value;
@@ -95,8 +104,7 @@ class JustificationAddController extends GetxController {
 
     try {
       from = Get.arguments['from'] ?? AppConstants.add;
-      if (from == AppConstants.edit)
-      {
+      if (from == AppConstants.edit) {
         JustificationItem emp = Get.arguments['emp'];
 
         textJustificationNo.text = emp.justid.toString();
@@ -112,10 +120,13 @@ class JustificationAddController extends GetxController {
             selectedPartnerType.value = partnerTypeList.firstWhere(
               (element) => element.value == emp.partnerType,
             );
-
             selectedPersonalNumber.value = personalNumberList.firstWhere(
               (element) => element.id == emp.employeeID,
             );
+            selectedViolationType.value = violationTypeDataList.firstWhere(
+              (element) => element.value == emp.violationType,
+            );
+            textJustificationReason.text = emp.justifyComments;
           },
         );
       } else if (from == AppConstants.view) {
@@ -137,9 +148,77 @@ class JustificationAddController extends GetxController {
             selectedPersonalNumber.value = personalNumberList.firstWhere(
               (element) => element.id == emp.employeeID,
             );
+
+            selectedViolationType.value = violationTypeDataList.firstWhere(
+              (element) => element.value == emp.violationType,
+            );
+
+            textJustificationReason.text = emp.justifyComments;
+          },
+        );
+      } else if (from == 'Notification') {
+        isFromNotification.value = true;
+        final dashboardController = Get.find<DashboardController>();
+        title.value = 'Decision Justification';
+        textJustificationNo.text = Get.arguments['objectNo'];
+        notificationId = Get.arguments['notificationNo'];
+        notificationStatus = Get.arguments['status'];
+        notificationObjectNo = Get.arguments['objectNo'];
+        notificationBusObject = Get.arguments['businessObject'];
+        printf('<--status :$notificationStatus');
+        printf('<--busObj :$notificationBusObject');
+        printf('<--ObjNo :$notificationObjectNo');
+        printf('<---notificationNo :$notificationId}');
+
+        // getDropDownListApi(clientId: clientId, userName: userName).whenComplete(
+        //   () {
+        //     textStatus.text = Get.arguments['status'];
+        //
+        //     try {
+        //       var dateTime = Get.arguments['date'];
+        //       List<String> parts = dateTime.split(" ");
+        //       String date = parts[0];
+        //       String time = parts[1].substring(0, 5);
+        //
+        //       textViolationDate.text = date;
+        //       textTimeIn.text = time;
+        //     } catch (e) {
+        //       printf('exe--notification->$e');
+        //     }
+        //
+        //     viewNotification(
+        //       clientId: clientId,
+        //       userName: userName,
+        //       notificationNo: notificationId,
+        //     ).whenComplete(() {
+        //       dashboardController.getNotificationCount(
+        //         clientId: clientId,
+        //         userName: userName,
+        //       );
+        //     });
+        //   },
+        // );
+
+        DateTime now = DateTime.now();
+        getFirstAndLastDay(now.year, now.month, true).whenComplete(
+          () async {
+            printf('completed-------------->');
+            await Future.delayed(const Duration(seconds: 2));
+            printf('delay finished-------------->');
+            viewNotification(
+              clientId: clientId,
+              userName: userName,
+              notificationNo: notificationId,
+            ).whenComplete(() {
+              dashboardController.getNotificationCount(
+                clientId: clientId,
+                userName: userName,
+              );
+            });
           },
         );
       } else {
+        title.value = 'Create Justification';
         getDropDownListApi(clientId: clientId, userName: userName);
       }
 
@@ -174,11 +253,18 @@ class JustificationAddController extends GetxController {
   }
 
   void changeType(ViolationTypeData type) {
-    printf('<--selected-type-->${type.id}');
+    printf('<--selected-type-->${type.id} ${type.value}');
     if (type.id == '1' || type.id == '2' || type.id == '4') {
       isShowTimeOut.value = false;
     } else {
       isShowTimeOut.value = true;
+    }
+
+    if (type.value == 'Absent') {
+      isShowTimeIn.value = false;
+      textTimeIn.text = '';
+    } else {
+      isShowTimeIn.value = true;
     }
   }
 
@@ -227,6 +313,55 @@ class JustificationAddController extends GetxController {
     }
   }
 
+  Future<void> viewNotification({
+    required String clientId,
+    required String userName,
+    required String notificationNo,
+  }) async {
+    printf('<--viewNotification-clientId-$clientId--userName-->$userName');
+
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.viewNotificationApi;
+
+    final dio = Dio();
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final uri = Uri.parse('$baseUrl$endpoint').replace(
+          queryParameters: {
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'NotificationNo': notificationNo,
+            'Date': '',
+          },
+        );
+
+        printf('Full URL: $uri');
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'NotificationNo': notificationNo,
+            'Date': '',
+          },
+        );
+
+        hideProgress();
+        printf('<----response---->${response.data}');
+      } catch (e, st) {
+        printf("Exception: $e");
+        printf("StackTrace: $st");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
   Future<void> getDropDownListApi({
     required String clientId,
     required String userName,
@@ -245,7 +380,7 @@ class JustificationAddController extends GetxController {
         final uri = Uri.parse('$baseUrl$endpoint').replace(
           queryParameters: {
             'BusObjCode': 'ATTEND_BUS_New_Justification',
-            'SMode': 'Create',
+            'SMode': from == AppConstants.edit ? 'Edit' : 'Create',
             'CPMClientID': clientId,
             'CPMUserName': userName,
           },
@@ -266,8 +401,7 @@ class JustificationAddController extends GetxController {
         hideProgress();
         printf('<----response---->${response.data}');
 
-        if (response.statusCode == 200 && response.data != null)
-        {
+        if (response.statusCode == 200 && response.data != null) {
           dynamic responseBody;
           if (response.data is String) {
             responseBody = jsonDecode(response.data);
@@ -320,13 +454,7 @@ class JustificationAddController extends GetxController {
   Future<void> buttonCreateJustification(from) async {
     if (textJustificationNo.text.isEmpty) {
       dropDownBannerError('Please enter justification no');
-    }
-    // else if (textStatus.text.isEmpty) {
-    //   dropDownBannerError('Please enter status');
-    // } else if (textPendingWith.text.isEmpty) {
-    //   dropDownBannerError('Please enter pending with');
-    // }
-    else if (textJustificationReason.text.isEmpty) {
+    } else if (textJustificationReason.text.isEmpty) {
       dropDownBannerError('Please add justification reason ');
     } else {
       printf('<----create-justification--->');
@@ -337,7 +465,7 @@ class JustificationAddController extends GetxController {
         "ObjectNo": '',
         "IsApprovalPreCondition": 'ActionBased',
         "MemberID": userId,
-        "ActionText": from == 'save' ? 'SAVE' : 'SUBMIT',
+        "ActionText": from == 'save' ? textSaved : textSubmitted,
         "ScreenMode": 'Create',
         "UserID": userId,
         "RoleID": clientId,
@@ -357,7 +485,8 @@ class JustificationAddController extends GetxController {
         "InTime": textTimeIn.text,
         "OutTime": textTimeOut.text,
         "Violationtype": selectedViolationType.value?.id.toString(),
-        "Status": textStatus.text.trim(),
+        "Status": from == 'save' ? textSaved : textSubmitted,
+        //textStatus.text.trim(),
         "JustifyComments": textJustificationReason.text.trim(),
         "RequestType": selectedRequestType.value,
       };
@@ -365,23 +494,23 @@ class JustificationAddController extends GetxController {
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
 
       var approvalData = {
-        "Status": "Saved",
+        "Status": from == 'save' ? textSaved : textSubmitted, //"Saved",
         "AppCode": "ATTEND",
         "BusObjectDesc": "Attendance Justification",
         "MemberStatus": "",
-        "SaveOrSubmit": "SAVE",
+        "SaveOrSubmit": from == 'save' ? textSaved : textSubmitted, //"SAVE",
         "apiUrl": "https://apis.crisprsys.net/api/",
         "EmployeeID": selectedPersonalNumber.value?.id.toString(),
         "baseUrl": "https://eportal.crisprsys.net",
         "Comment": "",
-        "UserAction": "SAVE",
+        "UserAction": from == 'save' ? textSaved : textSubmitted, //"SAVE",
       };
 
       printf('approvalData  payload:\n${jsonEncode(approvalData)}');
 
       printf('<--createJustification-clientId-$clientId--userName-->$userName');
 
-      const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+      const String baseUrl = AppConstants.baseUrl;
       const String endpoint = AppConstants.validationForJustification;
 
       if (await InternetConnection().hasInternetAccess) {
@@ -406,8 +535,7 @@ class JustificationAddController extends GetxController {
 
         printf('<---message--->$message');
 
-        if (message == 'Success')
-        {
+        if (message == 'Success') {
           final data = response.data;
 
           final teamMembersJson = data['TeamMembersList'] as List<dynamic>;
@@ -456,9 +584,12 @@ class JustificationAddController extends GetxController {
             hideProgress();
           }
         } else {
-          dropDownBannerError(AppConstants.somethingWentWrong);
+          final data = response.data;
+          final messageText =
+              data['ValidationResponse']?['MessageText'] ??
+              AppConstants.somethingWentWrong;
+          dropDownBannerError(messageText);
         }
-
         hideProgress();
       } else {
         Utility.showToastMessage(AppConstants.internetConnectionError);
@@ -469,13 +600,7 @@ class JustificationAddController extends GetxController {
   Future<void> buttonUpdateJustification(from) async {
     if (textJustificationNo.text.isEmpty) {
       dropDownBannerError('Please enter justification no');
-    }
-    // else if (textStatus.text.isEmpty) {
-    //   dropDownBannerError('Please enter status');
-    // } else if (textPendingWith.text.isEmpty) {
-    //   dropDownBannerError('Please enter pending with');
-    // }
-    else if (textJustificationReason.text.isEmpty) {
+    } else if (textJustificationReason.text.isEmpty) {
       dropDownBannerError('Please add justification reason ');
     } else {
       printf('<----create-justification--->');
@@ -486,7 +611,7 @@ class JustificationAddController extends GetxController {
         "ObjectNo": '',
         "IsApprovalPreCondition": 'ActionBased',
         "MemberID": userId,
-        "ActionText": from == 'save' ? 'SAVE' : 'SUBMIT',
+        "ActionText": from == 'save' ? textSaved : textSubmitted,
         "ScreenMode": 'Create',
         "UserID": userId,
         "RoleID": clientId,
@@ -506,7 +631,8 @@ class JustificationAddController extends GetxController {
         "InTime": textTimeIn.text,
         "OutTime": textTimeOut.text,
         "Violationtype": selectedViolationType.value?.id.toString(),
-        "Status": textStatus.text.trim(),
+        "Status": from == 'save' ? textSaved : textSubmitted,
+        //textStatus.text.trim(),
         "JustifyComments": textJustificationReason.text.trim(),
         "RequestType": selectedRequestType.value,
       };
@@ -514,16 +640,16 @@ class JustificationAddController extends GetxController {
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
 
       var approvalData = {
-        "Status": "Saved",
+        "Status": from == 'save' ? textSaved : textSubmitted, //"Saved",
         "AppCode": "ATTEND",
         "BusObjectDesc": "Attendance Justification",
         "MemberStatus": "",
-        "SaveOrSubmit": "SAVE",
+        "SaveOrSubmit": from == 'save' ? textSaved : textSubmitted, //"SAVE",
         "apiUrl": "https://apis.crisprsys.net/api/",
         "EmployeeID": selectedPersonalNumber.value?.id.toString(),
         "baseUrl": "https://eportal.crisprsys.net",
         "Comment": "",
-        "UserAction": "SAVE",
+        "UserAction": from == 'save' ? textSaved : textSubmitted, //"SAVE",
       };
 
       printf('approvalData  payload:\n${jsonEncode(approvalData)}');
@@ -561,7 +687,7 @@ class JustificationAddController extends GetxController {
           final teamMembersJson = data['TeamMembersList'] as List<dynamic>;
 
           final List<TeamMember> teamMembersList =
-          teamMembersJson.map((e) => TeamMember.fromJson(e)).toList();
+              teamMembersJson.map((e) => TeamMember.fromJson(e)).toList();
 
           printf('<--Parsed Members Count--> ${teamMembersList.length}');
 
@@ -604,7 +730,11 @@ class JustificationAddController extends GetxController {
             hideProgress();
           }
         } else {
-          dropDownBannerError(AppConstants.somethingWentWrong);
+          final data = response.data;
+          final messageText =
+              data['ValidationResponse']?['MessageText'] ??
+              AppConstants.somethingWentWrong;
+          dropDownBannerError(messageText);
         }
         hideProgress();
       } else {
@@ -613,4 +743,371 @@ class JustificationAddController extends GetxController {
     }
   }
 
+  Future<void> buttonApproveRejectNotification(type) async {
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.approveNotification;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final uri = Uri.parse('$baseUrl$endpoint').replace(
+          queryParameters: {
+            'ClientID': clientId,
+            'UserName': userName,
+            'SourceBusObj': 'CRIS_BUS_NOTIF_DB_MyAppr',
+            'TargetBusObj': notificationBusObject,
+            'Action': '5',
+            'Notification_Status': notificationStatus,
+            'Notification_Type': type, //'Approval',
+            'NotificationID': notificationId,
+            'TargetBusinessObject': 'ATTEND_BUS_New_Justification',
+            'ObjectNo': notificationObjectNo,
+          },
+        );
+
+        printf('<---Final URL--->${uri.toString()}');
+
+        final dio = dio_.Dio();
+        final response = await dio.getUri(uri);
+
+        printf('<---response-for-validation-->$response');
+        printf('Response runtimeType: ${response.data.runtimeType}');
+        printf('Raw response: ${response.data}');
+
+        Map<String, dynamic> data;
+        if (response.data is Map<String, dynamic>) {
+          data = response.data;
+        } else if (response.data is String) {
+          data = jsonDecode(response.data);
+        } else {
+          printf('Unexpected response format');
+          return;
+        }
+
+        final String message =
+            data['ActualResponse']?.toString() ?? 'No message provided';
+        printf('<---message--->$message');
+      } catch (e, stack) {
+        printf('Error in buttonApproveNotification: $e');
+        printf(stack.toString());
+        Utility.showToastMessage('Something went wrong. Please try again.');
+      } finally {
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
+
+  Future<void> buttonApproveReject(type) async {
+    if (textJustificationNo.text.isEmpty) {
+      dropDownBannerError('Please enter justification no');
+    } else if (textJustificationReason.text.isEmpty) {
+      dropDownBannerError('Please add justification reason ');
+    } else {
+      printf('<----create-justification--->');
+
+      var validationVariable = {
+        "BusObjCode": "ATTEND_BUS_New_Justification",
+        "ControlID": '5',
+        "ObjectNo": notificationObjectNo,
+        "IsApprovalPreCondition": 'ActionBased',
+        "MemberID": userId,
+        "ActionText": type,
+        "ScreenMode": 'Create',
+        "UserID": userId,
+        "RoleID": clientId,
+        "Notification_ID": notificationId,
+      };
+
+      printf(
+        'Validation Variable payload :\n${jsonEncode(validationVariable)}',
+      );
+
+      var justifyList = {
+        "UserName": userName,
+        "JUSTID": textJustificationNo.text.trim(),
+        "PartnerType": selectedPartnerType.value?.id.toString(),
+        "EmployeeID": selectedPersonalNumber.value?.id.toString(),
+        "Date": textViolationDate.text.trim(),
+        "InTime": textTimeIn.text,
+        "OutTime": textTimeOut.text,
+        "Violationtype": selectedViolationType.value?.id.toString(),
+        "Status": textStatus.text.trim(),
+        "JustifyComments": textJustificationReason.text.trim(),
+        "RequestType": selectedRequestType.value,
+      };
+
+      printf('Justification List payload:\n${jsonEncode(justifyList)}');
+
+      var approvalData = {
+        "Status": textStatus.text.trim(),
+        "AppCode": "ATTEND",
+        "BusObjectDesc": "Attendance Justification",
+        "MemberStatus": "",
+        "SaveOrSubmit": type,
+        "apiUrl": "https://apis.crisprsys.net/api/",
+        "EmployeeID": selectedPersonalNumber.value?.id.toString(),
+        "baseUrl": "https://eportal.crisprsys.net",
+        "Comment": "",
+        "UserAction": type,
+      };
+
+      printf('approvalData  payload:\n${jsonEncode(approvalData)}');
+
+      printf('<--createJustification-clientId-$clientId--userName-->$userName');
+
+      const String baseUrl = AppConstants.baseUrl;
+      const String endpoint = AppConstants.validationForJustification;
+
+      if (await InternetConnection().hasInternetAccess) {
+        showProgress();
+        final url =
+            '$baseUrl$endpoint?ClientID=$clientId&UserName=$userName&'
+            'ValidationVariables=${jsonEncode(validationVariable)}&'
+            'JustifyObjectJson=${jsonEncode(justifyList)}'; //; //&FilePath=$encodedPath';
+
+        printf('<---url-->$url');
+
+        final dio = dio_.Dio();
+        final response = await dio.get(url);
+        printf('<---response-for-validation-->$response');
+
+        printf('Response runtimeType: ${response.data.runtimeType}');
+        printf('Raw response: ${response.data}');
+
+        final Map<String, dynamic> data = response.data;
+
+        final String message = data['ActualResponse'] ?? 'No message provided';
+
+        printf('<---message--->$message');
+
+        if (message == 'Success') {
+          final data = response.data;
+
+          final teamMembersJson = data['TeamMembersList'] as List<dynamic>;
+
+          final List<TeamMember> teamMembersList =
+              teamMembersJson.map((e) => TeamMember.fromJson(e)).toList();
+
+          printf('<--Parsed Members Count--> ${teamMembersList.length}');
+
+          try {
+            printf('<--call-add-justification---->');
+
+            const String baseUrl =
+                AppConstants.baseUrl; // Replace with your base URL
+            const String endpoint = AppConstants.updateJustificationApi;
+
+            final teamMembersEncoded = Uri.encodeComponent(
+              jsonEncode(teamMembersList.map((e) => e.toJson()).toList()),
+            );
+
+            final urlForAdd =
+                '$baseUrl$endpoint?CPMClientID=$clientId&CPMUserName=$userName&'
+                'BusObjCode=ATTEND_BUS_New_Justification&'
+                'JustificationList=${jsonEncode(justifyList)}&'
+                'TeamMembersJsonData=$teamMembersEncoded&'
+                'ApprovalData=${jsonEncode(approvalData)}'; //; //&FilePath=$encodedPath';
+
+            printf('<---urlForAdd-->$urlForAdd');
+
+            final dio = dio_.Dio();
+            final res = await dio.get(urlForAdd);
+
+            printf('Response runtimeType: ${res.data.runtimeType}');
+            printf('Raw response: ${res.data}');
+
+            final Map<String, dynamic> data = jsonDecode(res.data);
+
+            final String message = data['Message'] ?? 'No message provided';
+
+            Get.back(result: true);
+            dropDownBannerSuccess(message);
+
+            hideProgress();
+          } catch (e) {
+            printf('exe-->$e');
+            hideProgress();
+          }
+        } else {
+          final data = response.data;
+          final messageText =
+              data['ValidationResponse']?['MessageText'] ??
+              AppConstants.somethingWentWrong;
+          dropDownBannerError(messageText);
+        }
+        hideProgress();
+      } else {
+        Utility.showToastMessage(AppConstants.internetConnectionError);
+      }
+    }
+  }
+
+  String dateToYMD(DateTime date) {
+    return "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> getFirstAndLastDay(int year, int month, bool isRefresh) async {
+    String firstDay = '';
+    String lastDay = '';
+
+    DateTime fd = DateTime(year, month, 1);
+    DateTime ld = DateTime(year, month + 1, 0);
+
+    firstDay = dateToYMD(fd);
+    lastDay = dateToYMD(ld);
+
+    printf("First day: $firstDay");
+    printf("Last day: $lastDay");
+
+    getJustificationList(
+      isRefresh,
+      clientId: clientId,
+      userName: userName,
+      startDay: firstDay,
+      endDay: lastDay,
+    );
+  }
+
+  Future<void> getJustificationList(
+    isRefresh, {
+    required String clientId,
+    required String userName,
+    required String startDay,
+    required String endDay,
+  }) async {
+    printf(
+      '<--clientId-$clientId--userName-->$userName--start-day-->$startDay--end-day-->$endDay',
+    );
+    RxList<JustificationItem> employeeList = <JustificationItem>[].obs;
+    final dio = Dio();
+
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.getJustDashboardDataApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+
+        final url = '$baseUrl$endpoint';
+
+        printf('<---url-->$url');
+
+        final queryParams = {
+          'flag': 'get',
+          'CPMClientID': clientId,
+          'CPMUserName': userName,
+          'AccessToken': '',
+          'SessionID': '',
+          'BusObjCode': 'ATTEND_BUS_Justification',
+          'RequestComingFrom': 'Mobile',
+          'AttendenceParamters': jsonEncode({
+            "StartDate": startDay,
+            "EndDate": endDay,
+            "UserID": "1",
+            "RoleID": "1",
+            "ScreenType": "ATTEND_BUS_Justification",
+            "DefaultName": "ATTEND_Justification",
+          }),
+        };
+
+        final uri = Uri.parse(
+          '$baseUrl$endpoint',
+        ).replace(queryParameters: queryParams);
+
+        printf('<-- Full URL --> ${uri.toString()}');
+
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {
+            'flag': 'get',
+            'CPMClientID': clientId,
+            'CPMUserName': userName,
+            'AccessToken': '',
+            'SessionID': '',
+            'BusObjCode': 'ATTEND_BUS_Justification',
+            'RequestComingFrom': 'Mobile',
+            'AttendenceParamters': jsonEncode({
+              "StartDate": startDay,
+              "EndDate": endDay,
+              "UserID": "1",
+              "RoleID": "1",
+              "ScreenType": "ATTEND_BUS_Justification",
+              "DefaultName": "ATTEND_Justification",
+            }),
+          },
+        );
+
+        printf('<----response---->$response');
+
+        final Map<String, dynamic> outerJson = jsonDecode(response.data);
+
+        // Step 2: Decode the nested JSON string in "ServiceStatus"
+        final Map<String, dynamic> serviceStatus = jsonDecode(
+          outerJson['ServiceStatus'],
+        );
+
+        final String messageCode = serviceStatus['MessageCode'];
+        final String messageDescription = serviceStatus['MessageDescription'];
+
+        printf('MessageCode: $messageCode');
+        printf('MessageDescription: $messageDescription');
+
+        if (messageCode == "200") {
+          employeeList.clear();
+          printf('<----success-getting-justification-list---->');
+
+          final Map<String, dynamic> outerJson = jsonDecode(response.data);
+          final model = JustificationModel.fromJson(outerJson);
+
+          if (model.justifyResults.justificationList.isNotEmpty) {
+            employeeList.value = model.justifyResults.justificationList;
+          }
+
+          printf('<----list-of-justification---->${employeeList.length}');
+
+          for (final emp in model.justifyResults.justificationList) {
+            if (notificationObjectNo == emp.justid) {
+              textJustificationNo.text = emp.justid.toString();
+
+              getDropDownListApi(
+                clientId: clientId,
+                userName: userName,
+              ).whenComplete(() {
+                textViolationDate.text = emp.date;
+                textStatus.text = emp.status;
+
+                textTimeIn.text = emp.timeIn;
+
+                selectedPartnerType.value = partnerTypeList.firstWhere(
+                  (element) => element.value == emp.partnerType,
+                );
+
+                selectedPersonalNumber.value = personalNumberList.firstWhere(
+                  (element) => element.id == emp.employeeID,
+                );
+
+                selectedViolationType.value = violationTypeDataList.firstWhere(
+                  (element) => element.value == emp.violationType,
+                );
+
+                textJustificationReason.text = emp.justifyComments;
+              });
+              break;
+            }
+          }
+        } else {
+          dropDownBannerError(messageDescription);
+        }
+        hideProgress();
+      } catch (e) {
+        printf("Exception: $e");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+    }
+  }
 }

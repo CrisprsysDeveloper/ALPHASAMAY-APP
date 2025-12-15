@@ -139,6 +139,28 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     controller: controller.textLeaveReason,
                     maxLine: 3,
                   ),
+                  Obx(() => Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Checkbox(
+                          value: controller.isAdvanceLeave.value,
+                          onChanged: (value) {
+                            controller.isAdvanceLeave.value = value ?? false;
+                          },
+                        ),
+                      ),
+                      const Text(
+                        'Is Advance Leave',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  )),
                   const SizedBox(height: 20),
                   controller.from == AppConstants.view
                       ? SizedBox()

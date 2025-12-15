@@ -39,6 +39,7 @@ class CheckInOutController extends GetxController {
 
   var clientId = '1';
   var userName = 'Call';
+  RxString userRole = ''.obs;
 
   var selectedEmpType = ''.obs;
   RxList<Map<String, String>> employeeTypeDropDown =
@@ -62,8 +63,8 @@ class CheckInOutController extends GetxController {
 
   late final UserSettingsModel userSettingsTimeZone;
 
-  var latitude = '';
-  var longitude = '';
+  RxDouble latitude = 28.7041.obs; //21.7563.obs;
+  RxDouble longitude = 77.1025.obs; //72.1258.obs;
 
   var from = AppConstants.add;
   var checkInId = '';
@@ -146,6 +147,7 @@ class CheckInOutController extends GetxController {
           },
         );
       } else {
+        printf('<--------fetch-location------->');
         getCurrentLocation();
         getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(
           () {
@@ -169,8 +171,11 @@ class CheckInOutController extends GetxController {
     if (companyId != null) {
       clientId = companyId;
     }
+    userRole.value = box.read(AppConstants.prefRoleCode);
 
-    printf('<---userName-->$userName---clientId--->$clientId');
+    printf(
+      '<---userName-->$userName---clientId--->$clientId---role--->${userRole.value}',
+    );
   }
 
   Future<void> selectDate(BuildContext context) async {
@@ -211,19 +216,20 @@ class CheckInOutController extends GetxController {
         picked.minute,
       );
 
-      final isToday =
-          selectedDate.value.year == now.year &&
-          selectedDate.value.month == now.month &&
-          selectedDate.value.day == now.day;
+      // final isToday =
+      //     selectedDate.value.year == now.year &&
+      //     selectedDate.value.month == now.month &&
+      //     selectedDate.value.day == now.day;
 
-      if (isToday && pickedDateTime.isAfter(now)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Cannot select future time for today's date."),
-          ),
-        );
-        return;
-      }
+      // if (isToday && pickedDateTime.isAfter(now))
+      // {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text("Cannot select future time for today's date."),
+      //     ),
+      //   );
+      //   return;
+      // }
 
       selectedTime.value = picked;
       defaultTime.value = timeFormat.format(pickedDateTime);
@@ -259,8 +265,7 @@ class CheckInOutController extends GetxController {
 
     final dio = Dio();
 
-    // Construct the full URL
-    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String baseUrl = AppConstants.baseUrl;
     const String endpoint = AppConstants.getCheckInCheckOutDropDownListApi;
 
     if (await InternetConnection().hasInternetAccess) {
@@ -323,6 +328,7 @@ class CheckInOutController extends GetxController {
               }).toList();
 
           if (partnerTypeDropdown.isNotEmpty) {
+            printf('filterListBySelectedEmployee------>');
             selectedPartnerType.value = partnerTypeDropdown.first['id'] ?? '';
             filterListBySelectedEmployee();
           }
@@ -356,7 +362,6 @@ class CheckInOutController extends GetxController {
         final selectedUser = filteredPartnerTypeList.firstWhere(
           (user) => user.id.toLowerCase().contains(editEmpId.toLowerCase()),
         );
-
         if (selectedUser != null) {
           selectedEmpType.value = selectedUser.id;
           printf('Edit mode: Matched user -> ${selectedUser.description}');
@@ -364,7 +369,13 @@ class CheckInOutController extends GetxController {
           printf('No matching user found for editing.');
         }
       } else {
-        selectedEmpType.value = filteredPartnerTypeList.first.id;
+        if (userRole.value.isNotEmpty && userRole.value == 'SELF') {
+          printf('USer is self role');
+          selectedEmpType.value = filteredPartnerTypeList.first.id;
+        } else {
+          printf('USer is not self');
+          selectedEmpType.value = '';
+        }
       }
     }
   }
@@ -407,6 +418,64 @@ class CheckInOutController extends GetxController {
   }
 
   Future<void> pickImage(ImageSource source) async {
+    final XFile? pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      final originalPath = pickedFile.path;
+      final dir = await getTemporaryDirectory();
+
+      // 🔹 Get extension and decide format
+      final ext = path.extension(pickedFile.path).toLowerCase();
+      CompressFormat format;
+      String newExt;
+
+      switch (ext) {
+        case '.png':
+          format = CompressFormat.png;
+          newExt = '.png';
+          break;
+        case '.heic':
+        case '.heif':
+          // Convert HEIC to JPEG for compatibility
+          format = CompressFormat.jpeg;
+          newExt = '.jpg';
+          break;
+        default:
+          format = CompressFormat.jpeg;
+          newExt = '.jpg';
+      }
+
+      // 🔹 Build valid target path
+      final targetPath = path.join(
+        dir.path,
+        'compressed_${path.basenameWithoutExtension(pickedFile.name)}$newExt',
+      );
+
+      // 🔹 Compress the image
+      final compressedFile = await FlutterImageCompress.compressAndGetFile(
+        originalPath,
+        targetPath,
+        quality: 85,
+        minWidth: 1080,
+        format: format,
+      );
+
+      if (compressedFile != null) {
+        final compressed = File(compressedFile.path);
+        if (compressed.lengthSync() <= 2 * 1024 * 1024) {
+          image.value = compressed;
+          pickedImagePath.value = compressed.path;
+          pickedImageName.value =
+              'compressed_${path.basename(compressed.path)}';
+        } else {
+          Get.snackbar("Image too large", "Compressed image still exceeds 2MB");
+        }
+      } else {
+        Get.snackbar("Error", "Image compression failed");
+      }
+    }
+  }
+
+  Future<void> pickImageOld(ImageSource source) async {
     final XFile? pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
       final originalPath = pickedFile.path;
@@ -470,10 +539,12 @@ class CheckInOutController extends GetxController {
   }
 
   Future<void> buttonCheckIn() async {
-    if (pickedImagePath.value.isEmpty) {
-      dropDownBannerError('Upload image');
-    } else if (selectedEmpType.value.isEmpty) {
-      dropDownBannerError('select partner type');
+    // if (pickedImagePath.value.isEmpty)
+    // {
+    //   dropDownBannerError('Upload image');
+    // } else
+    if (selectedEmpType.value.isEmpty) {
+      dropDownBannerError('select employee');
     } else if (selectedPartnerType.value.isEmpty) {
       dropDownBannerError('select employee type');
     } else {
@@ -526,40 +597,54 @@ class CheckInOutController extends GetxController {
       "EmployeeID": selectedEmpType.value,
       "CheckType": type,
       "InDate": selectedInDate.value,
-      "ConvertedCheckinDate": convertedCheckInDate.value,
-      //"Checktime": timeNow(defaultTime.value).toString(),
+      "TimeZone": userSettingsTimeZone.userTimeZone,
+      "Checktime": timeNow(defaultTime.value).toString(),
+      "DuplicateDate": convertedCheckInDate.value,
       "IsmanuallyDone": false,
+      "DeviceSno": "",
       "CreatedDate": createdDate,
-      "Latitude": latitude,
-      "Longitude": longitude,
+      "Latitude": latitude.value.toString(),
+      "Longitude": longitude.value.toString(),
       "BusObjCode": "ATTEND_BUS_Attendance_Events",
       "PartnerType": selectedPartnerType.value,
+      "filePath": image.value?.path ?? '',
     };
 
     printf('<---json-body--->${jsonEncode(body)}');
 
-    // Construct the full URL
-    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String baseUrl = AppConstants.baseUrl;
     const String endpoint = AppConstants.checkInApi;
 
     if (await InternetConnection().hasInternetAccess) {
       showProgress();
+
+      final String? imagePath = image.value?.path;
+      final bool hasImage = imagePath != null && imagePath.isNotEmpty;
+
       final url =
-          '$baseUrl$endpoint?flag=INSERT&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
+          '$baseUrl$endpoint?flag=INSERT&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}&FilePath=${hasImage ? imagePath : ''}';
 
       printf('<---url-->$url');
 
-      File imageFile = File(image.value!.path);
-      String fileName = imageFile.path.split('/').last;
-      dio_.FormData formData = dio_.FormData.fromMap({
-        'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
-          imageFile.path,
-          filename: fileName,
-        ),
-      });
-
       final dio = dio_.Dio();
-      final response = await dio.post(url, data: formData);
+      dio_.FormData? formData;
+
+      if (hasImage) {
+        final fileName = imagePath.split('/').last;
+        formData = dio_.FormData.fromMap({
+          'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
+            imagePath,
+            filename: fileName,
+          ),
+        });
+
+        debugPrint('📂 Image attached: $imagePath');
+      } else {
+        debugPrint('⚠️ No image attached, sending request without file.');
+      }
+
+      final response =
+          hasImage ? await dio.post(url, data: formData) : await dio.post(url);
 
       printf('<---response--->$response');
       final messageText = response.data['MessageText'];
@@ -576,11 +661,96 @@ class CheckInOutController extends GetxController {
     }
   }
 
+  Future<bool> timeEventUpdateApi({
+    required String clientId,
+    required String userName,
+    required String type,
+    required String checkInId,
+  }) async {
+    printf('<--timeEventUpdateApi-clientId-$clientId--userName-->$userName');
+    final DateTime nowUtc = DateTime.now().toUtc();
+    final String createdDate = nowUtc.toIso8601String();
+    Map<String, dynamic> body = {
+      "CheckInId": checkInId,
+      "EmployeeID": selectedEmpType.value,
+      "CheckType": type,
+      "InDate": selectedInDate.value,
+      "ConvertedCheckinDate": convertedCheckInDate.value,
+      "IsmanuallyDone": false,
+      "CreatedDate": createdDate,
+      "Latitude": latitude.value.toString(),
+      "Longitude": longitude.value.toString(),
+      "BusObjCode": "ATTEND_BUS_Attendance_Events",
+      "PartnerType": selectedPartnerType.value,
+    };
+
+    printf('<---json-body--->${jsonEncode(body)}');
+
+    // Construct the full URL
+    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
+    const String endpoint = AppConstants.timeEventUpdateApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      showProgress();
+      final String? imagePath = image.value?.path;
+      final bool hasImage = imagePath != null && imagePath.isNotEmpty;
+      final url =
+          '$baseUrl$endpoint?flag=UPDATE&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
+
+      printf('<---url-->$url');
+
+      // File imageFile = File(image.value?.path ?? '');
+      // String fileName = imageFile.path.split('/').last;
+      // dio_.FormData formData = dio_.FormData.fromMap({
+      //   'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
+      //     imageFile.path,
+      //     filename: fileName,
+      //   ),
+      // });
+      //
+      // final dio = dio_.Dio();
+      // final response = await dio.post(url);
+
+      final dio = dio_.Dio();
+      dio_.FormData? formData;
+
+      if (hasImage) {
+        final fileName = imagePath.split('/').last;
+        formData = dio_.FormData.fromMap({
+          'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
+            imagePath,
+            filename: fileName,
+          ),
+        });
+
+        debugPrint('📂 Image attached: $imagePath');
+      } else {
+        debugPrint('⚠️ No image attached, sending request without file.');
+      }
+
+      final response =
+          hasImage ? await dio.post(url, data: formData) : await dio.post(url);
+
+      printf('<---response--timeEventUpdateApi->$response');
+
+      if (response.data['Message'] == "Success") {
+        // final messageText = response.data['MessageText'];
+        // dropDownBannerSuccess(messageText);
+        return true;
+      } else {
+        // final messageText = response.data['MessageText'];
+        // dropDownBannerError(messageText);
+        return false;
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
+      return false;
+    }
+  }
+
   void buttonCheckOut() {
-    if (pickedImagePath.value.isEmpty) {
-      dropDownBannerError('Upload image');
-    } else if (selectedEmpType.value.isEmpty) {
-      dropDownBannerError('select partner type');
+    if (selectedEmpType.value.isEmpty) {
+      dropDownBannerError('select employee');
     } else if (selectedPartnerType.value.isEmpty) {
       dropDownBannerError('select employee type');
     } else {
@@ -624,7 +794,7 @@ class CheckInOutController extends GetxController {
 
       printf('<---url-->$url');
 
-      File imageFile = File(image.value!.path);
+      File imageFile = File(image.value?.path ?? '');
       String fileName = imageFile.path.split('/').last;
       dio_.FormData formData = dio_.FormData.fromMap({
         'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
@@ -653,72 +823,7 @@ class CheckInOutController extends GetxController {
     }
   }
 
-  Future<bool> timeEventUpdateApi({
-    required String clientId,
-    required String userName,
-    required String type,
-    required String checkInId,
-  }) async {
-    printf('<--timeEventUpdateApi-clientId-$clientId--userName-->$userName');
-    final DateTime nowUtc = DateTime.now().toUtc();
-    final String createdDate = nowUtc.toIso8601String();
-    Map<String, dynamic> body = {
-      "CheckInId": checkInId,
-      "EmployeeID": selectedEmpType.value,
-      "CheckType": type,
-      "InDate": selectedInDate.value,
-      "ConvertedCheckinDate": convertedCheckInDate.value,
-      "IsmanuallyDone": false,
-      "CreatedDate": createdDate,
-      "Latitude": latitude,
-      "Longitude": longitude,
-      "BusObjCode": "ATTEND_BUS_Attendance_Events",
-      "PartnerType": selectedPartnerType.value,
-    };
-
-    printf('<---json-body--->${jsonEncode(body)}');
-
-    // Construct the full URL
-    const String baseUrl = AppConstants.baseUrl; // Replace with your base URL
-    const String endpoint = AppConstants.timeEventUpdateApi;
-
-    if (await InternetConnection().hasInternetAccess) {
-      showProgress();
-      final url =
-          '$baseUrl$endpoint?flag=UPDATE&CPMClientID=1&CPMUserName=Call&AttendanceEventList=${jsonEncode(body)}'; //; //&FilePath=$encodedPath';
-
-      printf('<---url-->$url');
-
-      File imageFile = File(image.value!.path);
-      String fileName = imageFile.path.split('/').last;
-      dio_.FormData formData = dio_.FormData.fromMap({
-        'AttendanceUserProfilePic': await dio_.MultipartFile.fromFile(
-          imageFile.path,
-          filename: fileName,
-        ),
-      });
-
-      final dio = dio_.Dio();
-      final response = await dio.post(url);
-
-      printf('<---response--->$response');
-
-      if (response.data['Message'] == "Success") {
-        // final messageText = response.data['MessageText'];
-        // dropDownBannerSuccess(messageText);
-        return true;
-      } else {
-        // final messageText = response.data['MessageText'];
-        // dropDownBannerError(messageText);
-        return false;
-      }
-    } else {
-      Utility.showToastMessage(AppConstants.internetConnectionError);
-      return false;
-    }
-  }
-
-  Future<void> getCurrentLocation() async {
+  Future<void> getCurrentLocation1() async {
     String location = "Fetching...";
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -747,12 +852,134 @@ class CheckInOutController extends GetxController {
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    latitude = position.latitude.toString();
-    longitude = position.longitude.toString();
+    latitude.value = position.latitude;
+    longitude.value = position.longitude;
+
     location =
         "Latitude: ${position.latitude}, Longitude: ${position.longitude}";
     update();
 
     printf("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+  }
+
+  Future<void> getCurrentLocation2() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        latitude.value = 28.6139;
+        longitude.value = 77.2090;
+        printf("⚠️ Location services disabled. Using fallback location.");
+        update();
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          latitude.value = 28.6139;
+          longitude.value = 77.2090;
+          printf("⚠️ Location permission denied. Using fallback location.");
+          update();
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        latitude.value = 28.6139;
+        longitude.value = 77.2090;
+        printf(
+          "⚠️ Location permission permanently denied. Using fallback location.",
+        );
+        update();
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      latitude.value = position.latitude;
+      longitude.value = position.longitude;
+
+      printf(
+        "✅ Got location: Lat: ${position.latitude}, Lng: ${position.longitude}",
+      );
+      update();
+    } catch (e) {
+      latitude.value = 28.6139;
+      longitude.value = 77.2090;
+      printf("❌ Error while getting location: $e. Using fallback.");
+      update();
+    }
+  }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      // 1️⃣ Check if location services are enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        printf("⚠️ Location services are disabled. Opening settings...");
+
+        // 2️⃣ Open location settings
+        bool opened = await Geolocator.openLocationSettings();
+
+        // 3️⃣ Wait a few seconds and check again
+        await Future.delayed(const Duration(seconds: 3));
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+        if (!serviceEnabled) {
+          // 4️⃣ If still disabled → use fallback location
+          latitude.value = 28.6139;
+          longitude.value = 77.2090;
+          printf("Location still disabled. Using fallback location.");
+          update();
+          return;
+        }
+      }
+
+      // 5️⃣ Check location permission
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          // 6️⃣ Permission denied → fallback
+          latitude.value = 28.6139;
+          longitude.value = 77.2090;
+          printf("Location permission denied. Using fallback location.");
+          update();
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        // 7️⃣ Permission permanently denied → fallback
+        latitude.value = 28.6139;
+        longitude.value = 77.2090;
+        printf(
+          "Location permission permanently denied. Using fallback location.",
+        );
+        update();
+        return;
+      }
+
+      // 8️⃣ Get current location
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      latitude.value = position.latitude;
+      longitude.value = position.longitude;
+
+      printf(
+        "✅ Got location: Lat: ${position.latitude}, Lng: ${position.longitude}",
+      );
+      update();
+    } catch (e) {
+      latitude.value = 28.6139;
+      longitude.value = 77.2090;
+      printf("❌ Error while getting location: $e. Using fallback.");
+      update();
+    }
   }
 }

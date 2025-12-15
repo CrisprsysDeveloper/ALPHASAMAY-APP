@@ -5,12 +5,19 @@ import 'package:crysprsys/utils/extension_classes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../controllers/dashboard/check_in_out_controller.dart';
 
-class CheckInOutScreen extends StatelessWidget {
+class CheckInOutScreen extends StatefulWidget {
   CheckInOutScreen({super.key});
 
+  @override
+  State<CheckInOutScreen> createState() => _CheckInOutScreenState();
+}
+
+class _CheckInOutScreenState extends State<CheckInOutScreen> {
   final CheckInOutController controller = Get.find<CheckInOutController>();
 
   @override
@@ -84,29 +91,15 @@ class CheckInOutScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  height: 120,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: ColorConstants.appColor, // border color
-                      width: 1, // border width
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: const CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage(
-                            'assets/icons/ic_user_profile.png',
-                          ), // Replace with your image
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                Obx(() {
+                  return StaticMapCircle(
+                    latitude: controller.latitude.value,
+                    longitude: controller.longitude.value,
+                    key: ValueKey(
+                      "${controller.latitude.value}_${controller.longitude.value}",
+                    ), // 👈 force rebuild
+                  );
+                }),
               ],
             ),
             20.sbh,
@@ -186,7 +179,7 @@ class CheckInOutScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Partner Type",
+                  "Employee",
                   style: interTextStyle(
                     color: Colors.grey,
                     fontWeight: FontWeight.w700,
@@ -365,6 +358,61 @@ class CheckInOutScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class StaticMapCircle extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+
+  const StaticMapCircle({
+    super.key,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      width: 120,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.deepPurpleAccent, width: 1),
+      ),
+      child: ClipOval(
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: LatLng(latitude, longitude),
+            initialZoom: 15,
+            interactionOptions: const InteractionOptions(
+              flags: InteractiveFlag.none, // disable zoom/pan
+            ),
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              userAgentPackageName:
+                  'com.alphasamay.main', // <- change to your package name
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: LatLng(latitude, longitude),
+                  width: 30,
+                  height: 30,
+                  child: const Icon(
+                    Icons.location_pin,
+                    color: Colors.red,
+                    size: 30,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
