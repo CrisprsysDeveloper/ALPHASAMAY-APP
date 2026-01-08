@@ -90,7 +90,7 @@ class AppConstants {
       'api//Justification/INSERT_Justifications';
 
   static const String updateJustificationApi =
-      'api/Justification/UPDATE_Justifications';
+      'api//Justification/UPDATE_Justifications';
 
   //https://apis.crisprsys.net/Help/Api/GET-api-TimeEvents-SaveMobileAttendanceUserTimeEvents_flag_CPMClientID_CPMUserName_AttendanceEventList_FilePath
 

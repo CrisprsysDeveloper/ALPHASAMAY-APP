@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:crysprsys/app_assistant.dart';
 import 'package:crysprsys/controllers/dashboard/dashboard_controller.dart';
 import 'package:crysprsys/helper/common.dart';
 import 'package:crysprsys/model/dashboard/justification_model.dart';
+import 'package:crysprsys/model/dashboard/user_time_zone_model.dart';
 import 'package:crysprsys/model/justification/justification_drop_down.dart';
 import 'package:crysprsys/model/justification/justification_validation.dart';
 import 'package:crysprsys/repositories/token_repository.dart';
@@ -13,7 +15,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:dio/dio.dart' as dio_;
 import 'package:crysprsys/helper/snackbar_toast.dart';
-import 'package:crysprsys/utils/app_constants.dart';
 import 'package:crysprsys/utils/utility.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
@@ -26,7 +27,7 @@ class JustificationAddController extends GetxController {
 
   final box = GetStorage();
   var clientId = '1';
-  var userName = 'Call';
+  var userName = '';
 
   RxList<AuthEmployee> personalNumberList = <AuthEmployee>[].obs;
   RxList<PartnerType> partnerTypeList = <PartnerType>[].obs;
@@ -78,6 +79,8 @@ class JustificationAddController extends GetxController {
 
   var textSaved = 'Saved';
   var textSubmitted =  'Submitted';
+
+  late final UserSettingsModel userSettingsTimeZone;
 
   @override
   void onInit() {
@@ -219,7 +222,11 @@ class JustificationAddController extends GetxController {
         );
       } else {
         title.value = 'Create Justification';
-        getDropDownListApi(clientId: clientId, userName: userName);
+        getUserTimeZoneApi(clientId: clientId, userName: userName).whenComplete(
+          () {
+            getDropDownListApi(clientId: clientId, userName: userName);
+          },
+        );
       }
 
       printf('<---from---->$from');
@@ -310,6 +317,42 @@ class JustificationAddController extends GetxController {
       } else {
         textTimeOut.text = timeFormat.format(pickedDateTime);
       }
+    }
+  }
+
+  Future<void> getUserTimeZoneApi({
+    required String clientId,
+    required String userName,
+  }) async {
+    printf('<--getUserTimeZoneApi-clientId-$clientId--userName-->$userName');
+
+    final dio = Dio();
+
+    const String baseUrl = AppConstants.baseUrl;
+    const String endpoint = AppConstants.getUserTimeZoneApi;
+
+    if (await InternetConnection().hasInternetAccess) {
+      try {
+        showProgress();
+        final response = await dio.get(
+          '$baseUrl$endpoint',
+          queryParameters: {'CPMClientID': clientId, 'CPMUserName': userName},
+        );
+
+        printf('<----response---->$response');
+
+        final List<dynamic> jsonList = jsonDecode(response.toString());
+        userSettingsTimeZone = UserSettingsModel.fromJson(jsonList.first);
+
+        printf('time-zone-->${userSettingsTimeZone.userTimeZone}');
+
+        hideProgress();
+      } catch (e) {
+        printf("Exception: $e");
+        hideProgress();
+      }
+    } else {
+      Utility.showToastMessage(AppConstants.internetConnectionError);
     }
   }
 
@@ -465,7 +508,7 @@ class JustificationAddController extends GetxController {
         "ObjectNo": '',
         "IsApprovalPreCondition": 'ActionBased',
         "MemberID": userId,
-        "ActionText": from == 'save' ? textSaved : textSubmitted,
+        "ActionText": from == 'save' ? "SAVE" : "SUBMIT",
         "ScreenMode": 'Create',
         "UserID": userId,
         "RoleID": clientId,
@@ -478,17 +521,17 @@ class JustificationAddController extends GetxController {
 
       var justifyList = {
         "UserName": userName,
-        "JUSTID": textJustificationNo.text.trim(),
+        "JUSTID": textJustificationNo.text.trim() == "0" ? "" : textJustificationNo.text.trim(),
         "PartnerType": selectedPartnerType.value?.id.toString(),
         "EmployeeID": selectedPersonalNumber.value?.id.toString(),
-        "Date": textViolationDate.text.trim(),
+        "Date": DateTime.parse("${textViolationDate.text.trim()} ${DateFormat('HH:mm:ss').format(DateTime.now())}").toUtc().toIso8601String(),
         "InTime": textTimeIn.text,
         "OutTime": textTimeOut.text,
         "Violationtype": selectedViolationType.value?.id.toString(),
         "Status": from == 'save' ? textSaved : textSubmitted,
         //textStatus.text.trim(),
         "JustifyComments": textJustificationReason.text.trim(),
-        "RequestType": selectedRequestType.value,
+        "RequestType": selectedRequestType.value.toString(),
       };
 
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
@@ -498,12 +541,12 @@ class JustificationAddController extends GetxController {
         "AppCode": "ATTEND",
         "BusObjectDesc": "Attendance Justification",
         "MemberStatus": "",
-        "SaveOrSubmit": from == 'save' ? textSaved : textSubmitted, //"SAVE",
+        "SaveOrSubmit": from == 'save' ? "SAVE" : "SUBMIT", //"SAVE",
         "apiUrl": "https://apis.crisprsys.net/api/",
         "EmployeeID": selectedPersonalNumber.value?.id.toString(),
         "baseUrl": "https://eportal.crisprsys.net",
         "Comment": "",
-        "UserAction": from == 'save' ? textSaved : textSubmitted, //"SAVE",
+        "UserAction": from == 'save' ? "SAVE" : "SUBMIT", //"SAVE",
       };
 
       printf('approvalData  payload:\n${jsonEncode(approvalData)}');
@@ -556,6 +599,49 @@ class JustificationAddController extends GetxController {
               jsonEncode(teamMembersList.map((e) => e.toJson()).toList()),
             );
 
+            // Log all URL components before API call
+            printf('\n========== CREATE JUSTIFICATION API REQUEST ==========');
+            printf('Base URL: $baseUrl$endpoint');
+            printf('CPMClientID: $clientId');
+            printf('CPMUserName: $userName');
+            printf('BusObjCode: ATTEND_BUS_New_Justification');
+            
+            printf('\n--- JustificationList (Pretty Print) ---');
+            final justifyListPretty = JsonEncoder.withIndent('  ').convert(justifyList);
+            printf(justifyListPretty);
+            
+            printf('\n--- JustificationList (URL Encoded) ---');
+            printf(jsonEncode(justifyList));
+            
+            printf('\n--- TeamMembersJsonData Count: ${teamMembersList.length} ---');
+            printf('TeamMembersJsonData (Pretty Print):');
+            for (int i = 0; i < teamMembersList.length; i++) {
+              printf('Member $i:');
+              final memberPretty = JsonEncoder.withIndent('  ').convert(teamMembersList[i].toJson());
+              printf(memberPretty);
+            }
+            
+            printf('\n--- TeamMembersJsonData (Full JSON) ---');
+            final teamMembersFull = JsonEncoder.withIndent('  ').convert(
+              teamMembersList.map((e) => e.toJson()).toList(),
+            );
+            printf(teamMembersFull);
+            
+            printf('\n--- TeamMembersJsonData (URL Encoded - First 500 chars) ---');
+            printf(teamMembersEncoded.substring(0, teamMembersEncoded.length > 500 ? 500 : teamMembersEncoded.length));
+            if (teamMembersEncoded.length > 500) {
+              printf('... (${teamMembersEncoded.length - 500} more characters)');
+            }
+            
+            printf('\n--- ApprovalData (Pretty Print) ---');
+            final approvalDataPretty = JsonEncoder.withIndent('  ').convert(approvalData);
+            printf(approvalDataPretty);
+            
+            printf('\n--- ApprovalData (URL Encoded) ---');
+            printf(jsonEncode(approvalData));
+            
+            printf('\n======================================================\n');
+
             final urlForAdd =
                 '$baseUrl$endpoint?CPMClientID=$clientId&CPMUserName=$userName&'
                 'BusObjCode=ATTEND_BUS_New_Justification&'
@@ -563,7 +649,8 @@ class JustificationAddController extends GetxController {
                 'TeamMembersJsonData=$teamMembersEncoded&'
                 'ApprovalData=${jsonEncode(approvalData)}'; //; //&FilePath=$encodedPath';
 
-            printf('<---urlForAdd-->$urlForAdd');
+            printf('<---Final URL Length: ${urlForAdd.length} characters--->');
+            printf('URL (first 1000 chars): ${urlForAdd.substring(0, urlForAdd.length > 1000 ? 1000 : urlForAdd.length)}...');
 
             final dio = dio_.Dio();
             final res = await dio.get(urlForAdd);
@@ -611,7 +698,7 @@ class JustificationAddController extends GetxController {
         "ObjectNo": '',
         "IsApprovalPreCondition": 'ActionBased',
         "MemberID": userId,
-        "ActionText": from == 'save' ? textSaved : textSubmitted,
+        "ActionText": from == 'save' ? "SAVE" : "SUBMIT",
         "ScreenMode": 'Create',
         "UserID": userId,
         "RoleID": clientId,
@@ -623,18 +710,45 @@ class JustificationAddController extends GetxController {
       );
 
       var justifyList = {
-        "UserName": userName,
-        "JUSTID": textJustificationNo.text.trim(),
+        "UserName": selectedPersonalNumber.value?.id.toString(),
+        "JUSTID": textJustificationNo.text.trim() == "0" ? "" : textJustificationNo.text.trim(),
         "PartnerType": selectedPartnerType.value?.id.toString(),
         "EmployeeID": selectedPersonalNumber.value?.id.toString(),
-        "Date": textViolationDate.text.trim(),
+        "Date": () {
+          try {
+            // Try to parse the date in yyyy-MM-dd format first
+            final dateStr = textViolationDate.text.trim();
+            final timeStr = DateFormat('HH:mm:ss').format(DateTime.now());
+            final combinedStr = "$dateStr $timeStr";
+            return DateTime.parse(combinedStr).toUtc().toIso8601String();
+          } catch (e) {
+            printf('Error parsing date: $e, trying dd/MM/yyyy format');
+            // Fallback: try parsing with dd/MM/yyyy format
+            try {
+              final dateStr = textViolationDate.text.trim();
+              final parsedDate = DateFormat('dd/MM/yyyy').parse(dateStr);
+              final combinedDateTime = DateTime(
+                parsedDate.year,
+                parsedDate.month,
+                parsedDate.day,
+                DateTime.now().hour,
+                DateTime.now().minute,
+                DateTime.now().second,
+              );
+              return combinedDateTime.toUtc().toIso8601String();
+            } catch (e2) {
+              printf('Error parsing date with fallback: $e2');
+              return DateTime.now().toUtc().toIso8601String();
+            }
+          }
+        }(),
         "InTime": textTimeIn.text,
         "OutTime": textTimeOut.text,
         "Violationtype": selectedViolationType.value?.id.toString(),
         "Status": from == 'save' ? textSaved : textSubmitted,
         //textStatus.text.trim(),
         "JustifyComments": textJustificationReason.text.trim(),
-        "RequestType": selectedRequestType.value,
+        "RequestType": selectedRequestType.value.toString(),
       };
 
       printf('Justification List payload:\n${jsonEncode(justifyList)}');
@@ -644,12 +758,13 @@ class JustificationAddController extends GetxController {
         "AppCode": "ATTEND",
         "BusObjectDesc": "Attendance Justification",
         "MemberStatus": "",
-        "SaveOrSubmit": from == 'save' ? textSaved : textSubmitted, //"SAVE",
+        "SaveOrSubmit": from == 'save' ? "SAVE" : "SUBMIT", //"SAVE",
         "apiUrl": "https://apis.crisprsys.net/api/",
-        "EmployeeID": selectedPersonalNumber.value?.id.toString(),
+        "EmployeeID": clientId,
         "baseUrl": "https://eportal.crisprsys.net",
         "Comment": "",
-        "UserAction": from == 'save' ? textSaved : textSubmitted, //"SAVE",
+        "NotificationNo": "",
+        "UserAction": from == 'save' ? "SAVE" : "SUBMIT", //"SAVE",
       };
 
       printf('approvalData  payload:\n${jsonEncode(approvalData)}');
@@ -692,7 +807,7 @@ class JustificationAddController extends GetxController {
           printf('<--Parsed Members Count--> ${teamMembersList.length}');
 
           try {
-            printf('<--call-add-justification---->');
+            printf('<--call-update-justification---->');
 
             const String baseUrl =
                 AppConstants.baseUrl; // Replace with your base URL
@@ -702,6 +817,49 @@ class JustificationAddController extends GetxController {
               jsonEncode(teamMembersList.map((e) => e.toJson()).toList()),
             );
 
+            // Log all URL components before API call
+            printf('\n========== UPDATE JUSTIFICATION API REQUEST ==========');
+            printf('Base URL: $baseUrl$endpoint');
+            printf('CPMClientID: $clientId');
+            printf('CPMUserName: $userName');
+            printf('BusObjCode: ATTEND_BUS_New_Justification');
+            
+            printf('\n--- JustificationList (Pretty Print) ---');
+            final justifyListPretty = JsonEncoder.withIndent('  ').convert(justifyList);
+            printf(justifyListPretty);
+            
+            printf('\n--- JustificationList (URL Encoded) ---');
+            printf(jsonEncode(justifyList));
+            
+            printf('\n--- TeamMembersJsonData Count: ${teamMembersList.length} ---');
+            printf('TeamMembersJsonData (Pretty Print):');
+            for (int i = 0; i < teamMembersList.length; i++) {
+              printf('Member $i:');
+              final memberPretty = JsonEncoder.withIndent('  ').convert(teamMembersList[i].toJson());
+              printf(memberPretty);
+            }
+            
+            printf('\n--- TeamMembersJsonData (Full JSON) ---');
+            final teamMembersFull = JsonEncoder.withIndent('  ').convert(
+              teamMembersList.map((e) => e.toJson()).toList(),
+            );
+            printf(teamMembersFull);
+            
+            printf('\n--- TeamMembersJsonData (URL Encoded - First 500 chars) ---');
+            printf(teamMembersEncoded.substring(0, teamMembersEncoded.length > 500 ? 500 : teamMembersEncoded.length));
+            if (teamMembersEncoded.length > 500) {
+              printf('... (${teamMembersEncoded.length - 500} more characters)');
+            }
+            
+            printf('\n--- ApprovalData (Pretty Print) ---');
+            final approvalDataPretty = JsonEncoder.withIndent('  ').convert(approvalData);
+            printf(approvalDataPretty);
+            
+            printf('\n--- ApprovalData (URL Encoded) ---');
+            printf(jsonEncode(approvalData));
+            
+            printf('\n======================================================\n');
+
             final urlForAdd =
                 '$baseUrl$endpoint?CPMClientID=$clientId&CPMUserName=$userName&'
                 'BusObjCode=ATTEND_BUS_New_Justification&'
@@ -709,7 +867,8 @@ class JustificationAddController extends GetxController {
                 'TeamMembersJsonData=$teamMembersEncoded&'
                 'ApprovalData=${jsonEncode(approvalData)}'; //; //&FilePath=$encodedPath';
 
-            printf('<---urlForAdd-->$urlForAdd');
+            printf('<---Final URL Length: ${urlForAdd.length} characters--->');
+            printf('URL (first 1000 chars): ${urlForAdd.substring(0, urlForAdd.length > 1000 ? 1000 : urlForAdd.length)}...');
 
             final dio = dio_.Dio();
             final res = await dio.get(urlForAdd);
@@ -894,7 +1053,7 @@ class JustificationAddController extends GetxController {
           printf('<--Parsed Members Count--> ${teamMembersList.length}');
 
           try {
-            printf('<--call-add-justification---->');
+            printf('<--call-approve-reject-justification---->');
 
             const String baseUrl =
                 AppConstants.baseUrl; // Replace with your base URL
@@ -904,6 +1063,50 @@ class JustificationAddController extends GetxController {
               jsonEncode(teamMembersList.map((e) => e.toJson()).toList()),
             );
 
+            // Log all URL components before API call
+            printf('\n========== APPROVE/REJECT JUSTIFICATION API REQUEST ==========');
+            printf('Base URL: $baseUrl$endpoint');
+            printf('CPMClientID: $clientId');
+            printf('CPMUserName: $userName');
+            printf('BusObjCode: ATTEND_BUS_New_Justification');
+            printf('Action Type: $type');
+            
+            printf('\n--- JustificationList (Pretty Print) ---');
+            final justifyListPretty = JsonEncoder.withIndent('  ').convert(justifyList);
+            printf(justifyListPretty);
+            
+            printf('\n--- JustificationList (URL Encoded) ---');
+            printf(jsonEncode(justifyList));
+            
+            printf('\n--- TeamMembersJsonData Count: ${teamMembersList.length} ---');
+            printf('TeamMembersJsonData (Pretty Print):');
+            for (int i = 0; i < teamMembersList.length; i++) {
+              printf('Member $i:');
+              final memberPretty = JsonEncoder.withIndent('  ').convert(teamMembersList[i].toJson());
+              printf(memberPretty);
+            }
+            
+            printf('\n--- TeamMembersJsonData (Full JSON) ---');
+            final teamMembersFull = JsonEncoder.withIndent('  ').convert(
+              teamMembersList.map((e) => e.toJson()).toList(),
+            );
+            printf(teamMembersFull);
+            
+            printf('\n--- TeamMembersJsonData (URL Encoded - First 500 chars) ---');
+            printf(teamMembersEncoded.substring(0, teamMembersEncoded.length > 500 ? 500 : teamMembersEncoded.length));
+            if (teamMembersEncoded.length > 500) {
+              printf('... (${teamMembersEncoded.length - 500} more characters)');
+            }
+            
+            printf('\n--- ApprovalData (Pretty Print) ---');
+            final approvalDataPretty = JsonEncoder.withIndent('  ').convert(approvalData);
+            printf(approvalDataPretty);
+            
+            printf('\n--- ApprovalData (URL Encoded) ---');
+            printf(jsonEncode(approvalData));
+            
+            printf('\n======================================================\n');
+
             final urlForAdd =
                 '$baseUrl$endpoint?CPMClientID=$clientId&CPMUserName=$userName&'
                 'BusObjCode=ATTEND_BUS_New_Justification&'
@@ -911,7 +1114,8 @@ class JustificationAddController extends GetxController {
                 'TeamMembersJsonData=$teamMembersEncoded&'
                 'ApprovalData=${jsonEncode(approvalData)}'; //; //&FilePath=$encodedPath';
 
-            printf('<---urlForAdd-->$urlForAdd');
+            printf('<---Final URL Length: ${urlForAdd.length} characters--->');
+            printf('URL (first 1000 chars): ${urlForAdd.substring(0, urlForAdd.length > 1000 ? 1000 : urlForAdd.length)}...');
 
             final dio = dio_.Dio();
             final res = await dio.get(urlForAdd);
